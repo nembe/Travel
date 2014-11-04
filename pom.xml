@@ -19,7 +19,6 @@
     </parent>
 
     <dependencies>
-        <!-- Bootstrap -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -28,8 +27,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
-
-        <!-- Persistence -->
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
@@ -39,6 +36,11 @@
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
             <version>${c3p0.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
 
         <!-- Tests -->
