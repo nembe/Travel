@@ -7,7 +7,7 @@ public class DataSourceProperties {
 
     protected String driverClassName;
 
-    protected String jdbcUrl;
+    protected String url;
 
     protected String username;
 
@@ -21,12 +21,12 @@ public class DataSourceProperties {
         this.driverClassName = driverClassName;
     }
 
-    public String getJdbcUrl() {
-        return jdbcUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setJdbcUrl(String jdbcUrl) {
-        this.jdbcUrl = jdbcUrl;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getUsername() {

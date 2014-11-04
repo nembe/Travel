@@ -21,7 +21,7 @@ public class DataSourceConfiguration {
         ComboPooledDataSource ds = new ComboPooledDataSource();
         ds.setUser(properties.username);
         ds.setPassword(properties.password);
-        ds.setJdbcUrl(properties.jdbcUrl);
+        ds.setJdbcUrl(properties.url);
         ds.setDriverClass(properties.driverClassName);
 
         return ds;
