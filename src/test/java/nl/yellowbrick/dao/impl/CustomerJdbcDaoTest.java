@@ -5,6 +5,7 @@ import com.google.common.io.CharStreams;
 import nl.yellowbrick.BaseSpringTestCase;
 import nl.yellowbrick.dao.CustomerDao;
 import nl.yellowbrick.domain.Customer;
+import nl.yellowbrick.functions.Functions;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,7 +31,7 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void returnsCustomersIfDataIsInPlace() throws Exception {
+    public void returnsCustomersIfDataIsInPlace() {
         insertCustomersAndAddresses();
 
         List<Customer> customers = customerDao.findAllPendingActivation();
@@ -39,7 +40,7 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void fillsInCustomerBean() throws Exception {
+    public void fillsInCustomerBean() {
         insertCustomersAndAddresses();
 
         Customer c = customerDao.findAllPendingActivation().get(0);
@@ -88,12 +89,33 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(c.isExtraInvoiceAnnotations(), equalTo(false));
     }
 
-    private void insertCustomersAndAddresses() throws Exception {
-        String sql = CharStreams.toString(new InputStreamReader(
-                this.getClass().getClassLoader().getResourceAsStream("samples/customers_and_addresses.sql"),
-                Charsets.UTF_8
-        ));
+    @Test
+    public void marksCustomerAsPendingReview() {
+        insertCustomersAndAddresses();
+        Customer customer = customerDao.findAllPendingActivation().get(0);
 
-        template.execute(sql);
+        assertThat(customer.getCustomerStatusIdfk(), equalTo(1));
+
+        customerDao.markAsPendingHumanReview(customer);
+
+        assertThat(customer.getCustomerStatusIdfk(), equalTo(4));
+        assertThat(fetchCustomerStatus(customer.getCustomerId()), equalTo(4));
+    }
+
+    private int fetchCustomerStatus(long customerId) {
+        return template.queryForObject("SELECT customerstatusidfk from CUSTOMER where customerid = ?",
+                Integer.class,
+                customerId);
+    }
+
+    private void insertCustomersAndAddresses() {
+        Functions.unchecked(() -> {
+            String sql = CharStreams.toString(new InputStreamReader(
+                    this.getClass().getClassLoader().getResourceAsStream("samples/customers_and_addresses.sql"),
+                    Charsets.UTF_8
+            ));
+
+            template.execute(sql);
+        });
     }
 }

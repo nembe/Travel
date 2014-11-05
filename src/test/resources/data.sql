@@ -23,5 +23,6 @@ INSERT INTO TBLBILLINGAGENT VALUES (909, 'Op factuur', NULL, NULL);
 INSERT INTO CUSTOMERSTATUS VALUES (1, 'Aangemeld', 'lblSignedIt');
 INSERT INTO CUSTOMERSTATUS VALUES (2, 'Actief', 'lblActive');
 INSERT INTO CUSTOMERSTATUS VALUES (3, 'Blacklist', 'lblBlacklist');
+INSERT INTO CUSTOMERSTATUS VALUES (4, 'ActivationFailed', 'lblActivationFailed');
 INSERT INTO CUSTOMERSTATUS VALUES (99, 'Afgemeld', 'lblSignedOut');
 INSERT INTO CUSTOMERSTATUS VALUES (98, 'Oninbaar', 'lblIrrecoverable');

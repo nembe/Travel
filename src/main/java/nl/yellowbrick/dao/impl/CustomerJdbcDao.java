@@ -14,6 +14,8 @@ import java.util.List;
 @Component
 public class CustomerJdbcDao implements CustomerDao {
 
+    private static final int ACTIVATION_FAILED_STATUS = 4;
+
     @Autowired
     private JdbcTemplate template;
 
@@ -40,6 +42,10 @@ public class CustomerJdbcDao implements CustomerDao {
 
     @Override
     public void markAsPendingHumanReview(Customer customer) {
-        // TODO implement
+        customer.setCustomerStatusIdfk(ACTIVATION_FAILED_STATUS);
+
+        template.update("UPDATE CUSTOMER SET customerstatusidfk = ? WHERE customerid = ?",
+                customer.getCustomerStatusIdfk(),
+                customer.getCustomerId());
     }
 }
