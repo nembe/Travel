@@ -37,4 +37,9 @@ public class CustomerJdbcDao implements CustomerDao {
 
         return template.query(sql, rowMapper);
     }
+
+    @Override
+    public void markAsPendingHumanReview(Customer customer) {
+        // TODO implement
+    }
 }
