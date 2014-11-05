@@ -26,10 +26,10 @@ public class CustomerJdbcDao implements CustomerDao {
                 "INNER JOIN PRODUCT_GROUP pg ON pg.id = c.productgroup_id",
                 "INNER JOIN TBLBILLINGAGENT ba ON c.billingagentidfk = ba.billingagentid",
                 "INNER JOIN CUSTOMERSTATUS cs ON c.customerstatusidfk = cs.customerstatusid",
-                "WHERE (ca.ADDRESSTYPEIDFK = 1 OR ca.ADDRESSTYPEIDFK IS NULL)",
-                "AND c.PRODUCTGROUP_ID = 1 ",
-                "AND c.CUSTOMERSTATUSIDFK = 1 ",
-                "ORDER BY APPLICATIONDATE"
+                "WHERE (ca.addresstypeidfk = 1 OR ca.addresstypeidfk IS NULL)",
+                "AND c.productgroup_id = 1 ",
+                "AND c.customerstatusidfk = 1 ",
+                "ORDER BY applicationdate"
         ));
 
         BeanPropertyRowMapper<Customer> rowMapper = new BeanPropertyRowMapper<>(Customer.class);
