@@ -87,13 +87,14 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     @Test
     public void marksCustomerAsPendingReview() {
         Customer customer = customerDao.findAllPendingActivation().get(0);
+        int activationFailedStatus = 0;
 
         assertThat(customer.getCustomerStatusIdfk(), equalTo(1));
 
         customerDao.markAsPendingHumanReview(customer);
 
-        assertThat(customer.getCustomerStatusIdfk(), equalTo(4));
-        assertThat(fetchCustomerStatus(customer.getCustomerId()), equalTo(4));
+        assertThat(customer.getCustomerStatusIdfk(), equalTo(activationFailedStatus));
+        assertThat(fetchCustomerStatus(customer.getCustomerId()), equalTo(activationFailedStatus));
     }
 
     private int fetchCustomerStatus(long customerId) {

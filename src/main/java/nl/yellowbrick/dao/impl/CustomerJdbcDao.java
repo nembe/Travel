@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 public class CustomerJdbcDao implements CustomerDao {
 
-    private static final int ACTIVATION_FAILED_STATUS = 4;
+    private static final int ACTIVATION_FAILED_STATUS = 0;
 
     @Autowired
     private JdbcTemplate template;
