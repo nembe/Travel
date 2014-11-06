@@ -1,7 +1,5 @@
 package nl.yellowbrick.dao.impl;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
 import nl.yellowbrick.BaseSpringTestCase;
 import nl.yellowbrick.dao.CustomerDao;
 import nl.yellowbrick.domain.Customer;
@@ -10,7 +8,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.io.InputStreamReader;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -27,13 +24,13 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void returnsEmptyCollectionIfNoData() {
+        truncateTable("CUSTOMER");
+
         assertThat(customerDao.findAllPendingActivation().size(), equalTo(0));
     }
 
     @Test
     public void returnsCustomersIfDataIsInPlace() {
-        insertCustomersAndAddresses();
-
         List<Customer> customers = customerDao.findAllPendingActivation();
 
         assertThat(customers.size(), equalTo(2));
@@ -41,8 +38,6 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void fillsInCustomerBean() {
-        insertCustomersAndAddresses();
-
         Customer c = customerDao.findAllPendingActivation().get(0);
 
         assertThat(c.getAccountCity(), equalTo("Amsterdam"));
@@ -91,7 +86,6 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void marksCustomerAsPendingReview() {
-        insertCustomersAndAddresses();
         Customer customer = customerDao.findAllPendingActivation().get(0);
 
         assertThat(customer.getCustomerStatusIdfk(), equalTo(1));
@@ -103,19 +97,14 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     }
 
     private int fetchCustomerStatus(long customerId) {
-        return template.queryForObject("SELECT customerstatusidfk from CUSTOMER where customerid = ?",
+        return template.queryForObject("SELECT customerstatusidfk FROM CUSTOMER WHERE customerid = ?",
                 Integer.class,
                 customerId);
     }
 
-    private void insertCustomersAndAddresses() {
+    private void truncateTable(String tableName) {
         Functions.unchecked(() -> {
-            String sql = CharStreams.toString(new InputStreamReader(
-                    this.getClass().getClassLoader().getResourceAsStream("samples/customers_and_addresses.sql"),
-                    Charsets.UTF_8
-            ));
-
-            template.execute(sql);
+            template.execute("DELETE FROM " + tableName);
         });
     }
 }
