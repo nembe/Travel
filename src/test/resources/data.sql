@@ -8,6 +8,41 @@ INSERT INTO PRODUCT_GROUP VALUES (
              NULL,
              NULL);
 
+INSERT INTO PRODUCT_SUBGROUP VALUES (
+             2,
+             1,
+             'Particulier',
+             'N',
+             'SYSTEM',
+             null);
+
+INSERT INTO PRICEMODEL VALUES (
+             81,
+             'Yellowbrick particulier hoesje',
+             0,
+             32,
+             32,
+             75,
+             182,
+             1000,
+             'YBBEHEER:ron',
+             TO_DATE ('05/16/2013 11:33:36', 'MM/DD/YYYY HH24:MI:SS'),
+             100,
+             10,
+             0,
+             500,
+             0,
+             500,
+             500);
+
+INSERT INTO PRODUCT_SUBGROUP_PRICEMODEL VALUES (
+             82,
+             2,
+             81,
+             TO_DATE ('05/01/2013 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             'YBBEHEER:martijn',
+             TO_DATE ('04/29/2013 17:10:12', 'MM/DD/YYYY HH24:MI:SS'));
+
 INSERT INTO CUSTOMER VALUES (
              602,
              4776,

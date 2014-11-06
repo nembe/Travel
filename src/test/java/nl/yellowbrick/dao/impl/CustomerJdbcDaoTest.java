@@ -1,12 +1,10 @@
 package nl.yellowbrick.dao.impl;
 
 import nl.yellowbrick.BaseSpringTestCase;
-import nl.yellowbrick.dao.CustomerDao;
 import nl.yellowbrick.domain.Customer;
-import nl.yellowbrick.functions.Functions;
+import nl.yellowbrick.database.DbHelper;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 
@@ -17,14 +15,14 @@ import static org.hamcrest.core.IsNull.nullValue;
 public class CustomerJdbcDaoTest extends BaseSpringTestCase {
 
     @Autowired
-    CustomerDao customerDao;
+    CustomerJdbcDao customerDao;
 
     @Autowired
-    JdbcTemplate template;
+    DbHelper db;
 
     @Test
     public void returnsEmptyCollectionIfNoData() {
-        truncateTable("CUSTOMER");
+        db.truncateTable("CUSTOMER");
 
         assertThat(customerDao.findAllPendingActivation().size(), equalTo(0));
     }
@@ -98,14 +96,10 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     }
 
     private int fetchCustomerStatus(long customerId) {
-        return template.queryForObject("SELECT customerstatusidfk FROM CUSTOMER WHERE customerid = ?",
+        return db.withTemplate((template) -> {
+            return template.queryForObject("SELECT customerstatusidfk FROM CUSTOMER WHERE customerid = ?",
                 Integer.class,
                 customerId);
-    }
-
-    private void truncateTable(String tableName) {
-        Functions.unchecked(() -> {
-            template.execute("DELETE FROM " + tableName);
         });
     }
 }
