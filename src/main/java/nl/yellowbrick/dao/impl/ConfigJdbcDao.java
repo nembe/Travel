@@ -25,7 +25,7 @@ public class ConfigJdbcDao implements ConfigDao {
 
     @Override
     public Optional<Config> findSectionField(ConfigSection section, String field) {
-        String sql = "SELECT * FROM TBLCONFIG WHERE SECTION = ? AND FIELD = ?";
+        String sql = "SELECT * FROM TBLCONFIG WHERE SECTION = ? AND LOWER(FIELD) = LOWER(?)";
 
         List<Config> configs = template.query(sql, rowMapper(), section.getKey(), field);
 

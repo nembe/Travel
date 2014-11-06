@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 public class ConfigJdbcDaoTest extends BaseSpringTestCase {
@@ -54,5 +55,14 @@ public class ConfigJdbcDaoTest extends BaseSpringTestCase {
         expectedField.setTitle("ACTIVATION_CUSTOMER");
 
         assertThat(field.get(), equalTo(expectedField));
+    }
+
+    @Test
+    public void isCaseInsensitive() {
+        Config fieldUpper = configDao.findSectionField(ConfigSection.ACTIVATION, "HTTP_LINK").get();
+        Config fieldLower = configDao.findSectionField(ConfigSection.ACTIVATION, "http_link").get();
+
+        assertThat(fieldUpper, equalTo(fieldLower));
+        assertNotNull(fieldLower);
     }
 }
