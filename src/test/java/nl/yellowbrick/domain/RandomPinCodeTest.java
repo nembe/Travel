@@ -14,7 +14,7 @@ public class RandomPinCodeTest {
         String previousCode = "";
 
         Stream.generate(RandomPinCode::new).limit(1000).forEach((pinCode) -> {
-            String code = pinCode.code();
+            String code = pinCode.get();
 
             assertThat(code.length(), equalTo(4));
             assertThat(Integer.parseInt(code), is(lessThanOrEqualTo(9999)));
