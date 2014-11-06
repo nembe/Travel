@@ -1,0 +1,1 @@
+CREATE ALIAS TO_DATE FOR "nl.yellowbrick.database.H2Functions.toDate";
