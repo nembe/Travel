@@ -1,5 +1,6 @@
 package nl.yellowbrick;
 
+import nl.yellowbrick.database.SingleConnectionDataSourceFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -12,6 +13,10 @@ public class TestConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
+        return new EmbeddedDatabaseBuilder()
+                .setDataSourceFactory(new SingleConnectionDataSourceFactory())
+                .setType(EmbeddedDatabaseType.H2)
+                .addScript("functions.sql")
+                .build();
     }
 }
