@@ -9,4 +9,6 @@ public interface CustomerDao {
     List<Customer> findAllPendingActivation();
 
     void markAsPendingHumanReview(Customer customer);
+
+    void assignNextCustomerNr(Customer customer);
 }

@@ -48,4 +48,10 @@ public class CustomerJdbcDao implements CustomerDao {
                 customer.getCustomerStatusIdfk(),
                 customer.getCustomerId());
     }
+
+    @Override
+    public void assignNextCustomerNr(Customer customer) {
+        // TODO implement
+        //        String customerNr = sql.getNextCustomerNr();
+    }
 }

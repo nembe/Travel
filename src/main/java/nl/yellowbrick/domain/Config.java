@@ -1,5 +1,9 @@
 package nl.yellowbrick.domain;
 
+import com.google.common.collect.Iterables;
+
+import java.util.Collection;
+
 public class Config {
 
     private String field;
@@ -47,6 +51,10 @@ public class Config {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public static final Config findByField(Collection<Config> configs, String field) {
+        return Iterables.find(configs, (cfg) -> cfg.getField().equalsIgnoreCase(field));
     }
 
     @Override
