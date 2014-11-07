@@ -47,7 +47,7 @@ public class AccountActivationServiceTest {
     }
 
     @Test
-    public void noOpIfMissingPriceModel() {
+    public void no_op_if_missing_price_model() {
         when(priceModelDao.findForCustomer(eq(customer))).thenReturn(Optional.empty());
 
         activationService.activateCustomerAccount(customer);
@@ -56,7 +56,7 @@ public class AccountActivationServiceTest {
     }
 
     @Test
-    public void assignsNextCustomerNr() {
+    public void assigns_next_customer_nr() {
         mockCollaborations();
         activationService.activateCustomerAccount(customer);
 
@@ -64,7 +64,7 @@ public class AccountActivationServiceTest {
     }
 
     @Test
-    public void savesSpecialTarifAndValidatesCardOrders() {
+    public void saves_special_tarif_and_validates_card_orders() {
         mockCollaborations();
         activationService.activateCustomerAccount(customer);
 
@@ -73,7 +73,7 @@ public class AccountActivationServiceTest {
     }
 
     @Test
-    public void savesNewMembershipAndNotifiesCustomer() {
+    public void saves_new_membership_and_notifies_customer() {
         mockCollaborations();
         activationService.activateCustomerAccount(customer);
 
@@ -84,7 +84,7 @@ public class AccountActivationServiceTest {
     }
 
     @Test
-    public void noOpIfCustomerLacksTransponderCards() {
+    public void no_op_if_customer_lacks_transponder_cards() {
         mockCollaborations();
 
         customer.setNumberOfTCards(0);

@@ -14,28 +14,25 @@ import static org.junit.Assert.assertThat;
 
 public class PriceModelJdbcDaoTest extends BaseSpringTestCase {
 
-    @Autowired
-    PriceModelJdbcDao priceModelDao;
-
-    @Autowired
-    DbHelper db;
+    @Autowired PriceModelJdbcDao priceModelDao;
+    @Autowired DbHelper db;
 
     @Test
-    public void returnsEmptyIfCantFindSubgroup() {
+    public void returns_empty_if_cant_find_subgroup() {
         db.truncateTable("PRODUCT_SUBGROUP");
 
         assertThat(priceModelDao.findForCustomer(customer()), equalTo(Optional.empty()));
     }
 
     @Test
-    public void returnsEmptyIfCantFindPriceModel() {
+    public void returns_empty_if_cant_find_price_model() {
         db.truncateTable("PRICEMODEL");
 
         assertThat(priceModelDao.findForCustomer(customer()), equalTo(Optional.empty()));
     }
 
     @Test
-    public void returnsPriceModelIfAvailable() {
+    public void returns_price_model_if_available() {
         PriceModel model = priceModelDao.findForCustomer(customer()).get();
         
         assertThat(model.getId(), equalTo(81l));

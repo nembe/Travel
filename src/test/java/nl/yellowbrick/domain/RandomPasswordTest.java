@@ -14,12 +14,12 @@ import static org.junit.Assert.assertThat;
 public class RandomPasswordTest {
 
     @Test
-    public void has60characters() {
+    public void has_60_characters() {
         assertThat(password().get().length(), equalTo(60));
     }
 
     @Test
-    public void isRandomized() {
+    public void is_randomized() {
         List<RandomPassword> observedPasswords = new ArrayList<>();
 
         IntStream.of(1000).forEach((i) -> {

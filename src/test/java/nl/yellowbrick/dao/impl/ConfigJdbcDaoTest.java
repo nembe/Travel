@@ -22,14 +22,14 @@ public class ConfigJdbcDaoTest extends BaseSpringTestCase {
     DbHelper db;
 
     @Test
-    public void returnsEmptyListIfSectionMissing() {
+    public void returns_empty_list_if_section_missing() {
         db.truncateTable("TBLCONFIG");
 
         assertThat(configDao.findAllBySection(ConfigSection.ACTIVATION), empty());
     }
 
     @Test
-    public void returnsEntriesForSection() {
+    public void returns_entries_for_section() {
         configDao.findAllBySection(ConfigSection.ACTIVATION).forEach((config) -> {
             assertThat(config.getSection(), equalTo("ACT_CUST"));
             assertThat(config.getField(), not(isEmptyString()));
@@ -37,14 +37,14 @@ public class ConfigJdbcDaoTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void returnsEmptyForUnmatchedField() {
+    public void returns_empty_for_unmatched_field() {
         Optional<Config> field = configDao.findSectionField(ConfigSection.ACTIVATION, "I'm not really a field");
 
         assertThat(field, equalTo(Optional.empty()));
     }
 
     @Test
-    public void returnsMatchedField() {
+    public void returns_matched_field() {
         Optional<Config> field = configDao.findSectionField(ConfigSection.ACTIVATION, "HTTP_LINK");
 
         Config expectedField = new Config();
@@ -58,7 +58,7 @@ public class ConfigJdbcDaoTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void isCaseInsensitive() {
+    public void is_case_insensitive() {
         Config fieldUpper = configDao.findSectionField(ConfigSection.ACTIVATION, "HTTP_LINK").get();
         Config fieldLower = configDao.findSectionField(ConfigSection.ACTIVATION, "http_link").get();
 

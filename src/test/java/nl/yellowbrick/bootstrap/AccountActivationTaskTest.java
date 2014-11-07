@@ -22,20 +22,12 @@ import static org.mockito.Mockito.*;
 
 public class AccountActivationTaskTest {
 
-    @InjectMocks
-    AccountActivationTask accountActivationTask;
+    @InjectMocks AccountActivationTask accountActivationTask;
 
-    @Mock
-    CustomerDao customerDao;
-
-    @Mock
-    AccountActivationService accountActivationService;
-
-    @Spy
-    GeneralCustomerValidator generalCustomerValidator;
-
-    @Spy
-    CustomerMembershipValidator customerMembershipValidator;
+    @Mock CustomerDao customerDao;
+    @Mock AccountActivationService accountActivationService;
+    @Spy GeneralCustomerValidator generalCustomerValidator;
+    @Spy CustomerMembershipValidator customerMembershipValidator;
 
     Customer customerA = new Customer();
     Customer customerB = new Customer();
@@ -46,7 +38,7 @@ public class AccountActivationTaskTest {
     }
 
 	@Test
-	public void noOpIfThereAreNoAccountsPendingActivation() {
+	public void no_op_if_there_are_no_accounts_pending_activation() {
         when(customerDao.findAllPendingActivation()).thenReturn(new ArrayList<>());
 
         accountActivationTask.validateAndActivateAccounts();
@@ -56,7 +48,7 @@ public class AccountActivationTaskTest {
 	}
 
     @Test
-    public void activatesValidAccounts() {
+    public void activates_valid_accounts() {
         // ensure validators won't record any errors
         doNothing().when(generalCustomerValidator).validate(any(), any());
         doNothing().when(customerMembershipValidator).validate(any(), any());
@@ -72,7 +64,7 @@ public class AccountActivationTaskTest {
     }
 
     @Test
-    public void marksInvalidAccountsAsPendingReview() {
+    public void marks_invalid_accounts_as_pending_review() {
         // customerA doesn't pass general validation
         doAnswer(recordAnError()).when(generalCustomerValidator).validate(eq(customerA), any());
         doNothing().when(customerMembershipValidator).validate(eq(customerA), any());

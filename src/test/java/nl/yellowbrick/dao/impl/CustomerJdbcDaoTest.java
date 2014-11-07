@@ -14,28 +14,25 @@ import static org.hamcrest.core.IsNull.nullValue;
 
 public class CustomerJdbcDaoTest extends BaseSpringTestCase {
 
-    @Autowired
-    CustomerJdbcDao customerDao;
-
-    @Autowired
-    DbHelper db;
+    @Autowired CustomerJdbcDao customerDao;
+    @Autowired DbHelper db;
 
     @Test
-    public void returnsEmptyCollectionIfNoData() {
+    public void returns_empty_collection_if_no_data() {
         db.truncateTable("CUSTOMER");
 
         assertThat(customerDao.findAllPendingActivation().size(), equalTo(0));
     }
 
     @Test
-    public void returnsCustomersIfDataIsInPlace() {
+    public void returns_customers_if_data_is_in_place() {
         List<Customer> customers = customerDao.findAllPendingActivation();
 
         assertThat(customers.size(), equalTo(2));
     }
 
     @Test
-    public void fillsInCustomerBean() {
+    public void fills_in_customer_bean() {
         Customer c = customerDao.findAllPendingActivation().get(0);
 
         assertThat(c.getAccountCity(), equalTo("Amsterdam"));
@@ -83,7 +80,7 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void marksCustomerAsPendingReview() {
+    public void marks_customer_as_pending_review() {
         Customer customer = customerDao.findAllPendingActivation().get(0);
         int activationFailedStatus = 0;
 

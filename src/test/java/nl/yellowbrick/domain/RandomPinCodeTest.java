@@ -10,7 +10,7 @@ import static org.junit.Assert.assertThat;
 public class RandomPinCodeTest {
 
     @Test
-    public void has4RandomNumbers() {
+    public void has_4_random_numbers() {
         String previousCode = "";
 
         Stream.generate(RandomPinCode::new).limit(1000).forEach((pinCode) -> {
