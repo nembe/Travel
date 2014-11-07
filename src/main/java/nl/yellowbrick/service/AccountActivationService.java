@@ -1,5 +1,6 @@
 package nl.yellowbrick.service;
 
+import nl.yellowbrick.dao.CardOrderDao;
 import nl.yellowbrick.dao.CustomerDao;
 import nl.yellowbrick.dao.MembershipDao;
 import nl.yellowbrick.dao.PriceModelDao;
@@ -26,6 +27,9 @@ public class AccountActivationService {
     private MembershipDao membershipDao;
 
     @Autowired
+    private CardOrderDao cardOrderDao;
+
+    @Autowired
     private EmailNotificationService emailNotificationService;
 
     private Log log = LogFactory.getLog(AccountActivationService.class);
@@ -40,24 +44,20 @@ public class AccountActivationService {
             return;
         }
 
-        PriceModel priceModel = maybePriceModel.get();
-
         customerDao.assignNextCustomerNr(customer);
-
-        // TODO implement
-        // cardOrder.saveSpecialTarif(customerId);
+        cardOrderDao.saveSpecialTarifIfApplicable(customer);
 
         // TODO how do these cards get assigned now?
         if(customer.getNumberOfTCards() > 0) {
-            Membership membership = new Membership(customer, priceModel);
+            Membership membership = new Membership(customer, maybePriceModel.get());
             membershipDao.saveValidatedMembership(membership);
 
             log.info("Saved validated membership for customer id " + customer.getCustomerId());
 
-            // TODO implement
-            // cardOrder.validateCardOrdersOfCustomer(customerId);
-
+            cardOrderDao.validateCardOrders(customer);
             emailNotificationService.notifyAccountAccepted(customer);
+
+            log.info("Finished activation of customer id " + customer.getCustomerId());
         } else {
             log.error(String.format("Customer id %s expected to have transponder cards at this point",
                     customer.getCustomerId()));
