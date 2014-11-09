@@ -12,13 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Types;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class MembershipJdbcDao implements MembershipDao, InitializingBean {
@@ -44,49 +44,38 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
         compileJdbcCall();
     }
 
+    @Override
     public void saveValidatedMembership(Membership membership) {
         long newCreditLimit = membership.getCustomer().getCreditLimit() * 100;
 
         RandomPinCode pinCode = new RandomPinCode();
         RandomPassword password = new RandomPassword();
 
-        try {
+        Map<String, Object> results = jdbcCall.execute(new MapSqlParameterSource(new HashMap<String, Object>() {{
+            put("CustomerId_in", membership.getCustomer().getCustomerId());
+            put("CustomerNr_in", membership.getCustomer().getCustomerNr());
+            put("ParkadammerTotal_in", membership.getCustomer().getParkadammerTotal());
+            put("NumberOfTCards_in", membership.getCustomer().getNumberOfTCards());
+            put("NumberOfQCards_in", membership.getCustomer().getNumberOfQCards());
+            put("CreditLimit_in", newCreditLimit);
+            put("SubscriptionFee_in", DEFAULT_MEMBERSHIP_FEE);
+            put("RegistrationFee_in", DEFAULT_REGISTRATION_FEE);
+            put("InitialTCardFee_in", membership.getPriceModel().getInitTranspCardCost());
+            put("AdditionalTCardFee_in", membership.getPriceModel().getTranspCardCost());
+            put("InitialRTPCardFee_in", membership.getPriceModel().getInitRtpCardCost());
+            put("AdditionalRTPCardFee_in", membership.getPriceModel().getRtpCardCost());
+            put("PinCode_in", pinCode.get());
+            put("Password_in", password.get());
+            put("Mutator_in", mutator);
+        }}));
 
-        Connection connection = template.getDataSource().getConnection();
-
-        final String sql = "{CALL WEBAPP.CustomerValidateMembership(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
-		boolean retval = false;
-		CallableStatement cs = null;
-		int exitCode = -999;
-			cs = connection.prepareCall(sql);
-			cs.setLong(1, membership.getCustomer().getCustomerId());
-			cs.setString(2, membership.getCustomer().getCustomerNr());
-			cs.setInt(3, membership.getCustomer().getParkadammerTotal());
-			cs.setInt(4, membership.getCustomer().getNumberOfTCards());
-			cs.setInt(5, membership.getCustomer().getNumberOfQCards());
-			cs.setLong(6, newCreditLimit);
-			cs.setLong(7, DEFAULT_MEMBERSHIP_FEE);
-			cs.setLong(8, DEFAULT_REGISTRATION_FEE);
-			cs.setLong(9, membership.getPriceModel().getInitTranspCardCost());
-			cs.setLong(10, membership.getPriceModel().getTranspCardCost());
-			cs.setLong(11, membership.getPriceModel().getInitRtpCardCost());
-			cs.setLong(12, membership.getPriceModel().getRtpCardCost());
-			cs.setString(13, pinCode.get());
-			cs.setString(14, password.get());
-			cs.setString(15, mutator);
-			cs.registerOutParameter(16, Types.INTEGER);
-			cs.executeUpdate();
-            exitCode = cs.getInt(16);
-		} catch (SQLException sqle) {
-			sqle.printStackTrace();
-		}
+        log.info(String.format("Called %s.%s which returned %s", PACKAGE, PROCEDURE, results.get("Return_out")));
     }
 
     private void compileJdbcCall() {
         jdbcCall = new SimpleJdbcCall(template)
                 .withCatalogName(PACKAGE)
                 .withProcedureName(PROCEDURE)
-                .withReturnValue()
                 .declareParameters(
                         new SqlParameter("CustomerId_in", Types.NUMERIC),
                         new SqlParameter("CustomerNr_in", Types.VARCHAR),
