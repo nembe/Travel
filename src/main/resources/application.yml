@@ -7,11 +7,15 @@ datasource:
 activation:
   delay: 5000
 
+mutator: BATCH v. ${project.version}
+
 ---
 
 spring:
   profiles: test
   # for tests we use the built-in spring datasource
   datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:test;MODE=Oracle
+    driverClassName: org.hsqldb.jdbcDriver
+    url: jdbc:hsqldb:mem:PUBLIC:syntax.ora=true
+
+mutator: TEST MUTATOR

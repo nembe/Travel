@@ -10,6 +10,14 @@ public class Membership {
         this.priceModel = priceModel;
     }
 
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public PriceModel getPriceModel() {
+        return priceModel;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

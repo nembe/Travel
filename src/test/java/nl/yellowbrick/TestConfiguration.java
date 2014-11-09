@@ -15,7 +15,7 @@ public class TestConfiguration {
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
                 .setDataSourceFactory(new SingleConnectionDataSourceFactory())
-                .setType(EmbeddedDatabaseType.H2)
+                .setType(EmbeddedDatabaseType.HSQL)
                 .addScript("functions.sql")
                 .build();
     }
