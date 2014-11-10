@@ -1,5 +1,7 @@
 package nl.yellowbrick.dao.impl;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import nl.yellowbrick.dao.CardOrderDao;
 import nl.yellowbrick.domain.CardOrderStatus;
 import nl.yellowbrick.domain.CardType;
@@ -9,29 +11,37 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
-import javax.sql.rowset.CachedRowSet;
-import java.sql.*;
-import java.util.Date;
+import java.sql.Types;
+import java.util.Map;
 
 @Component
 public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
 
     private static final String PACKAGE = "WEBAPP";
     private static final String SAVE_SPECIAL_TARIF_PROC = "saveSignupSpecialRate";
+    private static final String CARD_ORDER_UPDATE_PROC = "cardorderUpdate";
+    private static final String CARD_ORDER_VALIDATE_PROC = "CardOrderValidate";
+
+    private static final String PROSPECT_CARD_TYPE = "Hoesje";
 
     @Autowired
     private JdbcTemplate template;
 
     private SimpleJdbcCall saveSpecialTarifCall;
+    private SimpleJdbcCall cardOrderUpdateCall;
+    private SimpleJdbcCall cardOrderValidateCall;
+
     private Log log = LogFactory.getLog(CardOrderJdbcDao.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        compileJdbcCall();
+        compileJdbcCalls();
     }
 
     @Override
@@ -41,189 +51,81 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
 
     @Override
     public void validateCardOrders(Customer customer) {
-        Object[] param = new Object[]{CardOrderStatus.INSERTED.code(), customer.getCustomerId()};
-        double pricepcard = -1.0;
+        String sql = Joiner.on(' ').join(ImmutableList.of(
+                "SELECT co.ORDERID, co.ORDERDATE, c.BUSINESS, c.LASTNAME, co.CARDTYPE, co.AMOUNT, co.PRICEPERCARD",
+                "FROM CARDORDER co, CUSTOMER c",
+                "WHERE co.ORDERSTATUS = ?",
+                "AND co.CUSTOMERID = c.CUSTOMERID",
+                "AND co.CARDTYPE != ? ",
+                "AND co.CUSTOMERID = ? "
+        ));
 
-        String sql = "SELECT co.ORDERID, co.ORDERDATE, c.BUSINESS, c.LASTNAME, co.CARDTYPE, co.AMOUNT , co.PRICEPERCARD "
-                + "FROM CARDORDER co, CUSTOMER c  "
-                + "WHERE co.ORDERSTATUS = ? "
-                + "AND co.CUSTOMERID = c.CUSTOMERID "
-                + "AND co.CARDTYPE != 'Hoesje' "
-                + "AND co.CUSTOMERID = ? ";
+        RowCallbackHandler processCardOrder = (rs) -> {
+            double pricePerCard = rs.getDouble("PricePerCard");
+            double orderid = rs.getDouble("OrderId");
 
-        CachedRowSet rs = null;
+            int amount = new Double(rs.getDouble("Amount")).intValue();
+
+            saveAndAcceptCardOrder(orderid, pricePerCard, amount);
+
+            CardType cardType = CardType.fromDescription(rs.getString("CardType"));
+            validateCardOrder(customer.getCustomerId(), pricePerCard, amount, cardType.code());
+        };
+
+        template.query(sql, processCardOrder,
+                CardOrderStatus.INSERTED.code(), PROSPECT_CARD_TYPE, customer.getCustomerId());
+    }
+
+    private void saveAndAcceptCardOrder(double orderId, double pricePerCard, int amount) {
+        cardOrderUpdateCall.execute(orderId, CardOrderStatus.ACCEPTED.code(), pricePerCard, amount);
+    }
+
+    private void validateCardOrder(long customerId, double pricePerCard, int amount, String typeOfCard) {
+        Map<String, Object> res = cardOrderValidateCall.execute(customerId, pricePerCard, amount, typeOfCard);
+        String returnStr = res.get("Return_out").toString();
+
+        Runnable logUnmetExpectation = () -> {
+            log.error(String.format("Expected %s.%s to return -1 but instead got %s",
+                    PACKAGE, CARD_ORDER_UPDATE_PROC, returnStr));
+        };
+
         try {
-            rs = ExecuteSql(sql, param);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
-            while (rs.next()) {
-                pricepcard = rs.getDouble("pricepercard");
-                double orderid = rs.getDouble("orderid");
-                int amount = new Double(rs.getDouble("amount")).intValue();
-                if (saveAndAcceptCardOrder(orderid, pricepcard, amount)) {
-                    String cardTypeCode = rs.getString("CARDTYPE");
-                    //ticket #115: cardType is a description, must be a code
-                    cardTypeCode = (cardTypeCode.toLowerCase()
-                            .startsWith("transponder")) ? ""
-                            + CardType.TRANSPONDER_CARD.code() : (cardTypeCode
-                            .toLowerCase().startsWith("rtp")) ? ""
-                            + CardType.RTP_CARD.code() : (cardTypeCode.toLowerCase().startsWith("qcard")) ?
-                            "" + CardType.QPARK_CARD.code() :
-                            "" + CardType.UNKNOWN_CARD.code();
-                    cardOrderValidate(customer.getCustomerId(), pricepcard, amount, cardTypeCode);
-                }
-            }
-        } catch (SQLException e) {
-
-            e.printStackTrace();
+            if(Integer.parseInt(returnStr) != -1)
+                logUnmetExpectation.run();
+        } catch(NumberFormatException e) {
+            logUnmetExpectation.run();
         }
     }
 
-    /**
-     * This method updates the card orders that were validated.
-     *
-     * @return true if update was successful, false otherwise
-     */
-    private boolean saveAndAcceptCardOrder(double orderId, double pricepercard, int amount) {
-        PreparedStatement prep = null;
-
-        boolean result = false;
-
-        try {
-            String sql = "{call WEBAPP.cardorderUpdate( ?, ?, ?, ? )}";
-            prep = getConnection().prepareStatement(sql);
-            prep.setDouble(1, orderId);
-            prep.setString(2, CardOrderStatus.ACCEPTED.code() + "");
-            prep.setDouble(3, pricepercard);
-            prep.setInt(4, amount);
-            prep.execute();
-            close(prep, null);
-            result = true;
-
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
-        }
-        closeConnection();
-        return result;
-    }
-
-    /**
-     * This method runs CreateFinancialTransaction on an ordered card.
-     *
-     * @return true if transaction was successful, false otherwise
-     */
-    public boolean cardOrderValidate(long customerId, double pricepercard,
-                                     int amount, String typeOfCard) {
-
-        CallableStatement prep = null;
-
-        boolean retval = false;
-        try {
-            String sql = "{call WEBAPP.CardOrderValidate( ?, ?, ?, ?, ? )}";
-            prep = getConnection().prepareCall(sql);
-            prep.setDouble(1, customerId);
-            prep.setDouble(2, pricepercard);
-            prep.setInt(3, amount);
-            prep.setString(4, typeOfCard);
-            prep.registerOutParameter(5, Types.INTEGER);
-            prep.executeUpdate();
-            if (prep.getInt(5) == -1) {
-                retval = true;
-            } else {
-                log.debug("CardOrderSQLHelper.cardOrderValidate return value: " + prep.getInt(5));
-            }
-            close(prep, null);
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
-            log.error("CardOrderSQLHelper.cardOrderValidate has caused and SQLException." + sqle.getMessage());
-            retval = false;
-        }
-        closeConnection();
-        return retval;
-    }
-
-    private void compileJdbcCall() {
+    private void compileJdbcCalls() {
         saveSpecialTarifCall = new SimpleJdbcCall(template)
                 .withCatalogName(PACKAGE)
                 .withProcedureName(SAVE_SPECIAL_TARIF_PROC)
                 .declareParameters(new SqlParameter("Customer_in", Types.NUMERIC));
 
+        cardOrderUpdateCall = new SimpleJdbcCall(template)
+                .withCatalogName(PACKAGE)
+                .withProcedureName(CARD_ORDER_UPDATE_PROC)
+                .declareParameters(
+                        new SqlParameter("neworderid", Types.NUMERIC),
+                        new SqlParameter("neworderstatus", Types.VARCHAR),
+                        new SqlParameter("newpricepercard", Types.NUMERIC),
+                        new SqlParameter("newamount", Types.INTEGER)
+                );
+
+        cardOrderValidateCall = new SimpleJdbcCall(template)
+                .withCatalogName(PACKAGE)
+                .withProcedureName(CARD_ORDER_VALIDATE_PROC)
+                .declareParameters(
+                        new SqlParameter("CustomerId_in", Types.NUMERIC),
+                        new SqlParameter("CardFee_in", Types.NUMERIC),
+                        new SqlParameter("NumberOfTCards_in", Types.NUMERIC),
+                        new SqlParameter("TypeOfCard_in", Types.VARCHAR),
+                        new SqlOutParameter("Return_out", Types.INTEGER)
+                );
+
         saveSpecialTarifCall.compile();
-    }
-
-    public CachedRowSet ExecuteSql(String sqlStr, Object[] parameters) throws SQLException {
-        final String sql = sqlStr;
-        PreparedStatement prep = null;
-        ResultSet rs = null;
-        CachedRowSet result;
-        try {
-            result = (CachedRowSet) Class.forName("com.sun.rowset.CachedRowSetImpl").newInstance();
-        } catch (Exception e) {
-            return null;
-        }
-
-        try {
-            prep = getConnection().prepareStatement(sql);
-            int i = 1;
-            if (parameters != null) {
-                for (Object p : parameters) {
-                    if (null == p) {
-                        break;
-                    }
-                    if (p instanceof String) {
-                        String d = (String) p;
-                        prep.setString(i, d);
-                    } else if (p instanceof Long) {
-                        Long d = (Long) p;
-                        prep.setLong(i, d);
-                    } else if (p instanceof Date) {
-                        Date d = (Date) p;
-                        java.sql.Date dd = new java.sql.Date(d.getTime());
-                        prep.setDate(i, dd);
-                    } else {
-                        prep.setObject(i, p);
-                    }
-                    i++;
-                }
-            }
-            rs = prep.executeQuery();
-            result.populate(rs);
-
-            close(prep, rs);
-            closeConnection();
-        } catch (SQLException e) {
-            closeConnection();
-            throw e;
-        } catch (Exception e) {
-            closeConnection();
-        }
-        return result;
-    }
-
-    public void close(Statement stmt, ResultSet rs) {
-        try {
-            if (rs != null) {
-                rs.close();
-            }
-        } catch (SQLException e) {
-            // ignore
-        }
-        try {
-            if (stmt != null) {
-                stmt.close();
-            }
-        } catch (SQLException e) {
-            // ignore
-        }
-    }
-
-    public void closeConnection() {
-    }
-
-    protected java.sql.Connection getConnection() throws SQLException {
-        return template.getDataSource().getConnection();
+        cardOrderUpdateCall.compile();
+        cardOrderValidateCall.compile();
     }
 }

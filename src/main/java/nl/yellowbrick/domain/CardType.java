@@ -9,7 +9,17 @@ public enum CardType {
         this.code = code;
     }
 
-    public int code() {
-        return code;
+    public String code() {
+        return code + "";
+    }
+
+    public static CardType fromDescription(String description) {
+        String desc = description.toLowerCase();
+
+        if(desc.startsWith("transponder")) return TRANSPONDER_CARD;
+        if(desc.startsWith("rtp")) return RTP_CARD;
+        if(desc.startsWith("qcard")) return QPARK_CARD;
+
+        return UNKNOWN_CARD;
     }
 }
