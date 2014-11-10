@@ -39,6 +39,23 @@ public class Functions {
         });
     }
 
+    public static void cardOrderUpdate(int newOrderId, String newOrderStatus, int newPricePerCard, int newAmount) {
+        CALL_RECORDERS.forEach((recorder) -> {
+            recorder.accept(new FunctionCall("cardOrderUpdate",
+                    newOrderId, newOrderStatus, newPricePerCard, newAmount));
+        });
+    }
+
+    public static void cardOrderValidate(int customerId, int cardFee, int numberOfTCards,
+                                         String typeOfCard, Integer[] returnOut) {
+        CALL_RECORDERS.forEach((recorder) -> {
+            recorder.accept(new FunctionCall("cardOrderValidate",
+                    customerId, cardFee, numberOfTCards, typeOfCard));
+        });
+
+        returnOut[0] = -1;
+    }
+
     public static class FunctionCall {
 
         public final String functionName;

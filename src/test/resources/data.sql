@@ -183,3 +183,13 @@ INSERT INTO TBLCONFIG VALUES ('TXM', 'GEMEENTE_EXPORT_CSV_PATH', 'C:\\pecoma\\Ge
 INSERT INTO TBLCONFIG VALUES ('TXM', 'REPORT_PATH', 'C:/Pecoma/reports/transacties/', NULL, 'TXM');
 INSERT INTO TBLCONFIG VALUES ('TXM', 'reply_address', 'info@yellowbrick.nl', NULL, 'Taxameter Settings');
 INSERT INTO TBLCONFIG VALUES ('TXM', 'use_old_mail_impl', NULL, NULL, 'Taxameter Settings');
+
+INSERT INTO CARDORDER VALUES (
+             72031,
+             TO_DATE ('12/23/2010 16:26:39', 'MM/DD/YYYY HH24:MI:SS'),
+             '1',
+             4776,
+             'Qcard',
+             '2',
+             1,
+             0);
