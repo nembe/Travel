@@ -1,7 +1,8 @@
 package nl.yellowbrick.dao.impl;
 
 import nl.yellowbrick.dao.CardOrderDao;
-import nl.yellowbrick.domain.CardOrder;
+import nl.yellowbrick.domain.CardOrderStatus;
+import nl.yellowbrick.domain.CardType;
 import nl.yellowbrick.domain.Customer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,7 +41,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
 
     @Override
     public void validateCardOrders(Customer customer) {
-        Object[] param = new Object[]{CardOrder.STATUS_INSERTED, customer.getCustomerId()};
+        Object[] param = new Object[]{CardOrderStatus.INSERTED.code(), customer.getCustomerId()};
         double pricepcard = -1.0;
 
         String sql = "SELECT co.ORDERID, co.ORDERDATE, c.BUSINESS, c.LASTNAME, co.CARDTYPE, co.AMOUNT , co.PRICEPERCARD "
@@ -67,11 +68,11 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                     //ticket #115: cardType is a description, must be a code
                     cardTypeCode = (cardTypeCode.toLowerCase()
                             .startsWith("transponder")) ? ""
-                            + CardOrder.TRANSPONDER_CARD : (cardTypeCode
+                            + CardType.TRANSPONDER_CARD.code() : (cardTypeCode
                             .toLowerCase().startsWith("rtp")) ? ""
-                            + CardOrder.RTP_CARD : (cardTypeCode.toLowerCase().startsWith("qcard")) ?
-                            "" + CardOrder.QPARK_CARD :
-                            "" + CardOrder.UNKNOWN_CARD;
+                            + CardType.RTP_CARD.code() : (cardTypeCode.toLowerCase().startsWith("qcard")) ?
+                            "" + CardType.QPARK_CARD.code() :
+                            "" + CardType.UNKNOWN_CARD.code();
                     cardOrderValidate(customer.getCustomerId(), pricepcard, amount, cardTypeCode);
                 }
             }
@@ -95,7 +96,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
             String sql = "{call WEBAPP.cardorderUpdate( ?, ?, ?, ? )}";
             prep = getConnection().prepareStatement(sql);
             prep.setDouble(1, orderId);
-            prep.setString(2, CardOrder.STATUS_ACCEPTED + "");
+            prep.setString(2, CardOrderStatus.ACCEPTED.code() + "");
             prep.setDouble(3, pricepercard);
             prep.setInt(4, amount);
             prep.execute();
