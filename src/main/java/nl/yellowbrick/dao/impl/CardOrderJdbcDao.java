@@ -53,9 +53,9 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     public void validateCardOrders(Customer customer) {
         String sql = Joiner.on(' ').join(ImmutableList.of(
                 "SELECT co.ORDERID, co.ORDERDATE, c.BUSINESS, c.LASTNAME, co.CARDTYPE, co.AMOUNT, co.PRICEPERCARD",
-                "FROM CARDORDER co, CUSTOMER c",
+                "FROM CARDORDER co",
+                "INNER JOIN CUSTOMER c ON c.CUSTOMERID = co.CUSTOMERID",
                 "WHERE co.ORDERSTATUS = ?",
-                "AND co.CUSTOMERID = c.CUSTOMERID",
                 "AND co.CARDTYPE != ? ",
                 "AND co.CUSTOMERID = ? "
         ));
