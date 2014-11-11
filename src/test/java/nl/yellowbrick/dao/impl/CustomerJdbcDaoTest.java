@@ -92,6 +92,15 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(fetchCustomerStatus(customer.getCustomerId()), equalTo(activationFailedStatus));
     }
 
+    @Test
+    public void retrieves_next_value_from_customer_nr_sequence() {
+        Customer cust = new Customer();
+
+        customerDao.assignNextCustomerNr(cust);
+
+        assertThat(cust.getCustomerNr(), equalTo("370761"));
+    }
+
     private int fetchCustomerStatus(long customerId) {
         return db.withTemplate((template) -> {
             return template.queryForObject("SELECT customerstatusidfk FROM CUSTOMER WHERE customerid = ?",

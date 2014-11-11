@@ -51,7 +51,7 @@ public class CustomerJdbcDao implements CustomerDao {
 
     @Override
     public void assignNextCustomerNr(Customer customer) {
-        // TODO implement
-        //        String customerNr = sql.getNextCustomerNr();
+        Long nr = template.queryForObject("SELECT CUSTOMERNUMBER_SEQ.NEXTVAL FROM DUAL", Long.class);
+        customer.setCustomerNr(nr.toString());
     }
 }
