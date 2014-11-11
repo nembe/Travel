@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -99,6 +100,22 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         customerDao.assignNextCustomerNr(cust);
 
         assertThat(cust.getCustomerNr(), equalTo("370761"));
+    }
+
+    @Test
+    public void returns_empty_for_locale_missing() {
+        Customer cust = new Customer();
+        cust.setCustomerId(12345l);
+
+        assertThat(customerDao.getRegistrationLocale(cust), equalTo(Optional.empty()));
+    }
+
+    @Test
+    public void returns_found_locale() {
+        Customer cust = new Customer();
+        cust.setCustomerId(4776l);
+
+        assertThat(customerDao.getRegistrationLocale(cust), equalTo(Optional.of("nl_NL")));
     }
 
     private int fetchCustomerStatus(long customerId) {

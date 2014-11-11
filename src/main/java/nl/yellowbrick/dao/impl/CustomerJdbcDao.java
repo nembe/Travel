@@ -4,12 +4,16 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import nl.yellowbrick.dao.CustomerDao;
 import nl.yellowbrick.domain.Customer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class CustomerJdbcDao implements CustomerDao {
@@ -18,6 +22,8 @@ public class CustomerJdbcDao implements CustomerDao {
 
     @Autowired
     private JdbcTemplate template;
+
+    private Logger log = LoggerFactory.getLogger(CustomerJdbcDao.class);
 
     @Override
     public List<Customer> findAllPendingActivation() {
@@ -53,5 +59,20 @@ public class CustomerJdbcDao implements CustomerDao {
     public void assignNextCustomerNr(Customer customer) {
         Long nr = template.queryForObject("SELECT CUSTOMERNUMBER_SEQ.NEXTVAL FROM DUAL", Long.class);
         customer.setCustomerNr(nr.toString());
+    }
+
+    @Override
+    public Optional<String> getRegistrationLocale(Customer customer) {
+        String sql = "SELECT locale FROM CUSTOMER_REGISTRATION cr WHERE CUSTOMERIDFK = ?";
+
+        try {
+            return Optional.of(
+                    template.queryForObject(sql, String.class, customer.getCustomerId())
+            );
+        } catch(DataAccessException e) {
+            log.warn("Failed to retrieve locale for customer id: " + customer.getCustomerId(), e);
+            return Optional.empty();
+        }
+
     }
 }

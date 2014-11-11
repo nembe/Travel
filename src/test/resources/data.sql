@@ -193,3 +193,5 @@ INSERT INTO CARDORDER VALUES (
              '2',
              1,
              0);
+
+INSERT INTO CUSTOMER_REGISTRATION VALUES (4776, 'nl_NL', 'YBAANMELDEN:Struijk', NULL);
