@@ -184,6 +184,27 @@ INSERT INTO TBLCONFIG VALUES ('TXM', 'REPORT_PATH', 'C:/Pecoma/reports/transacti
 INSERT INTO TBLCONFIG VALUES ('TXM', 'reply_address', 'info@yellowbrick.nl', NULL, 'Taxameter Settings');
 INSERT INTO TBLCONFIG VALUES ('TXM', 'use_old_mail_impl', NULL, NULL, 'Taxameter Settings');
 
+INSERT INTO TBLCONFIG VALUES (
+             'ACT_CUST',
+             'HTTP_LINK',
+             'http://localhost:8084/MyYellowbrick/auth/password/reset/',
+             'link om password opnieuw in te stellen',
+             'ACTIVATION_CUSTOMER');
+
+INSERT INTO TBLCONFIG VALUES (
+                  'ACT_CUST',
+                  'expire_token_formule_new_customer',
+                  '672',
+                  'geldigheid van activatielink bestaande klant 28 dagen na aanmaken waarde in uren',
+                  'ACTIVATION_CUSTOMER');
+
+INSERT INTO TBLCONFIG VALUES (
+             'TXM',
+             'reply_address',
+             'info@yellowbrick.nl',
+             NULL,
+             'Taxameter Settings');
+
 INSERT INTO CARDORDER VALUES (
              72031,
              TO_DATE ('12/23/2010 16:26:39', 'MM/DD/YYYY HH24:MI:SS'),
@@ -239,4 +260,19 @@ INSERT INTO MESSAGE VALUES (
              'Welkom bij Yellowbrick!',
              'dba',
              TO_DATE ('10/15/2013 15:06:50', 'MM/DD/YYYY HH24:MI:SS'),
+             NULL);
+
+INSERT INTO SYSTEMUSER VALUES (
+             936,
+             '200936',
+             'newnewnew',
+             2364,
+             0,
+             NULL,
+             NULL,
+             NULL,
+             NULL,
+             0,
+             NULL,
+             NULL,
              NULL);
