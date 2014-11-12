@@ -26,7 +26,7 @@ public class SystemUserJdbcDaoTest extends BaseSpringTestCase {
 
     @Before
     public void setUserAccountType() {
-        db.withTemplate((template) -> template.update("UPDATE SYSTEMUSER SET account_type = 0"));
+        db.accept((template) -> template.update("UPDATE SYSTEMUSER SET account_type = 0"));
     }
 
     @Test
@@ -41,13 +41,11 @@ public class SystemUserJdbcDaoTest extends BaseSpringTestCase {
 
         systemUserDao.createAndStoreUserToken(cust, validity);
 
-        db.withTemplate((template) -> {
+        db.accept((template) -> {
             Map<String, Object> res = template.queryForMap("SELECT * FROM SYSTEMUSER WHERE customeridfk = ?", 2364);
 
             assertThat(res.get("token").toString(), not(isEmptyOrNullString()));
             assertThat(((Timestamp)res.get("token_date")).getTime(), equalTo(valdityTime.getTime()));
-
-            return null;
         });
     }
 }

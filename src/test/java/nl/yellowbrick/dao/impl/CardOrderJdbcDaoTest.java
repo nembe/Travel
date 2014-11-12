@@ -158,9 +158,6 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
     }
 
     private void updateCardType(String cardType) {
-        db.withTemplate((template) -> {
-            template.update("UPDATE CARDORDER SET cardtype = ?", cardType);
-            return null;
-        });
+        db.accept((template) -> template.update("UPDATE CARDORDER SET cardtype = ?", cardType));
     }
 }
