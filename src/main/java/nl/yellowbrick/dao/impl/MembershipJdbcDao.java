@@ -4,8 +4,8 @@ import nl.yellowbrick.dao.MembershipDao;
 import nl.yellowbrick.domain.Membership;
 import nl.yellowbrick.domain.RandomPassword;
 import nl.yellowbrick.domain.RandomPinCode;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +37,7 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
     private String mutator;
 
     private SimpleJdbcCall jdbcCall;
-    private Log log = LogFactory.getLog(MembershipJdbcDao.class);
+    private Logger log = LoggerFactory.getLogger(MembershipJdbcDao.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {

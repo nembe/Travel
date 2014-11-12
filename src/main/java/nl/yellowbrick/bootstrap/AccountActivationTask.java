@@ -5,8 +5,8 @@ import nl.yellowbrick.domain.Customer;
 import nl.yellowbrick.service.AccountActivationService;
 import nl.yellowbrick.validation.CustomerMembershipValidator;
 import nl.yellowbrick.validation.GeneralCustomerValidator;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,7 +31,7 @@ public class AccountActivationTask {
     @Autowired
     private AccountActivationService accountActivationService;
 
-    private Log log = LogFactory.getLog(AccountActivationTask.class);
+    private Logger log = LoggerFactory.getLogger(AccountActivationTask.class);
 
     @Scheduled(fixedDelayString = "${activation.delay}")
     @Transactional(isolation = Isolation.READ_COMMITTED)

@@ -6,8 +6,8 @@ import nl.yellowbrick.dao.CardOrderDao;
 import nl.yellowbrick.domain.CardOrderStatus;
 import nl.yellowbrick.domain.CardType;
 import nl.yellowbrick.domain.Customer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -37,7 +37,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     private SimpleJdbcCall cardOrderUpdateCall;
     private SimpleJdbcCall cardOrderValidateCall;
 
-    private Log log = LogFactory.getLog(CardOrderJdbcDao.class);
+    private Logger log = LoggerFactory.getLogger(CardOrderJdbcDao.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {

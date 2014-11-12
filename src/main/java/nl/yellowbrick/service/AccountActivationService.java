@@ -7,8 +7,8 @@ import nl.yellowbrick.dao.PriceModelDao;
 import nl.yellowbrick.domain.Customer;
 import nl.yellowbrick.domain.Membership;
 import nl.yellowbrick.domain.PriceModel;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +32,7 @@ public class AccountActivationService {
     @Autowired
     private EmailNotificationService emailNotificationService;
 
-    private Log log = LogFactory.getLog(AccountActivationService.class);
+    private Logger log = LoggerFactory.getLogger(AccountActivationService.class);
 
     public void activateCustomerAccount(Customer customer) {
         log.info("Starting acceptance for customer id: " + customer.getCustomerId());

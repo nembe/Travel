@@ -5,8 +5,8 @@ import com.google.common.collect.ImmutableList;
 import nl.yellowbrick.dao.PriceModelDao;
 import nl.yellowbrick.domain.Customer;
 import nl.yellowbrick.domain.PriceModel;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ public class PriceModelJdbcDao implements PriceModelDao {
     @Autowired
     private JdbcTemplate template;
 
-    private Log log = LogFactory.getLog(PriceModelDao.class);
+    private Logger log = LoggerFactory.getLogger(PriceModelDao.class);
 
     public Optional<PriceModel> findForCustomer(Customer customer) {
         try {
