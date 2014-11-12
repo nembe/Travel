@@ -7,6 +7,9 @@ datasource:
 activation:
   delay: 5000
 
+mail:
+  host: 10.30.110.3
+
 mutator: BATCH v. ${project.version}
 
 ---

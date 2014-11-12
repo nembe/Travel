@@ -28,6 +28,11 @@
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-mail</artifactId>
+            <version>${spring.integration.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
             <version>${oracle.version}</version>
@@ -45,7 +50,17 @@
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
-            <version>0.3m</version>
+            <version>${bcrypt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>${javax.mail.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>${javax.activation.version}</version>
         </dependency>
 
         <!-- Tests -->
@@ -54,11 +69,16 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.h2database</groupId>-->
+            <!--<artifactId>h2</artifactId>-->
+            <!--<version>${h2.version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${h2.version}</version>
-            <scope>test</scope>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.3.2</version>
         </dependency>
     </dependencies>
 
@@ -73,7 +93,10 @@
         <c3p0.version>0.9.5-pre9</c3p0.version>
         <h2.version>1.4.182</h2.version>
         <guava.version>18.0</guava.version>
-        <brypt.version>0.3m</brypt.version>
+        <bcrypt.version>0.3m</bcrypt.version>
+        <spring.integration.version>4.0.4.RELEASE</spring.integration.version>
+        <javax.mail.version>1.4.7</javax.mail.version>
+        <javax.activation.version>1.1.1</javax.activation.version>
     </properties>
 
     <build>
@@ -83,6 +106,13 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
 </project>
