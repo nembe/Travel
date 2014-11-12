@@ -66,7 +66,7 @@ public class CustomerJdbcDao implements CustomerDao {
         String sql = "SELECT locale FROM CUSTOMER_REGISTRATION cr WHERE CUSTOMERIDFK = ?";
 
         try {
-            return Optional.of(
+            return Optional.ofNullable(
                     template.queryForObject(sql, String.class, customer.getCustomerId())
             );
         } catch(DataAccessException e) {

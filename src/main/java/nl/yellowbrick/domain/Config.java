@@ -3,6 +3,7 @@ package nl.yellowbrick.domain;
 import com.google.common.collect.Iterables;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public class Config {
 
@@ -53,8 +54,10 @@ public class Config {
         this.title = title;
     }
 
-    public static final Config findByField(Collection<Config> configs, String field) {
-        return Iterables.find(configs, (cfg) -> cfg.getField().equalsIgnoreCase(field));
+    public static final Optional<Config> findByField(Collection<Config> configs, String field) {
+        Config config = Iterables.find(configs, (cfg) -> cfg.getField().equalsIgnoreCase(field), null);
+
+        return Optional.ofNullable(config);
     }
 
     @Override

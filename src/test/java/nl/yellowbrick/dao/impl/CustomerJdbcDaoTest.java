@@ -111,11 +111,15 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void returns_found_locale() {
-        Customer cust = new Customer();
-        cust.setCustomerId(4776l);
+    public void returns_empty_if_locale_is_null() {
+        db.withTemplate((t) -> t.update("UPDATE CUSTOMER_REGISTRATION SET locale = NULL"));
 
-        assertThat(customerDao.getRegistrationLocale(cust), equalTo(Optional.of("nl_NL")));
+        assertThat(customerDao.getRegistrationLocale(testCustomer()), equalTo(Optional.empty()));
+    }
+
+    @Test
+    public void returns_found_locale() {
+        assertThat(customerDao.getRegistrationLocale(testCustomer()), equalTo(Optional.of("nl_NL")));
     }
 
     private int fetchCustomerStatus(long customerId) {
@@ -124,5 +128,12 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
                 Integer.class,
                 customerId);
         });
+    }
+
+    private Customer testCustomer() {
+        Customer cust = new Customer();
+        cust.setCustomerId(4776);
+
+        return cust;
     }
 }

@@ -23,7 +23,7 @@ public class MessageJdbcDao implements MessageDao {
         String sql = "SELECT text FROM MESSAGE WHERE key = ? AND locale = ?";
 
         try {
-            return Optional.of(
+            return Optional.ofNullable(
                     template.queryForObject(sql, String.class, key, locale)
             );
         } catch(DataAccessException e) {
@@ -42,7 +42,7 @@ public class MessageJdbcDao implements MessageDao {
                 "ORDER BY key DESC";
 
         try {
-            return Optional.of(
+            return Optional.ofNullable(
                     template.queryForObject(sql, String.class, locale, mainKey, altKey)
             );
         } catch(DataAccessException e) {
