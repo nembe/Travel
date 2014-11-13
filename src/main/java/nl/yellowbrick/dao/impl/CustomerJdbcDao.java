@@ -77,7 +77,7 @@ public class CustomerJdbcDao implements CustomerDao {
                     template.queryForObject(sql, String.class, customer.getCustomerId())
             );
         } catch(DataAccessException e) {
-            log.warn("Failed to retrieve locale for customer id: " + customer.getCustomerId(), e);
+            log.warn("Failed to retrieve locale for customer ID: " + customer.getCustomerId(), e);
             return Optional.empty();
         }
     }

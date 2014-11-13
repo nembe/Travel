@@ -30,7 +30,7 @@ public class PriceModelJdbcDao implements PriceModelDao {
             PriceModel model = getPriceModelForSubGroup(subGroupId);
             return Optional.of(model);
         } catch (Exception e) {
-            log.error("Failed to find PriceModel for customer id: " + customer.getCustomerId(), e);
+            log.error("Failed to find PriceModel for customer ID: " + customer.getCustomerId(), e);
             return Optional.empty();
         }
     }

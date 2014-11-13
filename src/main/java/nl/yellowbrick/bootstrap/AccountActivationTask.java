@@ -2,6 +2,7 @@ package nl.yellowbrick.bootstrap;
 
 import nl.yellowbrick.dao.CustomerDao;
 import nl.yellowbrick.domain.Customer;
+import nl.yellowbrick.errors.ActivationException;
 import nl.yellowbrick.service.AccountActivationService;
 import nl.yellowbrick.validation.CustomerMembershipValidator;
 import nl.yellowbrick.validation.GeneralCustomerValidator;
@@ -41,7 +42,11 @@ public class AccountActivationTask {
         List<Customer> customers = customerDao.findAllPendingActivation();
         log.info(String.format("processing %d customers", customers.size()));
 
-        customers.forEach((customer) -> {
+        customers.forEach(this::validateAndActivateAccount);
+    }
+
+    private void validateAndActivateAccount(Customer customer) {
+        try {
             DataBinder binder = new DataBinder(customer);
 
             binder.addValidators(generalCustomerValidator, customerMembershipValidator);
@@ -54,6 +59,8 @@ public class AccountActivationTask {
                 log.info("validation succeeded for customer ID: " + customer.getCustomerId());
                 accountActivationService.activateCustomerAccount(customer);
             }
-        });
+        } catch(ActivationException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }

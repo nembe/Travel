@@ -11,7 +11,7 @@ import java.util.function.Consumer;
  */
 public class Functions {
 
-    public static int VALIDATE_MEMBERSHIP_RETVAL = 1;
+    public static int VALIDATE_MEMBERSHIP_RETVAL = -1;
 
     public static List<Consumer<FunctionCall>> CALL_RECORDERS = new ArrayList<>();
 

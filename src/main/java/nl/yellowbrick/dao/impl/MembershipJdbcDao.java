@@ -68,7 +68,15 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
             put("Mutator_in", mutator);
         }}));
 
-        log.info(String.format("Called %s.%s which returned %s", PACKAGE, PROCEDURE, results.get("Return_out")));
+        int result = Integer.parseInt(results.get("Return_out").toString());
+
+        if(result == -1) {
+            log.info(String.format("Called %s.%s which returned %d", PACKAGE, PROCEDURE, result));
+        } else {
+            String errorMsg = String.format("Failed to save membership. Call %s.%s returned error code %d",
+                    PACKAGE, PROCEDURE, result);
+            throw new ActivationException(errorMsg);
+        }
     }
 
     private void compileJdbcCall() {

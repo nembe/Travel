@@ -46,7 +46,7 @@ public class EmailNotificationService {
         String customerLocale = customerDao.getRegistrationLocale(customer).orElse(defaultLocale());
         Optional<String> subject = messageDao.getMessage("emailSubjectNewCustomer", customerLocale);
         Optional<String> genderTitle = messageDao.getMessage("gendertitle." + customer.getGender(), customerLocale);
-        Optional<String> body = messageDao.getGroupSpecificMessage("emailBodyNewCustomer", customer.getProductGroupID(), customerLocale);
+        Optional<String> body = messageDao.getGroupSpecificMessage("emailBodyNewCustomer", customer.getProductGroupId(), customerLocale);
 
         // ensure all data is available
         Map<String, Optional<?>> namedConfigs = new HashMap<>();
@@ -60,7 +60,7 @@ public class EmailNotificationService {
         long nrMissingConfigs = namedConfigs.entrySet().stream()
                 .filter((entry) -> !entry.getValue().isPresent())
                 .map((entry) -> {
-                    log.error("missing property " + entry.getKey());
+                    log.error("missing property: " + entry.getKey());
                     return entry;
                 }).count();
 
