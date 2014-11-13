@@ -42,6 +42,7 @@ public class ConfigJdbcDao implements ConfigDao {
     private RowMapper<Config> rowMapper() {
         BeanPropertyRowMapper<Config> rowMapper = new BeanPropertyRowMapper<>(Config.class);
         rowMapper.setPrimitivesDefaultedForNullValue(true);
+        rowMapper.setCheckFullyPopulated(true);
 
         return rowMapper;
     }
