@@ -1,5 +1,7 @@
 package nl.yellowbrick.dao.impl;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import nl.yellowbrick.dao.MessageDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +38,15 @@ public class MessageJdbcDao implements MessageDao {
     public Optional<String> getGroupSpecificMessage(String key, int groupId, String locale) {
         String mainKey = key + ".Group" + groupId;
         String altKey = key + ".Group0";
-        String sql = "SELECT text FROM MESSAGE WHERE locale = ? " +
-                "AND key = ? " +
-                "OR key = ? " +
-                "ORDER BY key DESC";
+        String sql = Joiner.on(' ').join(ImmutableList.of(
+                "SELECT * FROM",
+                "( SELECT text FROM MESSAGE",
+                "WHERE locale = ?",
+                "AND key = ?",
+                "OR key = ?",
+                "ORDER BY key DESC",
+                ") WHERE ROWNUM <= 1"
+        ));
 
         try {
             return Optional.ofNullable(
