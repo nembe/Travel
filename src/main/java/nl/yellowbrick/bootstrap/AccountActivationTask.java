@@ -2,13 +2,18 @@ package nl.yellowbrick.bootstrap;
 
 import nl.yellowbrick.dao.CustomerDao;
 import nl.yellowbrick.domain.Customer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import nl.yellowbrick.errors.ActivationException;
+import nl.yellowbrick.service.AccountActivationService;
+import nl.yellowbrick.validation.CustomerMembershipValidator;
+import nl.yellowbrick.validation.GeneralCustomerValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.DataBinder;
 
 import java.util.List;
 
@@ -18,7 +23,16 @@ public class AccountActivationTask {
     @Autowired
     private CustomerDao customerDao;
 
-    private Log log = LogFactory.getLog(AccountActivationTask.class);
+    @Autowired
+    private GeneralCustomerValidator generalCustomerValidator;
+
+    @Autowired
+    private CustomerMembershipValidator customerMembershipValidator;
+
+    @Autowired
+    private AccountActivationService accountActivationService;
+
+    private Logger log = LoggerFactory.getLogger(AccountActivationTask.class);
 
     @Scheduled(fixedDelayString = "${activation.delay}")
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -28,8 +42,25 @@ public class AccountActivationTask {
         List<Customer> customers = customerDao.findAllPendingActivation();
         log.info(String.format("processing %d customers", customers.size()));
 
-        customers.forEach((cust) -> {
-            // TODO pipe to validation and activation
-        });
+        customers.forEach(this::validateAndActivateAccount);
+    }
+
+    private void validateAndActivateAccount(Customer customer) {
+        try {
+            DataBinder binder = new DataBinder(customer);
+
+            binder.addValidators(generalCustomerValidator, customerMembershipValidator);
+            binder.validate();
+
+            if(binder.getBindingResult().hasErrors()) {
+                log.info("validation failed for customer ID: " + customer.getCustomerId());
+                customerDao.markAsPendingHumanReview(customer);
+            } else {
+                log.info("validation succeeded for customer ID: " + customer.getCustomerId());
+                accountActivationService.activateCustomerAccount(customer);
+            }
+        } catch(ActivationException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }
