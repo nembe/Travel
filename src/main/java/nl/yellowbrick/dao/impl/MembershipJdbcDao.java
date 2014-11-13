@@ -4,6 +4,7 @@ import nl.yellowbrick.dao.MembershipDao;
 import nl.yellowbrick.domain.Membership;
 import nl.yellowbrick.domain.RandomPassword;
 import nl.yellowbrick.domain.RandomPinCode;
+import nl.yellowbrick.errors.ActivationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -46,8 +47,6 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
 
     @Override
     public void saveValidatedMembership(Membership membership) {
-        long newCreditLimit = membership.getCustomer().getCreditLimit() * 100;
-
         RandomPinCode pinCode = new RandomPinCode();
         RandomPassword password = new RandomPassword();
 
@@ -57,7 +56,7 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
             put("ParkadammerTotal_in", membership.getCustomer().getParkadammerTotal());
             put("NumberOfTCards_in", membership.getCustomer().getNumberOfTCards());
             put("NumberOfQCards_in", membership.getCustomer().getNumberOfQCards());
-            put("CreditLimit_in", newCreditLimit);
+            put("CreditLimit_in", membership.getCustomer().getCreditLimit());
             put("SubscriptionFee_in", DEFAULT_MEMBERSHIP_FEE);
             put("RegistrationFee_in", DEFAULT_REGISTRATION_FEE);
             put("InitialTCardFee_in", membership.getPriceModel().getInitTranspCardCost());

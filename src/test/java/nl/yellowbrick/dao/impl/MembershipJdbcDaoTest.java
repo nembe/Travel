@@ -31,7 +31,7 @@ public class MembershipJdbcDaoTest extends BaseSpringTestCase {
         customer.setParkadammerTotal(1);
         customer.setNumberOfTCards(2);
         customer.setNumberOfQCards(4);
-        customer.setCreditLimit(10);
+        customer.setCreditLimit(0);
 
         priceModel = new PriceModel();
         priceModel.setInitRtpCardCost(50);
@@ -61,7 +61,7 @@ public class MembershipJdbcDaoTest extends BaseSpringTestCase {
         assertThat(args[2], equalTo(customer.getParkadammerTotal()));
         assertThat(args[3], equalTo(customer.getNumberOfTCards()));
         assertThat(args[4], equalTo(customer.getNumberOfQCards()));
-        assertThat(Long.parseLong(args[5].toString()), equalTo(customer.getCreditLimit() * 100)); // NOTE: multiplies the credit limit!
+        assertThat(args[5], equalTo((int)customer.getCreditLimit()));
         assertThat(args[6], equalTo(0)); // membership fee
         assertThat(args[7], equalTo(0)); // registration fee
         assertThat(args[8], equalTo(priceModel.getInitTranspCardCost()));
