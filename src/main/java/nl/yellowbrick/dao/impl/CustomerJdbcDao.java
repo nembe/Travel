@@ -28,7 +28,14 @@ public class CustomerJdbcDao implements CustomerDao {
     @Override
     public List<Customer> findAllPendingActivation() {
         String sql = Joiner.on(' ').join(ImmutableList.of(
-                "SELECT c.*, ba.agentnaam AS agentname, cs.label AS custstatus, pg.description cgroup, 0 as parkammertotal",
+                "SELECT c.*,",
+                "c.productgroup_id AS product_group_id,",
+                "c.billingagentidfk AS billing_agent_id,",
+                "c.invoice_annotations AS extra_invoice_annotations,",
+                "ba.agentnaam AS agentname,",
+                "cs.label AS status,",
+                "pg.description product_group,",
+                "0 as parkadammertotal",
                 "FROM CUSTOMER c",
                 "INNER JOIN CUSTOMERADDRESS ca ON c.customerid = ca.customeridfk",
                 "INNER JOIN PRODUCT_GROUP pg ON pg.id = c.productgroup_id",
@@ -73,6 +80,5 @@ public class CustomerJdbcDao implements CustomerDao {
             log.warn("Failed to retrieve locale for customer id: " + customer.getCustomerId(), e);
             return Optional.empty();
         }
-
     }
 }

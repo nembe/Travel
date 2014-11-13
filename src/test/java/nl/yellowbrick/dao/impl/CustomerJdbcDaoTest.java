@@ -1,15 +1,20 @@
 package nl.yellowbrick.dao.impl;
 
+import com.google.common.base.Function;
 import nl.yellowbrick.BaseSpringTestCase;
-import nl.yellowbrick.domain.Customer;
 import nl.yellowbrick.database.DbHelper;
+import nl.yellowbrick.domain.Customer;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
 
@@ -34,7 +39,11 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void fills_in_customer_bean() {
-        Customer c = customerDao.findAllPendingActivation().get(0);
+        Customer c = customerDao.findAllPendingActivation().get(1);
+
+        Function<LocalDateTime, Timestamp> toTs = (localDateTime) -> {
+            return Timestamp.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        };
 
         assertThat(c.getAccountCity(), equalTo("Amsterdam"));
         assertThat(c.getAccountHolderName(), equalTo("M.C.  Slomp"));
@@ -42,12 +51,11 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(c.getAccountType(), equalTo(""));
         assertThat(c.getActionCode(), nullValue());
         assertThat(c.getAgentName(), equalTo("automatische incasso per week"));
-        assertThat(c.getApplicationDate(), nullValue());
-        assertThat(c.getBillingAgentId(), equalTo(0l));
+        assertThat(c.getApplicationDate(), equalTo(toTs.apply(LocalDateTime.of(2007, 4, 8, 18, 26, 22))));
+        assertThat(c.getBillingAgentId(), equalTo(602l));
         assertThat(c.getBusinessName(), equalTo(""));
         assertThat(c.getBusinessTypeId(), equalTo(0l));
         assertThat(c.getBusiness(), equalTo("N"));
-        assertThat(c.getCardName(), equalTo(""));
         assertThat(c.getCreditLimit(), equalTo(5000l));
         assertThat(c.getCustomerId(), equalTo(4776l));
         assertThat(c.getCustomerNr(), equalTo("203126"));
@@ -64,7 +72,7 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(c.getInfix(), equalTo(""));
         assertThat(c.getInitials(), equalTo("M.C."));
         assertThat(c.getLastName(), equalTo("Slomp"));
-        assertThat(c.getMemberDate(), nullValue());
+        assertThat(c.getMemberDate(), equalTo(toTs.apply(LocalDateTime.of(2007, 4, 11, 8, 33, 37))));
         assertThat(c.getNumberOfQCards(), equalTo(0));
         assertThat(c.getNumberOfRTPCards(), equalTo(0));
         assertThat(c.getNumberOfTCards(), equalTo(1));
@@ -72,12 +80,12 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(c.getPaymentMethod(), equalTo(""));
         assertThat(c.getPhoneNr(), equalTo("0614992123"));
         assertThat(c.getPincode(), equalTo("6858"));
-        assertThat(c.getProductGroup(), equalTo(""));
-        assertThat(c.getProductGroupID(), equalTo(-1));
-        assertThat(c.getStatus(), equalTo(""));
-        assertThat(c.getInvoiceAttn(), nullValue());
-        assertThat(c.getInvoiceEmail(), nullValue());
-        assertThat(c.isExtraInvoiceAnnotations(), equalTo(false));
+        assertThat(c.getProductGroup(), equalTo("YELLOWBRICK"));
+        assertThat(c.getProductGroupId(), equalTo(1));
+        assertThat(c.getStatus(), equalTo("lblSignedIt"));
+        assertThat(c.getInvoiceAttn(), equalTo("bar"));
+        assertThat(c.getInvoiceEmail(), equalTo("foo"));
+        assertThat(c.isExtraInvoiceAnnotations(), is(true));
     }
 
     @Test
@@ -125,8 +133,8 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     private int fetchCustomerStatus(long customerId) {
         return db.apply((template) -> {
             return template.queryForObject("SELECT customerstatusidfk FROM CUSTOMER WHERE customerid = ?",
-                Integer.class,
-                customerId);
+                    Integer.class,
+                    customerId);
         });
     }
 

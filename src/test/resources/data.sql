@@ -68,8 +68,8 @@ INSERT INTO CUSTOMER VALUES (
              1,
              NULL,
              '6858',
-             NULL,
-             NULL,
+             TO_DATE ('04/08/2007 18:26:22', 'MM/DD/YYYY HH24:MI:SS'),
+             TO_DATE ('04/11/2007 08:33:37', 'MM/DD/YYYY HH24:MI:SS'),
              NULL,
              5000,
              NULL,
@@ -81,9 +81,9 @@ INSERT INTO CUSTOMER VALUES (
              NULL,
              NULL,
              NULL,
-             NULL,
-             NULL,
-             '0');
+             'foo',
+             'bar',
+             '1');
 
 INSERT INTO CUSTOMER VALUES (
              602,

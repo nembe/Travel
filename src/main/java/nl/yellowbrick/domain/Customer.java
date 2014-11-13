@@ -41,7 +41,7 @@ public class Customer {
     private String phoneNr = "";
     private String pincode = "";
     private String productGroup = "";
-    private int productGroupID = -1;
+    private int productGroupId = -1;
     private String status = "";
     private String invoiceAttn = "";
     private String invoiceEmail = "";
@@ -216,8 +216,8 @@ public class Customer {
         return productGroup;
     }
 
-    public int getProductGroupID() {
-        return productGroupID;
+    public int getProductGroupId() {
+        return productGroupId;
     }
 
     public String getStatus() {
@@ -376,8 +376,8 @@ public class Customer {
         this.productGroup = productGroup;
     }
 
-    public void setProductGroupID(int productGroupID) {
-        this.productGroupID = productGroupID;
+    public void setProductGroupId(int productGroupId) {
+        this.productGroupId = productGroupId;
     }
 
     public void setStatus(String status) {

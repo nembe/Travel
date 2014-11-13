@@ -58,7 +58,7 @@ public class EmailNotificationServiceTest extends BaseSpringTestCase {
         customer.setFirstName("Rui");
         customer.setInfix("de");
         customer.setLastName("Salgado");
-        customer.setProductGroupID(8);
+        customer.setProductGroupId(8);
         customer.setEmail("rui.salgado@kabisa.nl");
     }
 
