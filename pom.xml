@@ -69,12 +69,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.h2database</groupId>-->
-            <!--<artifactId>h2</artifactId>-->
-            <!--<version>${h2.version}</version>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
@@ -104,6 +98,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <!-- by default spring boot does some fancy stuff to reload changes to
+                     application resources. However that breaks resource filtering.
+                     So we're disabling it. -->
+                <configuration>
+                    <addResources>false</addResources>
+                </configuration>
             </plugin>
         </plugins>
 
