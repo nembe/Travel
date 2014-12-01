@@ -97,15 +97,10 @@ public class AccountActivationTaskTest {
         };
     }
 
-    private class NoOpValidator implements AccountRegistrationValidator {
+    private class NoOpValidator extends AccountRegistrationValidator {
 
         @Override
-        public boolean supports(Class<?> aClass) {
-            return true;
-        }
-
-        @Override
-        public void validate(Object o, Errors errors) {
+        protected void validate(Customer customer, Errors errors) {
         }
     }
 }
