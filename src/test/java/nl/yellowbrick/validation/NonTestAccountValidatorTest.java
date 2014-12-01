@@ -33,13 +33,13 @@ public class NonTestAccountValidatorTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void noOpOnValidCustomer() throws Exception {
+    public void no_op_on_valid_customer() throws Exception {
         invokeValidator();
         assertThat(errors.getAllErrors(), empty());
     }
 
     @Test
-    public void handlesNulls() {
+    public void handles_nulls() {
         // just make some field null
         customer.setAccountCity(null);
 
@@ -48,7 +48,7 @@ public class NonTestAccountValidatorTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void detectsLeadingTestText() {
+    public void detects_leading_test_text() {
         customer.setFirstName("testsomething");
 
         invokeValidator();
@@ -56,7 +56,7 @@ public class NonTestAccountValidatorTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void detectsTrailingTestText() {
+    public void detects_trailing_test_text() {
         customer.setLastName("somethingtest");
 
         invokeValidator();
@@ -64,7 +64,7 @@ public class NonTestAccountValidatorTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void isCaseInsensitive() {
+    public void is_case_insensitive() {
         customer.setAccountCity("MUMBLETEST");
 
         invokeValidator();
