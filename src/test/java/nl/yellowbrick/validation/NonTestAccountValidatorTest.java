@@ -11,6 +11,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -51,7 +52,7 @@ public class NonTestAccountValidatorTest extends BaseSpringTestCase {
         customer.setFirstName("testsomething");
 
         invokeValidator();
-        assertTrue(errors.hasFieldErrors("firstName"));
+        assertThat(errors.getFieldError("firstName").getCode(), equalTo("test.data"));
     }
 
     @Test
@@ -59,7 +60,7 @@ public class NonTestAccountValidatorTest extends BaseSpringTestCase {
         customer.setLastName("somethingtest");
 
         invokeValidator();
-        assertTrue(errors.hasFieldErrors("lastName"));
+        assertThat(errors.getFieldError("lastName").getCode(), equalTo("test.data"));
     }
 
     @Test

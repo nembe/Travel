@@ -32,9 +32,8 @@ public class NonTestAccountValidator extends AccountRegistrationValidator {
             });
 
         } catch (Exception e) {
-            String errorMsg = String.format("an error occurred during automatic validation: %s",e.getMessage());
-            log.error(errorMsg);
-            errors.reject(errorMsg);
+            log.error(String.format("an error occurred during automatic validation: %s", e.getMessage()));
+            errors.reject("validation.failure");
         }
     }
 
@@ -47,7 +46,7 @@ public class NonTestAccountValidator extends AccountRegistrationValidator {
             String propText = propVal.toString().toLowerCase();
 
             if(propText.startsWith("test") || propText.endsWith("test"))
-                errors.rejectValue(prop.getName(), "field indicates this is likely a test account");
+                errors.rejectValue(prop.getName(), "test.data");
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
