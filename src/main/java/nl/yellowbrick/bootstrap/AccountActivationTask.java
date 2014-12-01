@@ -4,8 +4,7 @@ import nl.yellowbrick.dao.CustomerDao;
 import nl.yellowbrick.domain.Customer;
 import nl.yellowbrick.errors.ActivationException;
 import nl.yellowbrick.service.AccountActivationService;
-import nl.yellowbrick.validation.CustomerMembershipValidator;
-import nl.yellowbrick.validation.GeneralCustomerValidator;
+import nl.yellowbrick.validation.AccountRegistrationValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +19,19 @@ import java.util.List;
 @EnableScheduling
 public class AccountActivationTask {
 
-    @Autowired
-    private CustomerDao customerDao;
+    private static final Logger log = LoggerFactory.getLogger(AccountActivationTask.class);
+
+    private final CustomerDao customerDao;
+    private final AccountActivationService accountActivationService;
+    private final AccountRegistrationValidator[] accountRegistrationValidators;
 
     @Autowired
-    private GeneralCustomerValidator generalCustomerValidator;
-
-    @Autowired
-    private CustomerMembershipValidator customerMembershipValidator;
-
-    @Autowired
-    private AccountActivationService accountActivationService;
-
-    private Logger log = LoggerFactory.getLogger(AccountActivationTask.class);
+    public AccountActivationTask(CustomerDao customerDao, AccountActivationService activationService,
+                                 AccountRegistrationValidator... validators) {
+        this.customerDao = customerDao;
+        this.accountActivationService = activationService;
+        this.accountRegistrationValidators = validators;
+    }
 
     @Scheduled(fixedDelayString = "${activation.delay}")
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -49,7 +48,7 @@ public class AccountActivationTask {
         try {
             DataBinder binder = new DataBinder(customer);
 
-            binder.addValidators(generalCustomerValidator, customerMembershipValidator);
+            binder.addValidators(accountRegistrationValidators);
             binder.validate();
 
             if(binder.getBindingResult().hasErrors()) {

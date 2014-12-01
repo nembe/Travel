@@ -4,14 +4,9 @@ import com.google.common.collect.ImmutableList;
 import nl.yellowbrick.dao.CustomerDao;
 import nl.yellowbrick.domain.Customer;
 import nl.yellowbrick.service.AccountActivationService;
-import nl.yellowbrick.validation.CustomerMembershipValidator;
-import nl.yellowbrick.validation.GeneralCustomerValidator;
+import nl.yellowbrick.validation.AccountRegistrationValidator;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.validation.Errors;
@@ -22,19 +17,26 @@ import static org.mockito.Mockito.*;
 
 public class AccountActivationTaskTest {
 
-    @InjectMocks AccountActivationTask accountActivationTask;
+    AccountActivationTask accountActivationTask;
 
-    @Mock CustomerDao customerDao;
-    @Mock AccountActivationService accountActivationService;
-    @Spy GeneralCustomerValidator generalCustomerValidator;
-    @Spy CustomerMembershipValidator customerMembershipValidator;
+    CustomerDao customerDao;
+    AccountActivationService activationService;
+
+    // use a couple of validators for tests
+    AccountRegistrationValidator validatorA;
+    AccountRegistrationValidator validatorB;
 
     Customer customerA = new Customer();
     Customer customerB = new Customer();
 
     @Before
     public void initMocks() {
-        MockitoAnnotations.initMocks(this);
+        customerDao = mock(CustomerDao.class);
+        activationService = mock(AccountActivationService.class);
+        validatorA = spy(new NoOpValidator());
+        validatorB = spy(new NoOpValidator());
+
+        accountActivationTask = new AccountActivationTask(customerDao, activationService, validatorA, validatorB);
     }
 
 	@Test
@@ -44,34 +46,34 @@ public class AccountActivationTaskTest {
         accountActivationTask.validateAndActivateAccounts();
 
         verify(customerDao).findAllPendingActivation();
-        verifyNoMoreInteractions(customerDao, accountActivationService);
+        verifyNoMoreInteractions(customerDao, activationService);
 	}
 
     @Test
     public void activates_valid_accounts() {
         // ensure validators won't record any errors
-        doNothing().when(generalCustomerValidator).validate(any(), any());
-        doNothing().when(customerMembershipValidator).validate(any(), any());
+        doNothing().when(validatorA).validate(any(), any());
+        doNothing().when(validatorB).validate(any(), any());
 
         // return a couple of customers
         when(customerDao.findAllPendingActivation()).thenReturn(ImmutableList.of(customerA, customerB));
 
         accountActivationTask.validateAndActivateAccounts();
 
-        verify(accountActivationService).activateCustomerAccount(customerA);
-        verify(accountActivationService).activateCustomerAccount(customerB);
-        verifyNoMoreInteractions(accountActivationService);
+        verify(activationService).activateCustomerAccount(customerA);
+        verify(activationService).activateCustomerAccount(customerB);
+        verifyNoMoreInteractions(activationService);
     }
 
     @Test
     public void marks_invalid_accounts_as_pending_review() {
-        // customerA doesn't pass general validation
-        doAnswer(recordAnError()).when(generalCustomerValidator).validate(eq(customerA), any());
-        doNothing().when(customerMembershipValidator).validate(eq(customerA), any());
+        // customerA doesn't pass validation A
+        doAnswer(recordAnError()).when(validatorA).validate(eq(customerA), any());
+        doNothing().when(validatorB).validate(eq(customerA), any());
 
-        // customerB doesn't pass membership validation
-        doAnswer(recordAnError()).when(customerMembershipValidator).validate(eq(customerB), any());
-        doNothing().when(generalCustomerValidator).validate(eq(customerB), any());
+        // customerB doesn't pass validation B
+        doAnswer(recordAnError()).when(validatorB).validate(eq(customerB), any());
+        doNothing().when(validatorA).validate(eq(customerB), any());
 
         // return a couple of customers
         when(customerDao.findAllPendingActivation()).thenReturn(ImmutableList.of(customerA, customerB));
@@ -81,7 +83,7 @@ public class AccountActivationTaskTest {
         // they both are marked for review
         verify(customerDao).markAsPendingHumanReview(eq(customerA));
         verify(customerDao).markAsPendingHumanReview(eq(customerB));
-        verifyZeroInteractions(accountActivationService);
+        verifyZeroInteractions(activationService);
     }
 
     private Answer recordAnError() {
@@ -93,5 +95,17 @@ public class AccountActivationTaskTest {
                 return null;
             }
         };
+    }
+
+    private class NoOpValidator implements AccountRegistrationValidator {
+
+        @Override
+        public boolean supports(Class<?> aClass) {
+            return true;
+        }
+
+        @Override
+        public void validate(Object o, Errors errors) {
+        }
     }
 }
