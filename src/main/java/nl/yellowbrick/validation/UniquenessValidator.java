@@ -1,6 +1,7 @@
 package nl.yellowbrick.validation;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import nl.yellowbrick.dao.CustomerDao;
 import nl.yellowbrick.domain.Customer;
@@ -25,6 +26,14 @@ public class UniquenessValidator extends AccountRegistrationValidator {
         if(existsByNameAndDob(customer)) {
             errors.reject("duplicate");
         }
+
+        if (existsByEmail(customer.getEmail())) {
+            errors.rejectValue("email", "duplicate");
+        }
+    }
+
+    private boolean existsByEmail(String email) {
+        return Iterables.tryFind(customerDao.findAllByEmail(email), activatedCustomers()).isPresent();
     }
 
     private boolean existsByNameAndDob(Customer customer) {
@@ -33,11 +42,13 @@ public class UniquenessValidator extends AccountRegistrationValidator {
                 customer.getLastName(),
                 customer.getDateOfBirth());
 
-        Optional<Customer> match = Iterables.tryFind(customers, (cust) -> {
-            return cust.getCustomerStatusIdfk() != CustomerStatus.ACTIVATION_FAILED.code()
-                    && cust.getCustomerStatusIdfk() != CustomerStatus.REGISTERED.code();
-        });
+        Optional<Customer> match = Iterables.tryFind(customers, activatedCustomers());
 
         return match.isPresent();
+    }
+
+    private Predicate<Customer> activatedCustomers() {
+        return (cust) -> cust.getCustomerStatusIdfk() != CustomerStatus.ACTIVATION_FAILED.code()
+                && cust.getCustomerStatusIdfk() != CustomerStatus.REGISTERED.code();
     }
 }

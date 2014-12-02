@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -50,10 +51,7 @@ public class CustomerJdbcDao implements CustomerDao {
                 "ORDER BY applicationdate"
         );
 
-        BeanPropertyRowMapper<Customer> rowMapper = new BeanPropertyRowMapper<>(Customer.class);
-        rowMapper.setPrimitivesDefaultedForNullValue(true);
-
-        return template.query(sql, rowMapper);
+        return template.query(sql, beanRowMapper());
     }
 
     @Override
@@ -75,10 +73,15 @@ public class CustomerJdbcDao implements CustomerDao {
                 "AND TRIM(LOWER(lastname)) = ?"
         );
 
-        return template.query(query, rowMapper,
+        return template.query(query, beanRowMapper(),
                 dayOfBirth,
                 firstName.toLowerCase().trim(),
                 lastName.toLowerCase().trim());
+    }
+
+    @Override
+    public List<Customer> findAllByEmail(String email) {
+        return template.query("SELECT * FROM CUSTOMER WHERE email = ?", beanRowMapper(), email);
     }
 
     @Override
@@ -112,5 +115,12 @@ public class CustomerJdbcDao implements CustomerDao {
 
     private String buildQuery(String... parts) {
         return Joiner.on(' ').join(parts);
+    }
+
+    private RowMapper<Customer> beanRowMapper() {
+        BeanPropertyRowMapper<Customer> rowMapper = new BeanPropertyRowMapper<>(Customer.class);
+        rowMapper.setPrimitivesDefaultedForNullValue(true);
+
+        return rowMapper;
     }
 }

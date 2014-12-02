@@ -44,7 +44,7 @@ public class UniquenessValidatorTest extends BaseSpringTestCase {
 
     @Test
     public void invalidates_match_on_name_and_date_of_birth() {
-        mockFuzzyQuery(customer);
+        mockQueryByNameAndDob();
 
         customer.setCustomerStatusIdfk(CustomerStatus.ACTIVE.code());
 
@@ -55,7 +55,7 @@ public class UniquenessValidatorTest extends BaseSpringTestCase {
 
     @Test
     public void ignores_pre_active_results() {
-        mockFuzzyQuery(customer);
+        mockQueryByNameAndDob();
 
         customer.setCustomerStatusIdfk(CustomerStatus.REGISTERED.code());
         invokeValidator();
@@ -66,18 +66,29 @@ public class UniquenessValidatorTest extends BaseSpringTestCase {
         assertThat(errors.getAllErrors(), empty());
     }
 
-    private void mockFuzzyQuery(Customer... results) {
+    @Test
+    public void invalidates_match_on_email() {
+        when(customerDao.findAllByEmail(eq(customer.getEmail()))).thenReturn(Arrays.asList(customer));
+
+        customer.setCustomerStatusIdfk(CustomerStatus.ACTIVE.code());
+        invokeValidator();
+
+        assertThat(errors.getFieldError("email").getCode(), equalTo("duplicate"));
+    }
+
+    private void mockQueryByNameAndDob() {
         when(customerDao.findAllByFuzzyNameAndDateOfBirth(
                 eq(customer.getFirstName()),
                 eq(customer.getLastName()),
                 eq(customer.getDateOfBirth())
-        )).thenReturn(Arrays.asList(results));
+        )).thenReturn(Arrays.asList(customer));
     }
 
     private Customer customer() {
         Customer cust = new Customer();
         cust.setFirstName("John");
         cust.setLastName("Doe");
+        cust.setEmail("john@doe.com");
 
         Instant dob = LocalDate.of(1990, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant();
 
