@@ -8,12 +8,14 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -128,6 +130,16 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     @Test
     public void returns_found_locale() {
         assertThat(customerDao.getRegistrationLocale(testCustomer()), equalTo(Optional.of("nl_NL")));
+    }
+
+    @Test
+    public void fetches_customers_by_fuzzy_match_on_name_and_date() {
+        Date date = Date.from(Instant.parse("1965-11-15T12:34:56.789Z")); // time portion is expected to be ignored
+
+        assertThat(customerDao.findAllByFuzzyNameAndDateOfBirth("Rinze", "Opstal", date), not(empty()));
+        assertThat(customerDao.findAllByFuzzyNameAndDateOfBirth("rInZe", "oPsTaL", date), not(empty()));
+        assertThat(customerDao.findAllByFuzzyNameAndDateOfBirth("Rinze ", "   Opstal", date), not(empty()));
+        assertThat(customerDao.findAllByFuzzyNameAndDateOfBirth("Something", "Other", date), empty());
     }
 
     private int fetchCustomerStatus(long customerId) {
