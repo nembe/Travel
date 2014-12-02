@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +52,11 @@ public class CustomerJdbcDao implements CustomerDao {
         rowMapper.setPrimitivesDefaultedForNullValue(true);
 
         return template.query(sql, rowMapper);
+    }
+
+    @Override
+    public List<Customer> findAllByFuzzyNameAndDateOfBirth(String firstName, String lastName, Date dateOfBirth) {
+        return null;
     }
 
     @Override
