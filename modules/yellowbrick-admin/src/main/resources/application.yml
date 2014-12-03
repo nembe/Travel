@@ -1,0 +1,11 @@
+datasource:
+  driverClassName: oracle.jdbc.OracleDriver
+  url: jdbc:oracle:thin:@yb-oradev:1521:orcl
+  username: dev_nl_brickparking
+  password: dev_nl_brickparking
+
+spring:
+  thymeleaf:
+    cache: false
+
+mutator: ADMIN

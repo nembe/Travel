@@ -6,3 +6,6 @@ target/
 *.iws
 *.log
 activemq-data
+node
+node_modules
+npm-debug.log
