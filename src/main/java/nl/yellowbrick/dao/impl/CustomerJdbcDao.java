@@ -1,7 +1,6 @@
 package nl.yellowbrick.dao.impl;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import nl.yellowbrick.dao.CustomerDao;
 import nl.yellowbrick.domain.Customer;
 import org.slf4j.Logger;
@@ -12,6 +11,10 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +30,7 @@ public class CustomerJdbcDao implements CustomerDao {
 
     @Override
     public List<Customer> findAllPendingActivation() {
-        String sql = Joiner.on(' ').join(ImmutableList.of(
+        String sql = buildQuery(
                 "SELECT c.*,",
                 "c.productgroup_id AS product_group_id,",
                 "c.billingagentidfk AS billing_agent_id,",
@@ -45,12 +48,37 @@ public class CustomerJdbcDao implements CustomerDao {
                 "AND c.productgroup_id = 1 ",
                 "AND c.customerstatusidfk = 1 ",
                 "ORDER BY applicationdate"
-        ));
+        );
 
         BeanPropertyRowMapper<Customer> rowMapper = new BeanPropertyRowMapper<>(Customer.class);
         rowMapper.setPrimitivesDefaultedForNullValue(true);
 
         return template.query(sql, rowMapper);
+    }
+
+    @Override
+    public List<Customer> findAllByFuzzyNameAndDateOfBirth(String firstName, String lastName, Date dateOfBirth) {
+        Date dayOfBirth = Date.from(Instant
+                        .ofEpochMilli(dateOfBirth.getTime())
+                        .atOffset(ZoneOffset.ofHours(0))
+                        .truncatedTo(ChronoUnit.DAYS)
+                        .toInstant()
+        );
+
+        BeanPropertyRowMapper<Customer> rowMapper = new BeanPropertyRowMapper<>(Customer.class);
+        rowMapper.setPrimitivesDefaultedForNullValue(true);
+
+        String query = buildQuery(
+                "SELECT * FROM CUSTOMER",
+                "WHERE TRUNC(dateofbirth) = ?",
+                "AND TRIM(LOWER(firstname)) = ?",
+                "AND TRIM(LOWER(lastname)) = ?"
+        );
+
+        return template.query(query, rowMapper,
+                dayOfBirth,
+                firstName.toLowerCase().trim(),
+                lastName.toLowerCase().trim());
     }
 
     @Override
@@ -80,5 +108,9 @@ public class CustomerJdbcDao implements CustomerDao {
             log.warn("Failed to retrieve locale for customer ID: " + customer.getCustomerId(), e);
             return Optional.empty();
         }
+    }
+
+    private String buildQuery(String... parts) {
+        return Joiner.on(' ').join(parts);
     }
 }
