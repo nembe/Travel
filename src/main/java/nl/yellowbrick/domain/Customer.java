@@ -20,7 +20,7 @@ public class Customer {
     private long customerId = 0;
     private String customerNr = "";
     private int customerStatusIdfk = 0;
-    private String dateOfBirth = "";
+    private Date dateOfBirth = null;
     private String displayCard = "";
     private String email = "";
     private Date exitDate = null;
@@ -111,7 +111,7 @@ public class Customer {
         return customerStatusIdfk;
     }
 
-    public String getDateOfBirth() {
+    public Date getDateOfBirth() {
         return dateOfBirth;
     }
 
@@ -292,7 +292,7 @@ public class Customer {
         this.customerStatusIdfk = customerStatusIdfk;
     }
 
-    public void setDateOfBirth(String dateOfBirth) {
+    public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

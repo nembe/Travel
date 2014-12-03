@@ -112,7 +112,7 @@ INSERT INTO CUSTOMER VALUES (
              NULL,
              NULL,
              5000,
-             NULL,
+             TO_DATE ('11/15/1965 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
              'R Opstal',
              NULL,
              1,
