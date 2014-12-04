@@ -1,9 +1,148 @@
 @import 'normalize.css';
 
-$font-stack:    Helvetica, sans-serif;
-$primary-color: #333;
+$bg-color: #F4F5F8;
+$text-color: #1F3753;
+$base-font-size: 14px;
 
-body {
-  font: 100% $font-stack;
-  color: $primary-color;
+$dashboard-color: #FA9F28;
+$customers-color: #21A596;
+$product-groups-color: #E74144;
+$municipalities-color: #328AEA;
+$action-codes-color: #663BC9;
+$provisioning-color: #21A596;
+
+$side-menu-width: 200px;
+
+html, body {
+  height: 100%;
+  color: $text-color;
+  font-size: $base-font-size;
+  overflow: hidden;
+}
+
+a, a:active, a:hover, a:visited {
+  text-decoration: none;
+  color: $text-color;
+}
+
+#logo {
+  background-image: url("/images/logo.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  height: 30px;
+  width: 150px;
+  margin: 15px 0 20px 25px;
+  display: block;
+}
+
+#side-menu {
+  height: 100%;
+  width: $side-menu-width;
+  background-color: $bg-color;
+  float: left;
+
+  ul {
+    margin: 0;
+    list-style-type: none;
+    padding: 0;
+
+    li {
+      border-left-style: solid;
+      border-left-width: 4px;
+      padding-left: 20px;
+      line-height: 45px;
+      margin-top: 2px;
+    }
+
+    @mixin active-highlight($color) {
+      border-left-color: $color;
+
+      &:hover, &.active {
+        background-color: $color;
+
+        a {
+          color: #FFF;
+        }
+      }
+    }
+
+    li.dashboard {
+      @include active-highlight($dashboard-color);
+    }
+
+    li.customers {
+      @include active-highlight($customers-color);
+    }
+
+    li.product-groups {
+      @include active-highlight($product-groups-color);
+    }
+
+    li.municipalities {
+      @include active-highlight($municipalities-color);
+    }
+
+    li.action-codes {
+      @include active-highlight($action-codes-color);
+    }
+
+    li.provisioning {
+      @include active-highlight($provisioning-color);
+    }
+  }
+}
+
+#main {
+  margin-left: $side-menu-width;
+}
+
+#main-menu {
+  background-color: #199784;
+  width: 100%;
+  line-height: 60px;
+  text-align: right;
+
+  a {
+    color: #FFF;
+  }
+
+  ul {
+    margin: 0;
+    padding-right: 80px;
+  }
+
+  li {
+    list-style-type: none;
+    display: inline;
+  }
+}
+
+.main-body {
+  padding: 12px 10px;
+}
+
+.section {
+
+  h1, h2, h3 {
+    margin-top: 0;
+  }
+
+  background-color: $bg-color;
+  padding: 20px 10px;
+  margin-bottom: 18px;
+}
+
+table {
+  border-collapse: collapse;
+  text-align: left;
+  margin: 20px;
+}
+
+table th {
+  border-bottom: 2px solid;
+  padding: 10px 8px;
+}
+
+table td {
+  padding: 9px 8px 0;
 }
