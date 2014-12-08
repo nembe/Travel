@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    driverClassName: org.hsqldb.jdbcDriver
+    url: jdbc:hsqldb:mem:PUBLIC:syntax.ora=true
+
+mutator: TEST MUTATOR

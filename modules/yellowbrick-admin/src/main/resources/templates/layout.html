@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE">Yellowbrick Admin</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <link rel="stylesheet" type="text/css" media="all" th:href="@{/css/application.css}" />
+</head>
+<body>
+    <div id="side-menu">
+        <a id="logo" th:href="@{/}"></a>
+        <ul>
+            <li class="dashboard" bw:activeforctx="/dashboard">
+                <a href="#">DASHBOARD</a>
+            </li>
+            <li class="customers" bw:activeforctx="/customers">
+                <a href="#">CUSTOMERS</a>
+            </li>
+            <li class="product-groups" bw:activeforctx="/product-groups">
+                <a href="#">PRODUCT GROUPS</a>
+            </li>
+            <li class="municipalities" bw:activeforctx="/municipalities">
+                <a href="#">MUNICIPALITIES</a>
+            </li>
+            <li class="action-codes" bw:activeforctx="/action-codes">
+                <a href="#">ACTION CODES</a>
+            </li>
+            <li class="provisioning" bw:activeforctx="/provisioning">
+                <a th:href="@{/provisioning}">PROVISIONING</a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="main">
+        <div layout:fragment="content"></div>
+    </div>
+</body>
+</html>

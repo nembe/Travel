@@ -1,0 +1,16 @@
+{
+    "name": "yellowbrick-admin",
+    "version": "0.0.1",
+    "description": "Yellowbrick Admin",
+    "dependencies": {},
+    "devDependencies": {
+        "gulp": "3.8.10",
+        "gulp-sass": "1.1.0"
+    },
+    "scripts": {
+        "build": "gulp build"
+    },
+    "engines": {
+        "node": ">=0.10.0"
+    }
+}

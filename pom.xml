@@ -4,12 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>nl.yellowbrick</groupId>
-    <artifactId>yellowbrick-account-activation</artifactId>
+    <artifactId>yellowbrick-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
-    <name>Yellowbrick Account Activation</name>
-    <description>Continously running process that validates and activates new user accounts</description>
+    <name>Yellowbrick Parent POM</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -18,67 +17,14 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.integration</groupId>
-            <artifactId>spring-integration-mail</artifactId>
-            <version>${spring.integration.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>${oracle.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mchange</groupId>
-            <artifactId>c3p0</artifactId>
-            <version>${c3p0.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mindrot</groupId>
-            <artifactId>jbcrypt</artifactId>
-            <version>${bcrypt.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>${javax.mail.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>${javax.activation.version}</version>
-        </dependency>
-
-        <!-- Tests -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>2.3.2</version>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>modules/yellowbrick-data</module>
+        <module>modules/yellowbrick-account-activation</module>
+        <module>modules/yellowbrick-admin</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <start-class>nl.yellowbrick.bootstrap.Application</start-class>
         <!-- for production override with -Dspring.profiles.active=production -->
         <spring.profiles.active>development</spring.profiles.active>
         <!-- dependency versions -->
@@ -91,28 +37,7 @@
         <spring.integration.version>4.0.4.RELEASE</spring.integration.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <javax.activation.version>1.1.1</javax.activation.version>
+        <hsqldb.version>2.3.2</hsqldb.version>
     </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <!-- by default spring boot does some fancy stuff to reload changes to
-                     application resources. However that breaks resource filtering.
-                     So we're disabling it. -->
-                <configuration>
-                    <addResources>false</addResources>
-                </configuration>
-            </plugin>
-        </plugins>
-
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-    </build>
 
 </project>
