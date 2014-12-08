@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -141,6 +142,12 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(customerDao.findAllByFuzzyNameAndDateOfBirth("rInZe", "oPsTaL", date), not(empty()));
         assertThat(customerDao.findAllByFuzzyNameAndDateOfBirth("Rinze ", "   Opstal", date), not(empty()));
         assertThat(customerDao.findAllByFuzzyNameAndDateOfBirth("Something", "Other", date), empty());
+    }
+
+    @Test
+    public void fetches_customers_by_email() {
+        assertThat(customerDao.findAllByEmail("bestaatniet@taxameter.nl"), hasSize(2));
+        assertThat(customerDao.findAllByEmail("something@other.com"), empty());
     }
 
     private int fetchCustomerStatus(long customerId) {

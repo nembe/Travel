@@ -12,6 +12,8 @@ public interface CustomerDao {
 
     List<Customer> findAllByFuzzyNameAndDateOfBirth(String firstName, String lastName, Date dateOfBirth);
 
+    List<Customer> findAllByEmail(String email);
+
     void markAsPendingHumanReview(Customer customer);
 
     void assignNextCustomerNr(Customer customer);
