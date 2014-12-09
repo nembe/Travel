@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html layout:decorator="layouts/default">
+<head>
+    <title>Provisioning</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div id="main-menu">
+            <ul>
+                <li>
+                    <a th:href="@{/provisioning}">PENDING VALIDATION</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-body">
+
+            <form th:object="${form}" method="post">
+                <div class="section">
+
+                    <ul th:if="${#fields.hasErrors('global')}">
+                        <li th:each="err : ${#fields.errors('global')}" th:text="${err}">Input is incorrect</li>
+                    </ul>
+
+                    <h2>General data</h2>
+
+                    <div class="field">
+                        <input type="radio" th:field="*{gender}" th:value="M" />
+                        <label th:for="${#ids.prev('gender')}">Mr.</label>
+                        <input type="radio" th:field="*{gender}" th:value="F" />
+                        <label th:for="${#ids.prev('gender')}">Mrs.</label>
+                    </div>
+
+                    <div class="field">
+                        <label for="initials">Initial(s)</label>
+                        <input type="text" th:field="*{initials}"/>
+                    </div>
+
+                    <div class="field">
+                        <label for="firstname">First name</label>
+                        <input type="text" th:field="*{firstName}"/>
+                    </div>
+
+                    <div class="field">
+                        <label for="lastName">Last name</label>
+                        <input type="text" th:field="*{lastName}"/>
+                    </div>
+
+                    <div class="field">
+                        <label for="dateOfBirth">Date of birth</label>
+                        <input type="text" th:field="*{dateOfBirth}"/>
+                        <p th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}">Incorrect date</p>
+                    </div>
+
+                    <h3>Contact details</h3>
+
+                    <div class="field">
+                        <label for="email">Email address</label>
+                        <input type="text" th:field="*{email}"/>
+                    </div>
+
+                    <div class="field">
+                        <label for="phoneNr">Telephone</label>
+                        <input type="text" th:field="*{phoneNr}"/>
+                    </div>
+
+                    <h3>Address details</h3>
+
+                    <div class="field">
+                        <label for="street">Street</label>
+                        <input type="text" th:field="*{street}"/>
+                    </div>
+
+                    <div class="field">
+                        <label for="houseNr">House number</label>
+                        <input type="text" th:field="*{houseNr}"/>
+                    </div>
+
+                    <div class="field">
+                        <label for="supplement">supplement</label>
+                        <input type="text" th:field="*{supplement}"/>
+                    </div>
+
+                    <div class="field">
+                        <label for="postalCode">Postal code</label>
+                        <input type="text" th:field="*{postalCode}"/>
+                    </div>
+
+                    <div class="field">
+                        <label for="city">City</label>
+                        <input type="text" th:field="*{city}"/>
+                    </div>
+
+                    <div class="field">
+                        <label for="country">Country</label>
+                        <input type="text" th:field="*{country}"/>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Membership data</h2>
+
+                    <div class="field">
+                        <label for="numberOfTransponderCards">Number of transponder cards</label>
+                        <input type="text" th:field="*{numberOfTransponderCards}"/>
+                    </div>
+
+                    <div class="field">
+                        <label for="numberOfPPlusCards">Number of P+ cards</label>
+                        <input type="text" th:field="*{numberOfPPlusCards}"/>
+                    </div>
+
+                    <div class="field">
+                        <label for="registrationFee">Registration fee</label>
+                        <input type="text" th:field="*{registrationFee}"/>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <input type="submit" name="validate" value="Submit" />
+                </div>
+            </form>
+
+        </div>
+    </div>
+</body>
+</html>
