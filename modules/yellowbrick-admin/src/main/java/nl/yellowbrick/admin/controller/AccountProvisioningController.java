@@ -100,7 +100,7 @@ public class AccountProvisioningController {
 
         // save changes
         customerDao.savePrivateCustomer(customer);
-        addressDao.savePrivateCustomerAddress(address);
+        addressDao.savePrivateCustomerAddress(customer.getCustomerId(), address);
 
         // and activate customer
         accountActivationService.activateCustomerAccount(customer);

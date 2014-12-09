@@ -8,5 +8,5 @@ public interface CustomerAddressDao {
 
     Optional<CustomerAddress> findByCustomerId(long customerId);
 
-    void savePrivateCustomerAddress(CustomerAddress address);
+    void savePrivateCustomerAddress(long customerId, CustomerAddress address);
 }

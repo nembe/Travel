@@ -3,6 +3,7 @@ package nl.yellowbrick.data.database;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -54,6 +55,18 @@ public class Functions {
         });
 
         returnOut[0] = -1;
+    }
+
+    public static void customerSaveAddress(int customerAddressId, int customerId, int addressTypeId, String street,
+                                           String houseNr, String supplement, String poBox, String zipCode,
+                                           String city, String countryCode, String extraInfo, String mutator) {
+
+        CALL_RECORDERS.forEach((recorder) -> {
+            Object[] args = { customerAddressId, customerId, addressTypeId, street, houseNr, supplement, poBox,
+                    zipCode, city, countryCode, extraInfo, mutator };
+
+            recorder.accept(new FunctionCall("customerSaveAddress", args));
+        });
     }
 
     public static class FunctionCall {

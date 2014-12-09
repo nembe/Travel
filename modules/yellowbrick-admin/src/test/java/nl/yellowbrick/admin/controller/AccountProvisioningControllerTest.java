@@ -76,19 +76,19 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
     public void saves_changes_to_customer_and_address() throws Exception {
         // TODO get rid of these mocks
         doNothing().when(customerDao).savePrivateCustomer(any());
-        doNothing().when(addressDao).savePrivateCustomerAddress(any());
+        doNothing().when(addressDao).savePrivateCustomerAddress(anyLong(), any());
 
         postAccountProvisioningForm();
 
         verify(customerDao).savePrivateCustomer(argThat(isUpdatedCustomer()));
-        verify(addressDao).savePrivateCustomerAddress(argThat(isUpdatedAddress()));
+        verify(addressDao).savePrivateCustomerAddress(eq(2364l), argThat(isUpdatedAddress()));
     }
 
     @Test
     public void activates_customer_account() throws Exception {
         // TODO get rid of these mocks
         doNothing().when(customerDao).savePrivateCustomer(any());
-        doNothing().when(addressDao).savePrivateCustomerAddress(any());
+        doNothing().when(addressDao).savePrivateCustomerAddress(anyLong(), any());
 
         postAccountProvisioningForm();
 
