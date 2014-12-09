@@ -1,5 +1,6 @@
 package nl.yellowbrick.admin.dialect;
 
+import org.springframework.core.Ordered;
 import org.springframework.web.servlet.support.RequestContext;
 import org.thymeleaf.Arguments;
 import org.thymeleaf.dom.Element;
@@ -15,7 +16,7 @@ public class ActiveForContextAttrProcessor extends AbstractAttributeModifierAttr
     }
 
     public int getPrecedence() {
-        return Integer.MAX_VALUE;
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 
     @Override
