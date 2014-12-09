@@ -14,14 +14,14 @@ public class GeneralCustomerValidator extends AccountRegistrationValidator {
     @Override
     protected void validate(Customer customer, Errors errors) {
         if(customer.getDateOfBirth() == null) {
-            errors.rejectValue("dateOfBirth", "missing");
+            errors.rejectValue("dateOfBirth", "errors.missing");
             return;
         }
 
         boolean youngerThanSixteen = sixteenYearsAgo().isBefore(Instant.ofEpochMilli(customer.getDateOfBirth().getTime()));
 
         if(youngerThanSixteen) {
-            errors.rejectValue("dateOfBirth", "too.young");
+            errors.rejectValue("dateOfBirth", "errors.too.young");
         }
     }
 

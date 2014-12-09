@@ -37,7 +37,7 @@ public class GeneralCustomerValidatorTest {
         customer.setDateOfBirth(null);
 
         invokeValidator();
-        assertThat(errors.getFieldError("dateOfBirth").getCode(), equalTo("missing"));
+        assertThat(errors.getFieldError("dateOfBirth").getCode(), equalTo("errors.missing"));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class GeneralCustomerValidatorTest {
         customer.setDateOfBirth(Date.from(tooYoung));
 
         invokeValidator();
-        assertThat(errors.getFieldError("dateOfBirth").getCode(), equalTo("too.young"));
+        assertThat(errors.getFieldError("dateOfBirth").getCode(), equalTo("errors.too.young"));
     }
 
     @Test
