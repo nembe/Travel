@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -41,12 +42,10 @@ public class CustomerJdbcDao implements CustomerDao {
                 "pg.description product_group,",
                 "0 as parkadammertotal",
                 "FROM CUSTOMER c",
-                "INNER JOIN CUSTOMERADDRESS ca ON c.customerid = ca.customeridfk",
                 "INNER JOIN PRODUCT_GROUP pg ON pg.id = c.productgroup_id",
                 "INNER JOIN TBLBILLINGAGENT ba ON c.billingagentidfk = ba.billingagentid",
                 "INNER JOIN CUSTOMERSTATUS cs ON c.customerstatusidfk = cs.customerstatusid",
-                "WHERE (ca.addresstypeidfk = 1 OR ca.addresstypeidfk IS NULL)",
-                "AND c.productgroup_id = 1 ",
+                "WHERE c.productgroup_id = 1 ",
                 "AND c.customerstatusidfk = 1 ",
                 "ORDER BY applicationdate"
         );
@@ -56,6 +55,10 @@ public class CustomerJdbcDao implements CustomerDao {
 
     @Override
     public List<Customer> findAllByFuzzyNameAndDateOfBirth(String firstName, String lastName, Date dateOfBirth) {
+        if(dateOfBirth == null) {
+            return new ArrayList<>();
+        }
+
         Date dayOfBirth = Date.from(Instant
                         .ofEpochMilli(dateOfBirth.getTime())
                         .atOffset(ZoneOffset.ofHours(0))
@@ -111,6 +114,12 @@ public class CustomerJdbcDao implements CustomerDao {
             log.warn("Failed to retrieve locale for customer ID: " + customer.getCustomerId(), e);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public void savePrivateCustomer(Customer customer) {
+        // TODO implement
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     private String buildQuery(String... parts) {
