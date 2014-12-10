@@ -1,15 +1,6 @@
 @import 'normalize.css';
-
-$bg-color: #F4F5F8;
-$text-color: #1F3753;
-$base-font-size: 14px;
-
-$dashboard-color: #FA9F28;
-$customers-color: #21A596;
-$product-groups-color: #E74144;
-$municipalities-color: #328AEA;
-$action-codes-color: #663BC9;
-$provisioning-color: #21A596;
+@import 'colors';
+@import 'forms';
 
 $side-menu-width: 200px;
 
@@ -21,7 +12,7 @@ html, body {
 }
 
 a, a:active, a:hover, a:visited {
-  text-decoration: none;
+  text-decoration: underline;
   color: $text-color;
 }
 
@@ -119,17 +110,6 @@ a, a:active, a:hover, a:visited {
 
 .main-body {
   padding: 12px 10px;
-}
-
-.section {
-
-  h1, h2, h3 {
-    margin-top: 0;
-  }
-
-  background-color: $bg-color;
-  padding: 20px 10px;
-  margin-bottom: 18px;
 }
 
 table {

@@ -18,13 +18,17 @@
             <form th:object="${form}" method="post">
                 <div class="section">
 
-                    <ul th:if="${#fields.hasErrors('global')}">
-                        <li th:each="err : ${#fields.errors('global')}" th:text="${err}">Input is incorrect</li>
-                    </ul>
+                    <div th:if="${#fields.hasErrors('global')}" class="global-errors">
+                        <h3>Validation errors</h3>
+                        <ul>
+                            <li th:each="err : ${#fields.errors('global')}" th:text="${err}"></li>
+                        </ul>
+                    </div>
 
                     <h2>General data</h2>
 
                     <div class="field">
+                        <span class="field-label">Gender</span>
                         <input type="radio" th:field="*{gender}" th:value="M" />
                         <label th:for="${#ids.prev('gender')}">Mr.</label>
                         <input type="radio" th:field="*{gender}" th:value="F" />
@@ -32,68 +36,79 @@
                     </div>
 
                     <div class="field">
-                        <label for="initials">Initial(s)</label>
-                        <input type="text" th:field="*{initials}"/>
+                        <label for="initials" class="field-label">Initial(s)</label>
+                        <input type="text" th:field="*{initials}" th:errorclass="field-error" />
+                        <span class="field-error" th:if="${#fields.hasErrors('initials')}" th:errors="*{initials}"></span>
                     </div>
 
                     <div class="field">
-                        <label for="firstname">First name</label>
-                        <input type="text" th:field="*{firstName}"/>
+                        <label for="firstname" class="field-label">First name</label>
+                        <input type="text" th:field="*{firstName}" th:errorclass="field-error" />
+                        <span class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
                     </div>
 
                     <div class="field">
-                        <label for="lastName">Last name</label>
-                        <input type="text" th:field="*{lastName}"/>
+                        <label for="lastName" class="field-label">Last name</label>
+                        <input type="text" th:field="*{lastName}" th:errorclass="field-error"/>
+                        <span class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
                     </div>
 
                     <div class="field">
-                        <label for="dateOfBirth">Date of birth</label>
-                        <input type="text" th:field="*{dateOfBirth}"/>
-                        <p th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}">Incorrect date</p>
+                        <label for="dateOfBirth" class="field-label">Date of birth</label>
+                        <input type="text" th:field="*{dateOfBirth}" th:errorclass="field-error"/>
+                        <span class="field-error" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></span>
                     </div>
 
                     <h3>Contact details</h3>
 
                     <div class="field">
-                        <label for="email">Email address</label>
-                        <input type="text" th:field="*{email}"/>
+                        <label for="email" class="field-label">Email address</label>
+                        <input type="text" th:field="*{email}" th:errorclass="field-error"/>
+                        <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
                     </div>
 
                     <div class="field">
-                        <label for="phoneNr">Telephone</label>
-                        <input type="text" th:field="*{phoneNr}"/>
+                        <label for="phoneNr" class="field-label">Telephone</label>
+                        <input type="text" th:field="*{phoneNr}" th:errorclass="field-error"/>
+                        <span class="field-error" th:if="${#fields.hasErrors('phoneNr')}" th:errors="*{phoneNr}"></span>
                     </div>
 
                     <h3>Address details</h3>
 
                     <div class="field">
-                        <label for="street">Street</label>
-                        <input type="text" th:field="*{street}"/>
+                        <label for="street" class="field-label">Street</label>
+                        <input type="text" th:field="*{street}" th:errorclass="field-error"/>
+                        <span class="field-error" th:if="${#fields.hasErrors('street')}" th:errors="*{street}"></span>
                     </div>
 
                     <div class="field">
-                        <label for="houseNr">House number</label>
-                        <input type="text" th:field="*{houseNr}"/>
+                        <label for="houseNr" class="field-label">House number</label>
+                        <input type="text" th:field="*{houseNr}" th:errorclass="field-error"/>
+                        <span class="field-error" th:if="${#fields.hasErrors('houseNr')}" th:errors="*{houseNr}"></span>
                     </div>
 
                     <div class="field">
-                        <label for="supplement">supplement</label>
-                        <input type="text" th:field="*{supplement}"/>
+                        <label for="supplement" class="field-label">supplement</label>
+                        <input type="text" th:field="*{supplement}" th:errorclass="field-error"/>
+                        <span class="field-error" th:if="${#fields.hasErrors('supplement')}" th:errors="*{supplement}"></span>
                     </div>
 
                     <div class="field">
-                        <label for="postalCode">Postal code</label>
-                        <input type="text" th:field="*{postalCode}"/>
+                        <label for="postalCode" class="field-label">Postal code</label>
+                        <input type="text" th:field="*{postalCode}" th:errorclass="field-error"/>
+                        <span class="field-error" th:if="${#fields.hasErrors('postalCode')}" th:errors="*{postalCode}"></span>
                     </div>
 
                     <div class="field">
-                        <label for="city">City</label>
+                        <label for="city" class="field-label">City</label>
                         <input type="text" th:field="*{city}"/>
+                        <span class="field-error" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></span>
                     </div>
 
                     <div class="field">
-                        <label for="country">Country</label>
-                        <input type="text" th:field="*{country}"/>
+                        <label for="country" class="field-label">Country</label>
+                        <input type="text" th:field="*{country}" th:errorclass="field-error"/>
+                        <span class="field-error" th:if="${#fields.hasErrors('country')}" th:errors="*{country}"></span>
                     </div>
                 </div>
 
@@ -101,18 +116,21 @@
                     <h2>Membership data</h2>
 
                     <div class="field">
-                        <label for="numberOfTransponderCards">Number of transponder cards</label>
-                        <input type="text" th:field="*{numberOfTransponderCards}"/>
+                        <label for="numberOfTransponderCards" class="field-label">Number of transponder cards</label>
+                        <input type="text" th:field="*{numberOfTransponderCards}" th:errorclass="field-error"/>
+                        <span class="field-error" th:if="${#fields.hasErrors('numberOfTransponderCards')}" th:errors="*{numberOfTransponderCards}"></span>
                     </div>
 
                     <div class="field">
-                        <label for="numberOfPPlusCards">Number of P+ cards</label>
-                        <input type="text" th:field="*{numberOfPPlusCards}"/>
+                        <label for="numberOfPPlusCards" class="field-label">Number of P+ cards</label>
+                        <input type="text" th:field="*{numberOfPPlusCards}" th:errorclass="field-error"/>
+                        <span class="field-error" th:if="${#fields.hasErrors('numberOfPPlusCards')}" th:errors="*{numberOfPPlusCards}"></span>
                     </div>
 
                     <div class="field">
-                        <label for="registrationFee">Registration fee</label>
-                        <input type="text" th:field="*{registrationFee}"/>
+                        <label for="registrationFee" class="field-label">Registration fee</label>
+                        <input type="text" th:field="*{registrationFee}" th:errorclass="field-error"/>
+                        <span class="field-error" th:if="${#fields.hasErrors('registrationFee')}" th:errors="*{registrationFee}"></span>
                     </div>
                 </div>
 
