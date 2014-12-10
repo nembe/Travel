@@ -30,6 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
+    // id of customer pending manual validation
+    private static final long CUSTOMER_ID = 394744;
+
     // under test
     @Autowired WebApplicationContext wac;
     @Autowired @InjectMocks AccountProvisioningController controller;
@@ -58,15 +61,15 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
     public void returns_409_if_customer_address_not_found() throws Exception {
         db.truncateTable("CUSTOMERADDRESS");
 
-        mockMvc.perform(get("/provisioning/2364")).andExpect(status().is(409));
+        mockMvc.perform(get("/provisioning/" + CUSTOMER_ID)).andExpect(status().is(409));
     }
 
     @Test
     public void shows_account_registration_validation_errors() throws Exception {
         // make use of the age restriction to check validations
-        db.accept((t) -> t.update("UPDATE CUSTOMER SET DATEOFBIRTH = NULL WHERE CUSTOMERID = 2364"));
+        db.accept((t) -> t.update("UPDATE CUSTOMER SET DATEOFBIRTH = NULL WHERE CUSTOMERID = ?", CUSTOMER_ID));
 
-        MvcResult res = mockMvc.perform(get("/provisioning/2364")).andReturn();
+        MvcResult res = mockMvc.perform(get("/provisioning/" + CUSTOMER_ID)).andReturn();
 
         assertThat(res.getResponse().getStatus(), equalTo(200));
         assertThat(res.getResponse().getContentAsString(), containsString("must be specified"));
@@ -81,7 +84,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
         postAccountProvisioningForm();
 
         verify(customerDao).savePrivateCustomer(argThat(isUpdatedCustomer()));
-        verify(addressDao).savePrivateCustomerAddress(eq(2364l), argThat(isUpdatedAddress()));
+        verify(addressDao).savePrivateCustomerAddress(eq(CUSTOMER_ID), argThat(isUpdatedAddress()));
     }
 
     @Test
@@ -96,7 +99,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
     }
 
     private MvcResult postAccountProvisioningForm() throws Exception {
-        return mockMvc.perform(post("/provisioning/2364")
+        return mockMvc.perform(post("/provisioning/" + CUSTOMER_ID)
                 .param("email", "some.other.email@test.com")
                 .param("street", "middle of nowhere")
                 .param("numberOfPPlusCards", "2")
@@ -111,7 +114,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
             public boolean matches(Object o) {
                 Customer cust = (Customer) o;
 
-                return cust.getCustomerId() == 2364
+                return cust.getCustomerId() == CUSTOMER_ID
                         && cust.getEmail().equals("some.other.email@test.com")
                         && cust.getNumberOfQCards() == 2;
 

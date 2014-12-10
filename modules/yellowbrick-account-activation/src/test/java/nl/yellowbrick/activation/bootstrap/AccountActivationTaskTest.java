@@ -5,6 +5,7 @@ import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.activation.service.AccountActivationService;
 import nl.yellowbrick.activation.validation.AccountRegistrationValidator;
+import nl.yellowbrick.data.domain.CustomerStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -26,8 +27,8 @@ public class AccountActivationTaskTest {
     AccountRegistrationValidator validatorA;
     AccountRegistrationValidator validatorB;
 
-    Customer customerA = new Customer();
-    Customer customerB = new Customer();
+    Customer customerA = testCustomer();
+    Customer customerB = testCustomer();
 
     @Before
     public void initMocks() {
@@ -84,6 +85,13 @@ public class AccountActivationTaskTest {
         verify(customerDao).markAsPendingHumanReview(eq(customerA));
         verify(customerDao).markAsPendingHumanReview(eq(customerB));
         verifyZeroInteractions(activationService);
+    }
+
+    private Customer testCustomer() {
+        Customer customer = new Customer();
+        customer.setCustomerStatusIdfk(CustomerStatus.REGISTERED.code());
+
+        return customer;
     }
 
     private Answer recordAnError() {

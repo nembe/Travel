@@ -125,6 +125,46 @@ INSERT INTO CUSTOMER VALUES (
              NULL,
              '0');
 
+INSERT INTO CUSTOMER VALUES (
+             602,
+             394744,
+             NULL,
+             'N',
+             '212448900',
+             NULL,
+             NULL,
+             NULL,
+             'M',
+             NULL,
+             'Scheltinga',
+             'Wietse',
+             'van',
+             'W.J.',
+             'bestaatniet@taxameter.nl',
+             NULL,
+             0, -- needs manual validation
+             '0616545500',
+             NULL,
+             1,
+             0,
+             NULL,
+             TO_DATE ('08/23/2013 10:05:06', 'MM/DD/YYYY HH24:MI:SS'),
+             NULL,
+             NULL,
+             NULL,
+             TO_DATE ('12/31/1981 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             'W.j. Van Scheltinga',
+             NULL,
+             1, -- product group id
+             1,
+             'YBAANMELDEN:Scheltinga',
+             NULL,
+             '0616545500',
+             '27-HZZ-9',
+             NULL,
+             NULL,
+             '0');
+
 INSERT INTO CUSTOMERADDRESS VALUES (
              5803,
              4776,
@@ -154,6 +194,21 @@ INSERT INTO CUSTOMERADDRESS VALUES (
              NULL,
              'YBKLANT:2364',
              NULL);
+
+INSERT INTO CUSTOMERADDRESS VALUES (
+             397339,
+             394744,
+             1,
+             'Davisstraat',
+             '42',
+             'I',
+             NULL,
+             '1057 TL',
+             'Amsterdam',
+             'NL',
+             NULL,
+             'YBAANMELDEN:Scheltinga',
+             NULL);COMMIT;
 
 INSERT INTO TBLBILLINGAGENT VALUES (104, 'TravelCard', 'TravelCard', NULL);
 INSERT INTO TBLBILLINGAGENT VALUES (601, 'creditcard per dag(Visa)', NULL, NULL);

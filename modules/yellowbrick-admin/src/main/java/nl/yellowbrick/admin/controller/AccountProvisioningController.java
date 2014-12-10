@@ -9,6 +9,7 @@ import nl.yellowbrick.data.dao.CustomerAddressDao;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
+import nl.yellowbrick.data.domain.CustomerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/provisioning")
@@ -59,7 +62,7 @@ public class AccountProvisioningController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String pendingValidation(Model model) {
-        model.addAttribute("customers", customerDao.findAllPendingActivation());
+        model.addAttribute("customers", customersPendingManualValidation());
 
         return "provisioning/index";
     }
@@ -108,8 +111,14 @@ public class AccountProvisioningController {
         return "redirect:/provisioning";
     }
 
-    private Customer customerById(int customerId) {
+    private List<Customer> customersPendingManualValidation() {
         return customerDao.findAllPendingActivation().stream()
+                .filter((customer) -> customer.getCustomerStatusIdfk() == CustomerStatus.ACTIVATION_FAILED.code())
+                .collect(Collectors.toList());
+    }
+
+    private Customer customerById(int customerId) {
+        return customersPendingManualValidation().stream()
                 .filter((cust) -> cust.getCustomerId() == customerId)
                 .findFirst()
                 .orElseThrow(ResourceNotFoundException::new);

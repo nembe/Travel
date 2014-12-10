@@ -47,7 +47,7 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     public void returns_customers_if_data_is_in_place() {
         List<Customer> customers = customerDao.findAllPendingActivation();
 
-        assertThat(customers.size(), equalTo(2));
+        assertThat(customers.size(), equalTo(3));
     }
 
     @Test
@@ -155,7 +155,7 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void fetches_customers_by_email() {
-        assertThat(customerDao.findAllByEmail("bestaatniet@taxameter.nl"), hasSize(2));
+        assertThat(customerDao.findAllByEmail("bestaatniet@taxameter.nl"), hasSize(3));
         assertThat(customerDao.findAllByEmail("something@other.com"), empty());
     }
 

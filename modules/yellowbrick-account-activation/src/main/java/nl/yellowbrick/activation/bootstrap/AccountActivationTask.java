@@ -2,6 +2,7 @@ package nl.yellowbrick.activation.bootstrap;
 
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.Customer;
+import nl.yellowbrick.data.domain.CustomerStatus;
 import nl.yellowbrick.data.errors.ActivationException;
 import nl.yellowbrick.activation.service.AccountActivationService;
 import nl.yellowbrick.activation.validation.AccountRegistrationValidator;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.DataBinder;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @EnableScheduling
 public class AccountActivationTask {
@@ -38,10 +40,16 @@ public class AccountActivationTask {
     public void validateAndActivateAccounts()  {
         log.debug("starting validateAndActivateAccounts");
 
-        List<Customer> customers = customerDao.findAllPendingActivation();
+        List<Customer> customers = newlyRegisteredCustomers();
         log.info(String.format("processing %d customers", customers.size()));
 
         customers.forEach(this::validateAndActivateAccount);
+    }
+
+    private List<Customer> newlyRegisteredCustomers() {
+        return customerDao.findAllPendingActivation().stream()
+                .filter((customer) -> customer.getCustomerStatusIdfk() == CustomerStatus.REGISTERED.code())
+                .collect(Collectors.toList());
     }
 
     private void validateAndActivateAccount(Customer customer) {

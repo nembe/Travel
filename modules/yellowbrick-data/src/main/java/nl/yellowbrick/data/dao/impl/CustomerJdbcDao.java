@@ -62,7 +62,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 "INNER JOIN TBLBILLINGAGENT ba ON c.billingagentidfk = ba.billingagentid",
                 "INNER JOIN CUSTOMERSTATUS cs ON c.customerstatusidfk = cs.customerstatusid",
                 "WHERE c.productgroup_id = 1 ",
-                "AND c.customerstatusidfk = 1 ",
+                "AND c.customerstatusidfk < 2 ",
                 "ORDER BY applicationdate"
         );
 
