@@ -69,6 +69,18 @@ public class Functions {
         });
     }
 
+    public static void customerSavePrivateData(int customerId, String gender, String initials, String firstName,
+                                               String infix, String lastName, String email, String phoneNr,
+                                               String fax, Date dateOfBirth, int productGroupId, String mutator) {
+
+        CALL_RECORDERS.forEach((recorder) -> {
+            Object[] args = { customerId, gender, initials, firstName, infix, lastName, email,
+                    phoneNr, fax, dateOfBirth, productGroupId, mutator };
+
+            recorder.accept(new FunctionCall("customerSavePrivateData", args));
+        });
+    }
+
     public static class FunctionCall {
 
         public final String functionName;

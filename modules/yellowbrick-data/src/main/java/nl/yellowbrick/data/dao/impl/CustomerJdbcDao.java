@@ -5,13 +5,18 @@ import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
+import java.sql.Types;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
@@ -21,14 +26,25 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class CustomerJdbcDao implements CustomerDao {
+public class CustomerJdbcDao implements CustomerDao, InitializingBean {
+
+    private static final Logger log = LoggerFactory.getLogger(CustomerJdbcDao.class);
+    private static final String PACKAGE = "WEBAPP";
+    private static final String PROCEDURE = "CustomerSavePrivateData";
 
     private static final int ACTIVATION_FAILED_STATUS = 0;
 
     @Autowired
     private JdbcTemplate template;
 
-    private Logger log = LoggerFactory.getLogger(CustomerJdbcDao.class);
+    @Value("${mutator}")
+    private String mutator;
+    private SimpleJdbcCall saveCustomerCall;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        compileJdbcCall();
+    }
 
     @Override
     public List<Customer> findAllPendingActivation() {
@@ -118,8 +134,42 @@ public class CustomerJdbcDao implements CustomerDao {
 
     @Override
     public void savePrivateCustomer(Customer customer) {
-        // TODO implement
-        throw new UnsupportedOperationException("not implemented yet");
+        saveCustomerCall.execute(
+                customer.getCustomerId(),
+                customer.getGender(),
+                customer.getInitials(),
+                customer.getFirstName(),
+                customer.getInfix(),
+                customer.getLastName(),
+                customer.getEmail(),
+                customer.getPhoneNr(),
+                customer.getFax(),
+                customer.getDateOfBirth(),
+                customer.getProductGroupId(),
+                mutator
+        );
+    }
+
+    private void compileJdbcCall() {
+        saveCustomerCall = new SimpleJdbcCall(template)
+                .withCatalogName(PACKAGE)
+                .withProcedureName(PROCEDURE)
+                .declareParameters(
+                        new SqlParameter("CustomerId_in", Types.NUMERIC),
+                        new SqlParameter("Gender_in", Types.CHAR),
+                        new SqlParameter("Initials_in", Types.VARCHAR),
+                        new SqlParameter("FirstName_in", Types.VARCHAR),
+                        new SqlParameter("Infix_in", Types.VARCHAR),
+                        new SqlParameter("LastName_in", Types.VARCHAR),
+                        new SqlParameter("Email_in", Types.VARCHAR),
+                        new SqlParameter("PhoneNr_in", Types.VARCHAR),
+                        new SqlParameter("Fax_in", Types.VARCHAR),
+                        new SqlParameter("DateOfBirth_in", Types.DATE),
+                        new SqlParameter("ProductGroup_in", Types.NUMERIC),
+                        new SqlParameter("Mutator_in", Types.VARCHAR)
+                );
+
+        saveCustomerCall.compile();
     }
 
     private String buildQuery(String... parts) {

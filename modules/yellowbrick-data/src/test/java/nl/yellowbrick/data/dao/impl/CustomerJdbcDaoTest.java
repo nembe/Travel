@@ -3,21 +3,30 @@ package nl.yellowbrick.data.dao.impl;
 import com.google.common.base.Function;
 import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.database.DbHelper;
+import nl.yellowbrick.data.database.Functions;
 import nl.yellowbrick.data.domain.Customer;
+import nl.yellowbrick.data.domain.CustomerAddress;
+import org.hamcrest.Matchers;
+import org.hamcrest.core.IsEqual;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
 
@@ -148,6 +157,39 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     public void fetches_customers_by_email() {
         assertThat(customerDao.findAllByEmail("bestaatniet@taxameter.nl"), hasSize(2));
         assertThat(customerDao.findAllByEmail("something@other.com"), empty());
+    }
+
+    @Test
+    public void delegates_saving_private_customer_to_stored_procedure() throws Exception {
+        CountDownLatch lock = new CountDownLatch(1);
+        LinkedList<Functions.FunctionCall> calls = new LinkedList<>();
+
+        Functions.CALL_RECORDERS.add((functionCall) -> {
+            calls.add(functionCall);
+            lock.countDown();
+        });
+
+        Customer customer = testCustomer();
+        customerDao.savePrivateCustomer(customer);
+
+        lock.await(2, TimeUnit.SECONDS);
+
+        Object[] args = calls.getFirst().arguments;
+        String fnName = calls.getFirst().functionName;
+
+        assertThat(fnName, Matchers.equalTo("customerSavePrivateData"));
+        assertThat(Long.parseLong(args[0].toString()), equalTo(customer.getCustomerId()));
+        assertThat(args[1], equalTo(customer.getGender()));
+        assertThat(args[2], equalTo(customer.getInitials()));
+        assertThat(args[3], equalTo(customer.getFirstName()));
+        assertThat(args[4], equalTo(customer.getInfix()));
+        assertThat(args[5], equalTo(customer.getLastName()));
+        assertThat(args[6], equalTo(customer.getEmail()));
+        assertThat(args[7], equalTo(customer.getPhoneNr()));
+        assertThat(args[8], equalTo(customer.getFax()));
+        assertThat(args[9], equalTo(customer.getDateOfBirth()));
+        assertThat(args[10], equalTo(customer.getProductGroupId()));
+        assertThat(args[11], equalTo("TEST MUTATOR"));
     }
 
     private int fetchCustomerStatus(long customerId) {
