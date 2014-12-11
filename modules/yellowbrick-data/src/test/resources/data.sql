@@ -310,3 +310,16 @@ INSERT INTO SYSTEMUSER VALUES (
              NULL,
              NULL,
              NULL);
+
+
+INSERT INTO MARKETINGACTION VALUES (
+             'AFCIJBURG',
+             10,
+             TO_DATE ('09/24/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             TO_DATE ('09/30/2013 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+
+INSERT INTO MARKETINGACTION VALUES (
+             'FACEBOOK',
+             0,
+             TO_DATE ('11/12/2014 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             TO_DATE ('01/01/2199 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
