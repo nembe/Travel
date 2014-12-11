@@ -1,9 +1,12 @@
 package nl.yellowbrick.activation.bootstrap;
 
+import com.google.common.base.Strings;
 import nl.yellowbrick.data.dao.CustomerDao;
+import nl.yellowbrick.data.dao.MarketingActionDao;
 import nl.yellowbrick.data.dao.PriceModelDao;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerStatus;
+import nl.yellowbrick.data.domain.MarketingAction;
 import nl.yellowbrick.data.domain.PriceModel;
 import nl.yellowbrick.data.errors.ActivationException;
 import nl.yellowbrick.activation.service.AccountActivationService;
@@ -28,15 +31,18 @@ public class AccountActivationTask {
 
     private final CustomerDao customerDao;
     private final PriceModelDao priceModelDao;
+    private final MarketingActionDao marketingActionDao;
     private final AccountActivationService accountActivationService;
     private final AccountRegistrationValidator[] accountRegistrationValidators;
 
     @Autowired
     public AccountActivationTask(CustomerDao customerDao, PriceModelDao priceModelDao,
+                                 MarketingActionDao marketingActionDao,
                                  AccountActivationService activationService,
                                  AccountRegistrationValidator... validators) {
         this.customerDao = customerDao;
         this.priceModelDao = priceModelDao;
+        this.marketingActionDao = marketingActionDao;
         this.accountActivationService = activationService;
         this.accountRegistrationValidators = validators;
     }
@@ -74,7 +80,22 @@ public class AccountActivationTask {
 
                 if(!priceModel.isPresent()) {
                     log.error("Activation failed due to lack of price model for customer ID: " + customer.getCustomerId());
+                    customerDao.markAsPendingHumanReview(customer);
                     return;
+                }
+
+                if(!Strings.isNullOrEmpty(customer.getActionCode())) {
+                    Optional<MarketingAction> marketingAction = marketingActionDao.findByActionCode(customer.getActionCode());
+
+                    if(!marketingAction.isPresent() || !marketingAction.get().isCurrentlyValid()) {
+                        log.error("unacceptable action code " + customer.getActionCode());
+                        customerDao.markAsPendingHumanReview(customer);
+                    } else {
+                        log.info(String.format("applying action code %s to customer ID %s",
+                                customer.getActionCode(),
+                                customer.getCustomerId()));
+                        priceModel.get().setRegistratiekosten(marketingAction.get().getRegistrationCost());
+                    }
                 }
 
                 log.info("validation succeeded for customer ID: " + customer.getCustomerId());

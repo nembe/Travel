@@ -4,9 +4,11 @@ import com.google.common.collect.ImmutableList;
 import nl.yellowbrick.activation.service.AccountActivationService;
 import nl.yellowbrick.activation.validation.AccountRegistrationValidator;
 import nl.yellowbrick.data.dao.CustomerDao;
+import nl.yellowbrick.data.dao.MarketingActionDao;
 import nl.yellowbrick.data.dao.PriceModelDao;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerStatus;
+import nl.yellowbrick.data.domain.MarketingAction;
 import nl.yellowbrick.data.domain.PriceModel;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,8 +17,11 @@ import org.mockito.stubbing.Answer;
 import org.springframework.validation.Errors;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Optional;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 public class AccountActivationTaskTest {
@@ -25,6 +30,7 @@ public class AccountActivationTaskTest {
 
     CustomerDao customerDao;
     PriceModelDao priceModelDao;
+    MarketingActionDao marketingActionDao;
     AccountActivationService activationService;
 
     // use a couple of validators for tests
@@ -40,32 +46,31 @@ public class AccountActivationTaskTest {
     public void initMocks() {
         customerDao = mock(CustomerDao.class);
         priceModelDao = mock(PriceModelDao.class);
+        marketingActionDao = mock(MarketingActionDao.class);
         activationService = mock(AccountActivationService.class);
         validatorA = spy(new NoOpValidator());
         validatorB = spy(new NoOpValidator());
 
-        accountActivationTask = new AccountActivationTask(customerDao, priceModelDao, activationService, validatorA, validatorB);
+        accountActivationTask = new AccountActivationTask(customerDao, priceModelDao, marketingActionDao,
+                activationService, validatorA, validatorB);
     }
 
-	@Test
-	public void no_op_if_there_are_no_accounts_pending_activation() {
+    @Test
+    public void no_op_if_there_are_no_accounts_pending_activation() {
         when(customerDao.findAllPendingActivation()).thenReturn(new ArrayList<>());
 
         accountActivationTask.validateAndActivateAccounts();
 
         verify(customerDao).findAllPendingActivation();
         verifyNoMoreInteractions(customerDao, activationService);
-	}
+    }
 
     @Test
     public void activates_valid_accounts() {
-        // ensure validators won't record any errors
-        doNothing().when(validatorA).validate(any(), any());
-        doNothing().when(validatorB).validate(any(), any());
-
         // return a couple of customers
         when(customerDao.findAllPendingActivation()).thenReturn(ImmutableList.of(customerA, customerB));
         when(priceModelDao.findForCustomer(anyLong())).thenReturn(Optional.of(priceModel));
+        when(marketingActionDao.findByActionCode(any())).thenReturn(Optional.empty());
 
         accountActivationTask.validateAndActivateAccounts();
 
@@ -96,21 +101,43 @@ public class AccountActivationTaskTest {
     }
 
     @Test
-    public void no_op_if_missing_price_model() {
-        doNothing().when(validatorA).validate(any(), any());
-
+    public void marks_invalid_account_if_missing_price_model() {
         // return a couple of customers
         when(customerDao.findAllPendingActivation()).thenReturn(ImmutableList.of(customerA));
         when(priceModelDao.findForCustomer(anyLong())).thenReturn(Optional.empty());
 
         accountActivationTask.validateAndActivateAccounts();
 
+        verify(customerDao).markAsPendingHumanReview(eq(customerA));
         verifyZeroInteractions(activationService);
+    }
+
+    @Test
+    public void applies_marketing_action() {
+        when(customerDao.findAllPendingActivation()).thenReturn(ImmutableList.of(customerA));
+        when(priceModelDao.findForCustomer(anyLong())).thenReturn(Optional.of(priceModel));
+        when(marketingActionDao.findByActionCode(customerA.getActionCode()))
+                .thenReturn(Optional.of(validMarketingAction()));
+
+        accountActivationTask.validateAndActivateAccounts();
+
+        verify(activationService).activateCustomerAccount(customerA, priceModel);
+        assertThat(priceModel.getRegistratiekosten(), equalTo(12345));
+    }
+
+    private MarketingAction validMarketingAction() {
+        long day = 1440 * 60 * 1000;
+
+        Date validFrom = new Date(System.currentTimeMillis() - day);
+        Date validTo = new Date(System.currentTimeMillis() + day);
+
+        return new MarketingAction("BOOYAKASHA", 12345, validFrom, validTo);
     }
 
     private Customer testCustomer() {
         Customer customer = new Customer();
         customer.setCustomerStatusIdfk(CustomerStatus.REGISTERED.code());
+        customer.setActionCode("BOOYAKASHA");
 
         return customer;
     }
