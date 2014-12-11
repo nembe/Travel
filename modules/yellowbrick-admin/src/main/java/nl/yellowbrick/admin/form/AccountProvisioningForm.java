@@ -12,7 +12,7 @@ public class AccountProvisioningForm {
     private String firstName;
     private String infix;
     private String lastName;
-    @DateTimeFormat(pattern = "dd-MM-YYYY")
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date dateOfBirth;
 
     // contact details

@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.sql.Date;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -103,6 +105,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
                 .param("email", "some.other.email@test.com")
                 .param("street", "middle of nowhere")
                 .param("numberOfPPlusCards", "2")
+                .param("dateOfBirth", "07-09-1985")
                 .param("validate", "Submit") // TODO do we need this here ?
                 // TODO change and test remaining fields
         ).andReturn();
@@ -116,7 +119,8 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
                 return cust.getCustomerId() == CUSTOMER_ID
                         && cust.getEmail().equals("some.other.email@test.com")
-                        && cust.getNumberOfQCards() == 2;
+                        && cust.getNumberOfQCards() == 2
+                        && cust.getDateOfBirth().equals(Date.valueOf("1985-09-07"));
 
             }
         };

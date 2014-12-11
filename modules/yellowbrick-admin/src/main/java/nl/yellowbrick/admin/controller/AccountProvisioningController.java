@@ -13,6 +13,7 @@ import nl.yellowbrick.data.domain.CustomerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,15 +38,18 @@ public class AccountProvisioningController {
     private CustomerAddressDao addressDao;
     private AccountActivationService accountActivationService;
     private AccountRegistrationValidator[] accountRegistrationValidators;
+    private ConversionService conversionService;
 
     @Autowired
     public AccountProvisioningController(CustomerDao customerDao,
                                          CustomerAddressDao addressDao,
                                          AccountActivationService accountActivationService,
+                                         ConversionService conversionService,
                                          AccountRegistrationValidator... accountRegistrationValidators) {
         this.customerDao = customerDao;
         this.addressDao = addressDao;
         this.accountActivationService = accountActivationService;
+        this.conversionService = conversionService;
         this.accountRegistrationValidators = accountRegistrationValidators;
     }
 
@@ -74,7 +79,8 @@ public class AccountProvisioningController {
 
         AccountProvisioningForm form = form(customer, address);
 
-        Errors errors = new BindException(form, "form");
+        BeanPropertyBindingResult errors = new BeanPropertyBindingResult(form, "form");
+        errors.initConversion(conversionService);
 
         for(Validator validator: accountRegistrationValidators) {
             ValidationUtils.invokeValidator(validator, customer, errors);
@@ -144,7 +150,7 @@ public class AccountProvisioningController {
         form.setFirstName(customer.getFirstName());
         form.setInfix(customer.getInfix());
         form.setLastName(customer.getLastName());
-        form.setDateOfBirth(customer.getDateOfBirth());
+        form.setDateOfBirth(new Date());
         form.setEmail(customer.getEmail());
         form.setPhoneNr(customer.getPhoneNr());
 

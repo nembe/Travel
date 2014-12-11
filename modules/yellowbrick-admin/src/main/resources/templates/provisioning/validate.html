@@ -55,7 +55,7 @@
 
                     <div class="field">
                         <label for="dateOfBirth" class="field-label">Date of birth</label>
-                        <input type="text" th:field="*{dateOfBirth}" th:errorclass="field-error"/>
+                        <input type="text" th:field="*{{dateOfBirth}}" th:errorclass="field-error"/>
                         <span class="field-error" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></span>
                     </div>
 
