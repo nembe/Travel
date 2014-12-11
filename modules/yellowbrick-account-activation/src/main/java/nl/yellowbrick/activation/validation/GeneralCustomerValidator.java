@@ -1,5 +1,6 @@
 package nl.yellowbrick.activation.validation;
 
+import com.google.common.base.Strings;
 import nl.yellowbrick.data.dao.MarketingActionDao;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.MarketingAction;
@@ -29,7 +30,7 @@ public class GeneralCustomerValidator extends AccountRegistrationValidator {
             errors.rejectValue("dateOfBirth", "errors.too.young");
         }
 
-        if(!validActionCode(customer.getActionCode())) {
+        if(!Strings.isNullOrEmpty(customer.getActionCode()) && !validActionCode(customer.getActionCode())) {
             errors.rejectValue("actionCode", "errors.invalid.action.code");
         }
     }

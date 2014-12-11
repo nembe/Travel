@@ -71,7 +71,6 @@ public class GeneralCustomerValidatorTest extends BaseSpringTestCase {
     private Customer validCustomer() {
         Customer cust = new Customer();
         cust.setDateOfBirth(Date.from(sixteenYearsAgo));
-        cust.setActionCode("FACEBOOK");
 
         return cust;
     }
