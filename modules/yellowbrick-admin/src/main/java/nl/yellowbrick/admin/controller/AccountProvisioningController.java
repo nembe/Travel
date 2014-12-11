@@ -7,11 +7,9 @@ import nl.yellowbrick.admin.exceptions.ResourceNotFoundException;
 import nl.yellowbrick.admin.form.AccountProvisioningForm;
 import nl.yellowbrick.data.dao.CustomerAddressDao;
 import nl.yellowbrick.data.dao.CustomerDao;
+import nl.yellowbrick.data.dao.MarketingActionDao;
 import nl.yellowbrick.data.dao.PriceModelDao;
-import nl.yellowbrick.data.domain.Customer;
-import nl.yellowbrick.data.domain.CustomerAddress;
-import nl.yellowbrick.data.domain.CustomerStatus;
-import nl.yellowbrick.data.domain.PriceModel;
+import nl.yellowbrick.data.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Controller
@@ -36,39 +36,18 @@ public class AccountProvisioningController {
 
     private static final Logger log = LoggerFactory.getLogger(AccountProvisioningController.class);
 
-    private CustomerDao customerDao;
-    private CustomerAddressDao addressDao;
-    private PriceModelDao priceModelDao;
-    private AccountActivationService accountActivationService;
-    private AccountRegistrationValidator[] accountRegistrationValidators;
-    private ConversionService conversionService;
+    // collaborators
+    @Autowired private CustomerDao customerDao;
+    @Autowired private CustomerAddressDao addressDao;
+    @Autowired private PriceModelDao priceModelDao;
+    @Autowired private MarketingActionDao marketingActionDao;
+    @Autowired private AccountActivationService accountActivationService;
 
-    @Autowired
-    public AccountProvisioningController(CustomerDao customerDao,
-                                         CustomerAddressDao addressDao,
-                                         PriceModelDao priceModelDao,
-                                         AccountActivationService accountActivationService,
-                                         ConversionService conversionService,
-                                         AccountRegistrationValidator... accountRegistrationValidators) {
-        this.customerDao = customerDao;
-        this.addressDao = addressDao;
-        this.priceModelDao = priceModelDao;
-        this.accountActivationService = accountActivationService;
-        this.conversionService = conversionService;
-        this.accountRegistrationValidators = accountRegistrationValidators;
-    }
+    // validators
+    @Autowired private List<AccountRegistrationValidator> accountRegistrationValidators;
 
-    public void setCustomerDao(CustomerDao customerDao) {
-        this.customerDao = customerDao;
-    }
-
-    public void setAddressDao(CustomerAddressDao addressDao) {
-        this.addressDao = addressDao;
-    }
-
-    public void setAccountActivationService(AccountActivationService accountActivationService) {
-        this.accountActivationService = accountActivationService;
-    }
+    // formatters
+    @Autowired private ConversionService conversionService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String pendingValidation(Model model) {
@@ -81,7 +60,7 @@ public class AccountProvisioningController {
     public String validate(Model model, @PathVariable("id") int id) {
         Customer customer = customerById(id);
         CustomerAddress address = addressForCustomer(id);
-        PriceModel priceModel = priceModelForCustomer(id);
+        PriceModel priceModel = priceModelForCustomer(id, customer.getActionCode());
 
         AccountProvisioningForm form = form(customer, address, priceModel);
 
@@ -94,6 +73,7 @@ public class AccountProvisioningController {
 
         model.addAttribute("form", form);
         model.addAttribute(BindingResult.MODEL_KEY_PREFIX + "form", errors);
+        model.addAttribute("customer", customer);
 
         return "provisioning/validate";
     }
@@ -107,7 +87,7 @@ public class AccountProvisioningController {
         // TODO run some additional validations here ?
         Customer customer = customerById(id);
         CustomerAddress address = addressForCustomer(id);
-        PriceModel priceModel = priceModelForCustomer(id);
+        PriceModel priceModel = priceModelForCustomer(id, customer.getActionCode());
 
         updateCustomer(customer, form);
         updateAddress(address, form);
@@ -149,16 +129,23 @@ public class AccountProvisioningController {
         throw new InconsistentDataException(error);
     }
 
-    private PriceModel priceModelForCustomer(int customerId) {
+    private PriceModel priceModelForCustomer(int customerId, String actionCode) {
         Optional<PriceModel> priceModel = priceModelDao.findForCustomer(customerId);
+        Optional<MarketingAction> marketingAction = marketingActionDao.findByActionCode(actionCode);
 
-        if(priceModel.isPresent())
-            return priceModel.get();
+        Supplier<InconsistentDataException> inconsistentDataError = () -> {
+            String error = "couldn't find price model for customer id: " + customerId;
+            log.error(error);
 
-        String error = "couldn't find price model for customer id: " + customerId;
+            return new InconsistentDataException(error);
+        };
 
-        log.error(error);
-        throw new InconsistentDataException(error);
+        Function<PriceModel, PriceModel> applyDiscount = (pm) -> {
+            marketingAction.ifPresent((action) -> pm.setRegistratiekosten(action.getRegistrationCost()));
+            return pm;
+        };
+
+        return priceModel.map(applyDiscount).orElseThrow(inconsistentDataError);
     }
 
     private AccountProvisioningForm form(Customer customer, CustomerAddress address, PriceModel priceModel) {

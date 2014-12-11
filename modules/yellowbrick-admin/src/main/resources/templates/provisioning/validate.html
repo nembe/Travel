@@ -116,6 +116,16 @@
                     <h2>Membership data</h2>
 
                     <div class="field">
+                        <span class="field-label">Applied on</span>
+                        <span class="field-value" th:text="${customer.applicationDate}"></span>
+                    </div>
+
+                    <div class="field">
+                        <span class="field-label">Action code</span>
+                        <span class="field-value" th:text="${customer.actionCode}"></span>
+                    </div>
+
+                    <div class="field">
                         <label for="numberOfTransponderCards" class="field-label">Number of transponder cards</label>
                         <input type="text" th:field="*{numberOfTransponderCards}" th:errorclass="field-error"/>
                         <span class="field-error" th:if="${#fields.hasErrors('numberOfTransponderCards')}" th:errors="*{numberOfTransponderCards}"></span>
