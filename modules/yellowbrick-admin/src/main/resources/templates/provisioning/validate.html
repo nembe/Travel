@@ -128,8 +128,14 @@
                     </div>
 
                     <div class="field">
+                        <label for="registrationFee" class="field-label">Subscription fee</label>
+                        <input type="text" th:field="*{subscriptionFee}" th:errorclass="field-error" disabled="disabled" />
+                        <span class="field-error" th:if="${#fields.hasErrors('subscriptionFee')}" th:errors="*{subscriptionFee}"></span>
+                    </div>
+
+                    <div class="field">
                         <label for="registrationFee" class="field-label">Registration fee</label>
-                        <input type="text" th:field="*{registrationFee}" th:errorclass="field-error"/>
+                        <input type="text" th:field="*{registrationFee}" th:errorclass="field-error" disabled="disabled" />
                         <span class="field-error" th:if="${#fields.hasErrors('registrationFee')}" th:errors="*{registrationFee}"></span>
                     </div>
                 </div>

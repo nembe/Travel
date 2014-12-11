@@ -97,7 +97,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
         postAccountProvisioningForm();
 
-        verify(accountActivationService).activateCustomerAccount(any());
+        verify(accountActivationService).activateCustomerAccount(any(), any());
     }
 
     private MvcResult postAccountProvisioningForm() throws Exception {

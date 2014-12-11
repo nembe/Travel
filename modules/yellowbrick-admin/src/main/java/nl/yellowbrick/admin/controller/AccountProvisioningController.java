@@ -7,9 +7,11 @@ import nl.yellowbrick.admin.exceptions.ResourceNotFoundException;
 import nl.yellowbrick.admin.form.AccountProvisioningForm;
 import nl.yellowbrick.data.dao.CustomerAddressDao;
 import nl.yellowbrick.data.dao.CustomerDao;
+import nl.yellowbrick.data.dao.PriceModelDao;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
 import nl.yellowbrick.data.domain.CustomerStatus;
+import nl.yellowbrick.data.domain.PriceModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ public class AccountProvisioningController {
 
     private CustomerDao customerDao;
     private CustomerAddressDao addressDao;
+    private PriceModelDao priceModelDao;
     private AccountActivationService accountActivationService;
     private AccountRegistrationValidator[] accountRegistrationValidators;
     private ConversionService conversionService;
@@ -43,11 +46,13 @@ public class AccountProvisioningController {
     @Autowired
     public AccountProvisioningController(CustomerDao customerDao,
                                          CustomerAddressDao addressDao,
+                                         PriceModelDao priceModelDao,
                                          AccountActivationService accountActivationService,
                                          ConversionService conversionService,
                                          AccountRegistrationValidator... accountRegistrationValidators) {
         this.customerDao = customerDao;
         this.addressDao = addressDao;
+        this.priceModelDao = priceModelDao;
         this.accountActivationService = accountActivationService;
         this.conversionService = conversionService;
         this.accountRegistrationValidators = accountRegistrationValidators;
@@ -76,8 +81,9 @@ public class AccountProvisioningController {
     public String validate(Model model, @PathVariable("id") int id) {
         Customer customer = customerById(id);
         CustomerAddress address = addressForCustomer(id);
+        PriceModel priceModel = priceModelForCustomer(id);
 
-        AccountProvisioningForm form = form(customer, address);
+        AccountProvisioningForm form = form(customer, address, priceModel);
 
         BeanPropertyBindingResult errors = new BeanPropertyBindingResult(form, "form");
         errors.initConversion(conversionService);
@@ -101,6 +107,7 @@ public class AccountProvisioningController {
         // TODO run some additional validations here ?
         Customer customer = customerById(id);
         CustomerAddress address = addressForCustomer(id);
+        PriceModel priceModel = priceModelForCustomer(id);
 
         updateCustomer(customer, form);
         updateAddress(address, form);
@@ -112,7 +119,7 @@ public class AccountProvisioningController {
         addressDao.savePrivateCustomerAddress(customer.getCustomerId(), address);
 
         // and activate customer
-        accountActivationService.activateCustomerAccount(customer);
+        accountActivationService.activateCustomerAccount(customer, priceModel);
 
         return "redirect:/provisioning";
     }
@@ -142,7 +149,19 @@ public class AccountProvisioningController {
         throw new InconsistentDataException(error);
     }
 
-    private AccountProvisioningForm form(Customer customer, CustomerAddress address) {
+    private PriceModel priceModelForCustomer(int customerId) {
+        Optional<PriceModel> priceModel = priceModelDao.findForCustomer(customerId);
+
+        if(priceModel.isPresent())
+            return priceModel.get();
+
+        String error = "couldn't find price model for customer id: " + customerId;
+
+        log.error(error);
+        throw new InconsistentDataException(error);
+    }
+
+    private AccountProvisioningForm form(Customer customer, CustomerAddress address, PriceModel priceModel) {
         AccountProvisioningForm form = new AccountProvisioningForm();
 
         form.setGender(customer.getGender());
@@ -163,6 +182,9 @@ public class AccountProvisioningController {
 
         form.setNumberOfTransponderCards(customer.getNumberOfTCards());
         form.setNumberOfPPlusCards(customer.getNumberOfQCards());
+
+        form.setSubscriptionFee(priceModel.getSubscriptionCostEuroCents() / 100);
+        form.setRegistrationFee(priceModel.getRegistratiekosten() / 100);
 
         return form;
     }

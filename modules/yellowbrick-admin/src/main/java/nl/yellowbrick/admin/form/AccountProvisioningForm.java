@@ -31,7 +31,8 @@ public class AccountProvisioningForm {
     private int numberOfTransponderCards;
     private int numberOfPPlusCards;
 
-    // payment data
+    // fees
+    private double subscriptionFee;
     private double registrationFee;
 
     public String getGender() {
@@ -160,6 +161,14 @@ public class AccountProvisioningForm {
 
     public void setNumberOfPPlusCards(int numberOfPPlusCards) {
         this.numberOfPPlusCards = numberOfPPlusCards;
+    }
+
+    public double getSubscriptionFee() {
+        return subscriptionFee;
+    }
+
+    public void setSubscriptionFee(double subscriptionFee) {
+        this.subscriptionFee = subscriptionFee;
     }
 
     public double getRegistrationFee() {

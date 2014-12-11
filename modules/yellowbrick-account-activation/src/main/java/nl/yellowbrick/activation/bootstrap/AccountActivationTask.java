@@ -1,8 +1,10 @@
 package nl.yellowbrick.activation.bootstrap;
 
 import nl.yellowbrick.data.dao.CustomerDao;
+import nl.yellowbrick.data.dao.PriceModelDao;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerStatus;
+import nl.yellowbrick.data.domain.PriceModel;
 import nl.yellowbrick.data.errors.ActivationException;
 import nl.yellowbrick.activation.service.AccountActivationService;
 import nl.yellowbrick.activation.validation.AccountRegistrationValidator;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.DataBinder;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @EnableScheduling
@@ -24,13 +27,16 @@ public class AccountActivationTask {
     private static final Logger log = LoggerFactory.getLogger(AccountActivationTask.class);
 
     private final CustomerDao customerDao;
+    private final PriceModelDao priceModelDao;
     private final AccountActivationService accountActivationService;
     private final AccountRegistrationValidator[] accountRegistrationValidators;
 
     @Autowired
-    public AccountActivationTask(CustomerDao customerDao, AccountActivationService activationService,
+    public AccountActivationTask(CustomerDao customerDao, PriceModelDao priceModelDao,
+                                 AccountActivationService activationService,
                                  AccountRegistrationValidator... validators) {
         this.customerDao = customerDao;
+        this.priceModelDao = priceModelDao;
         this.accountActivationService = activationService;
         this.accountRegistrationValidators = validators;
     }
@@ -63,8 +69,16 @@ public class AccountActivationTask {
                 log.info("validation failed for customer ID: " + customer.getCustomerId());
                 customerDao.markAsPendingHumanReview(customer);
             } else {
+
+                Optional<PriceModel> priceModel = priceModelDao.findForCustomer(customer.getCustomerId());
+
+                if(!priceModel.isPresent()) {
+                    log.error("Activation failed due to lack of price model for customer ID: " + customer.getCustomerId());
+                    return;
+                }
+
                 log.info("validation succeeded for customer ID: " + customer.getCustomerId());
-                accountActivationService.activateCustomerAccount(customer);
+                accountActivationService.activateCustomerAccount(customer, priceModel.get());
             }
         } catch(ActivationException e) {
             log.error(e.getMessage(), e);
