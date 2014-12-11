@@ -24,10 +24,6 @@ import java.util.Map;
 @Component
 public class MembershipJdbcDao implements MembershipDao, InitializingBean {
 
-    // TODO check what these values should actually be (maybe make it configurable)
-    private static final int DEFAULT_MEMBERSHIP_FEE = 0;
-    private static final int DEFAULT_REGISTRATION_FEE = 0;
-
     private static final String PACKAGE = "WEBAPP";
     private static final String PROCEDURE = "CustomerValidateMembership";
 
@@ -57,8 +53,8 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
             put("NumberOfTCards_in", membership.getCustomer().getNumberOfTCards());
             put("NumberOfQCards_in", membership.getCustomer().getNumberOfQCards());
             put("CreditLimit_in", membership.getCustomer().getCreditLimit());
-            put("SubscriptionFee_in", DEFAULT_MEMBERSHIP_FEE);
-            put("RegistrationFee_in", DEFAULT_REGISTRATION_FEE);
+            put("SubscriptionFee_in", membership.getPriceModel().getSubscriptionCostEuroCents());
+            put("RegistrationFee_in", membership.getPriceModel().getRegistratiekosten());
             put("InitialTCardFee_in", membership.getPriceModel().getInitTranspCardCost());
             put("AdditionalTCardFee_in", membership.getPriceModel().getTranspCardCost());
             put("InitialRTPCardFee_in", membership.getPriceModel().getInitRtpCardCost());
