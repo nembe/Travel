@@ -1,8 +1,10 @@
 package nl.yellowbrick.activation.validation;
 
+import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.domain.Customer;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
@@ -16,8 +18,9 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
-public class GeneralCustomerValidatorTest {
+public class GeneralCustomerValidatorTest extends BaseSpringTestCase {
 
+    @Autowired
     GeneralCustomerValidator customerValidator;
 
     Customer customer;
@@ -27,7 +30,6 @@ public class GeneralCustomerValidatorTest {
 
     @Before
     public void setUp() {
-        customerValidator = new GeneralCustomerValidator();
         customer = validCustomer();
         errors = new BindException(customer, "customer");
     }
@@ -37,7 +39,7 @@ public class GeneralCustomerValidatorTest {
         customer.setDateOfBirth(null);
 
         invokeValidator();
-        assertThat(errors.getFieldError("dateOfBirth").getCode(), equalTo("missing"));
+        assertThat(errors.getFieldError("dateOfBirth").getCode(), equalTo("errors.missing"));
     }
 
     @Test
@@ -47,13 +49,22 @@ public class GeneralCustomerValidatorTest {
         customer.setDateOfBirth(Date.from(tooYoung));
 
         invokeValidator();
-        assertThat(errors.getFieldError("dateOfBirth").getCode(), equalTo("too.young"));
+        assertThat(errors.getFieldError("dateOfBirth").getCode(), equalTo("errors.too.young"));
     }
 
     @Test
     public void validates_otherwise() {
         invokeValidator();
         assertThat(errors.getAllErrors(), empty());
+    }
+
+    @Test
+    public void validates_action_code() {
+        customer.setActionCode("TOTALLY BOGUS");
+
+        invokeValidator();
+
+        assertThat(errors.getFieldError("actionCode").getCode(), equalTo("errors.invalid.action.code"));
     }
 
 

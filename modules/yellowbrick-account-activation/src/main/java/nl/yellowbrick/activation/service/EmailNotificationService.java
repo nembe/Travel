@@ -70,6 +70,7 @@ public class EmailNotificationService {
         String token = createUserToken(customer, expireTokenFormula.get().getValue());
 
         String messageBody = body.get().replace("%GENDERTITLE%", genderTitle.get().toLowerCase())
+                .replace("%FIRSTNAME%", customer.getFirstName())
                 .replace("%LASTNAME%", lastNameWithInfix(customer))
                 .replace("%CUSTOMERNR%", customer.getCustomerNr())
                 .replace("%LINK%", httpLink.get().getValue() + token)

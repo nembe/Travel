@@ -125,6 +125,46 @@ INSERT INTO CUSTOMER VALUES (
              NULL,
              '0');
 
+INSERT INTO CUSTOMER VALUES (
+             602,
+             394744,
+             NULL,
+             'N',
+             '212448900',
+             NULL,
+             NULL,
+             NULL,
+             'M',
+             NULL,
+             'Scheltinga',
+             'Wietse',
+             'van',
+             'W.J.',
+             'bestaatniet@taxameter.nl',
+             NULL,
+             0, -- needs manual validation
+             '0616545500',
+             NULL,
+             1,
+             0,
+             NULL,
+             TO_DATE ('08/23/2013 10:05:06', 'MM/DD/YYYY HH24:MI:SS'),
+             NULL,
+             NULL,
+             NULL,
+             TO_DATE ('12/31/1981 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             'W.j. Van Scheltinga',
+             NULL,
+             1, -- product group id
+             1,
+             'YBAANMELDEN:Scheltinga',
+             NULL,
+             '0616545500',
+             '27-HZZ-9',
+             NULL,
+             NULL,
+             '0');
+
 INSERT INTO CUSTOMERADDRESS VALUES (
              5803,
              4776,
@@ -154,6 +194,21 @@ INSERT INTO CUSTOMERADDRESS VALUES (
              NULL,
              'YBKLANT:2364',
              NULL);
+
+INSERT INTO CUSTOMERADDRESS VALUES (
+             397339,
+             394744,
+             1,
+             'Davisstraat',
+             '42',
+             'I',
+             NULL,
+             '1057 TL',
+             'Amsterdam',
+             'NL',
+             NULL,
+             'YBAANMELDEN:Scheltinga',
+             NULL);COMMIT;
 
 INSERT INTO TBLBILLINGAGENT VALUES (104, 'TravelCard', 'TravelCard', NULL);
 INSERT INTO TBLBILLINGAGENT VALUES (601, 'creditcard per dag(Visa)', NULL, NULL);
@@ -200,7 +255,7 @@ INSERT INTO MESSAGE VALUES (
                   1917,
                   'emailBodyNewCustomer.Group8',
                   'nl_NL',
-                  'Geachte %GENDERTITLE% %LASTNAME%,<br/><br/>Hiermee bevestigen wij de verwerking van uw registratie bij Yellowbrick.<br/><br/>Hieronder vindt u uw klantnummer. Klik op de onderstaande link om uw wachtwoord aan te maken en uw account te activeren. U kunt 28 dagen gebruik maken van deze link, na deze periode dient u een nieuwe link aan te vragen met behulp van uw klantnummer. Op uw persoonlijke pagina &quot;Mijn Yellowbrick&quot;, kunt u o.a. uw parkeertransacties bekijken of uw gegevens wijzigen. Bewaar uw klantnummer goed!<br/><br/><a href="%LINK%">%LINK1%</a><br/><br/> Klantnummer: %CUSTOMERNR%<br/><br/>Binnen enkele dagen ontvangt u de kaarten en een instructie hoe u de benodigde gegevens, zoals uw kenteken, dient te koppelen aan uw account. Dit is nodig om gebruik te kunnen maken van onze dienst. Wij adviseren u pas in te loggen als u het welkomstpakket heeft ontvangen.<br/><br/>Uitgebreide instructies en uitleg over de verschillende producten en mogelijkheden van Yellowbrick vindt u op onze website.<br/><br/>Wij gaan er vanuit u hiermee voldoende te hebben geinformeerd. Mocht u nog vragen of opmerkingen hebben, aarzel dan niet om contact met ons op te nemen.<br/><br/>Met vriendelijke groet,<br/>Yellowbrick BV<br/><br/><table border="0" style="font-size: 16px; font-weight: normal; font-family: Calibri, Verdana, Ariel, sans-serif;"><tr><td>Customer Service</td><td>:</td><td>0900 - 2006 999 (15 eurocent per minuut)</td></tr><tr><td>Aan- en afmeldlijn</td><td>:</td><td>088-BRICKEN, 088-2742536 (Lokaal tarief)</td></tr><tr><td>of</td><td></td><td>0900 - BELGEEL  0900-2354335  (6 eurocent per minuut)</td></tr><tr><td>E-mail</td><td>:</td><td>info@yellowbrick.nl</td></tr></table>',
+                  'Geachte %GENDERTITLE% %FIRSTNAME% %LASTNAME%,<br/><br/>Hiermee bevestigen wij de verwerking van uw registratie bij Yellowbrick.<br/><br/>Hieronder vindt u uw klantnummer. Klik op de onderstaande link om uw wachtwoord aan te maken en uw account te activeren. U kunt 28 dagen gebruik maken van deze link, na deze periode dient u een nieuwe link aan te vragen met behulp van uw klantnummer. Op uw persoonlijke pagina &quot;Mijn Yellowbrick&quot;, kunt u o.a. uw parkeertransacties bekijken of uw gegevens wijzigen. Bewaar uw klantnummer goed!<br/><br/><a href="%LINK%">%LINK1%</a><br/><br/> Klantnummer: %CUSTOMERNR%<br/><br/>Binnen enkele dagen ontvangt u de kaarten en een instructie hoe u de benodigde gegevens, zoals uw kenteken, dient te koppelen aan uw account. Dit is nodig om gebruik te kunnen maken van onze dienst. Wij adviseren u pas in te loggen als u het welkomstpakket heeft ontvangen.<br/><br/>Uitgebreide instructies en uitleg over de verschillende producten en mogelijkheden van Yellowbrick vindt u op onze website.<br/><br/>Wij gaan er vanuit u hiermee voldoende te hebben geinformeerd. Mocht u nog vragen of opmerkingen hebben, aarzel dan niet om contact met ons op te nemen.<br/><br/>Met vriendelijke groet,<br/>Yellowbrick BV<br/><br/><table border="0" style="font-size: 16px; font-weight: normal; font-family: Calibri, Verdana, Ariel, sans-serif;"><tr><td>Customer Service</td><td>:</td><td>0900 - 2006 999 (15 eurocent per minuut)</td></tr><tr><td>Aan- en afmeldlijn</td><td>:</td><td>088-BRICKEN, 088-2742536 (Lokaal tarief)</td></tr><tr><td>of</td><td></td><td>0900 - BELGEEL  0900-2354335  (6 eurocent per minuut)</td></tr><tr><td>E-mail</td><td>:</td><td>info@yellowbrick.nl</td></tr></table>',
                   'dba',
                   TO_DATE ('10/15/2013 15:37:00', 'MM/DD/YYYY HH24:MI:SS'),
                   NULL);
@@ -255,3 +310,16 @@ INSERT INTO SYSTEMUSER VALUES (
              NULL,
              NULL,
              NULL);
+
+
+INSERT INTO MARKETINGACTION VALUES (
+             'AFCIJBURG',
+             10,
+             TO_DATE ('09/24/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             TO_DATE ('09/30/2013 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+
+INSERT INTO MARKETINGACTION VALUES (
+             'FACEBOOK',
+             0,
+             TO_DATE ('11/12/2014 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             TO_DATE ('01/01/2199 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));

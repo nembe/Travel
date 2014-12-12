@@ -3,7 +3,6 @@ package nl.yellowbrick.data.dao.impl;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import nl.yellowbrick.data.dao.PriceModelDao;
-import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.PriceModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +23,13 @@ public class PriceModelJdbcDao implements PriceModelDao {
 
     private Logger log = LoggerFactory.getLogger(PriceModelDao.class);
 
-    public Optional<PriceModel> findForCustomer(Customer customer) {
+    public Optional<PriceModel> findForCustomer(long customerId) {
         try {
-            long subGroupId = getSubgroupIdForCustomer(customer.getCustomerId());
+            long subGroupId = getSubgroupIdForCustomer(customerId);
             PriceModel model = getPriceModelForSubGroup(subGroupId);
             return Optional.of(model);
         } catch (Exception e) {
-            log.error("Failed to find PriceModel for customer ID: " + customer.getCustomerId(), e);
+            log.error("Failed to find PriceModel for customer ID: " + customerId, e);
             return Optional.empty();
         }
     }

@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 /**
  * Looks for the word "TEST" leading or trailing any of the customer properties.
- * That would indicate this was likely an account created by testers and so shouldn't be auomatically
+ * That would indicate this was likely an account created by testers and so shouldn't be automatically
  * activated as it's likely it will be discarded.
  */
 @Component
@@ -33,7 +33,7 @@ public class NonTestAccountValidator extends AccountRegistrationValidator {
 
         } catch (Exception e) {
             log.error(String.format("an error occurred during automatic validation: %s", e.getMessage()));
-            errors.reject("validation.failure");
+            errors.reject("errors.validation.failure");
         }
     }
 
@@ -46,7 +46,7 @@ public class NonTestAccountValidator extends AccountRegistrationValidator {
             String propText = propVal.toString().toLowerCase();
 
             if(propText.startsWith("test") || propText.endsWith("test"))
-                errors.rejectValue(prop.getName(), "test.data");
+                errors.rejectValue(prop.getName(), "errors.test.data");
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }

@@ -34,14 +34,10 @@ public class EmailNotificationServiceTest extends BaseSpringTestCase {
 
     @Autowired @InjectMocks EmailNotificationService emailNotificationService;
 
-    @Autowired @Spy
-    ConfigDao configDao;
-    @Autowired @Spy
-    CustomerDao customerDao;
-    @Autowired @Spy
-    SystemUserDao systemUserDao;
-    @Autowired @Spy
-    MessageDao messageDao;
+    @Autowired @Spy ConfigDao configDao;
+    @Autowired @Spy CustomerDao customerDao;
+    @Autowired @Spy SystemUserDao systemUserDao;
+    @Autowired @Spy MessageDao messageDao;
     @Autowired @Spy JavaMailSender mailSender;
 
     @Autowired DbHelper db;
@@ -167,7 +163,7 @@ public class EmailNotificationServiceTest extends BaseSpringTestCase {
 
                 String body = StreamUtils.copyToString(msgBody.getInputStream(), Charset.forName("UTF-8"));
 
-                return body.contains("Geachte heer de Salgado")
+                return body.contains("Geachte heer Rui de Salgado")
                         && body.contains("ABC123")
                         && body.matches("(?s).*http:\\/\\/localhost:8084\\/MyYellowbrick\\/auth\\/password\\/reset\\/.*")
                         && !body.contains("%");

@@ -52,7 +52,7 @@ public class NonTestAccountValidatorTest extends BaseSpringTestCase {
         customer.setFirstName("testsomething");
 
         invokeValidator();
-        assertThat(errors.getFieldError("firstName").getCode(), equalTo("test.data"));
+        assertThat(errors.getFieldError("firstName").getCode(), equalTo("errors.test.data"));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class NonTestAccountValidatorTest extends BaseSpringTestCase {
         customer.setLastName("somethingtest");
 
         invokeValidator();
-        assertThat(errors.getFieldError("lastName").getCode(), equalTo("test.data"));
+        assertThat(errors.getFieldError("lastName").getCode(), equalTo("errors.test.data"));
     }
 
     @Test

@@ -24,11 +24,11 @@ public class UniquenessValidator extends AccountRegistrationValidator {
     @Override
     protected void validate(Customer customer, Errors errors) {
         if(existsByNameAndDob(customer)) {
-            errors.reject("duplicate");
+            errors.reject("errors.duplicate");
         }
 
         if (existsByEmail(customer.getEmail())) {
-            errors.rejectValue("email", "duplicate");
+            errors.rejectValue("email", "errors.duplicate");
         }
     }
 

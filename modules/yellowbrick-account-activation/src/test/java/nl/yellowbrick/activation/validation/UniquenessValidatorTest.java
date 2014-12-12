@@ -50,7 +50,7 @@ public class UniquenessValidatorTest extends BaseSpringTestCase {
 
         invokeValidator();
 
-        assertThat(errors.getGlobalError().getCode(), equalTo("duplicate"));
+        assertThat(errors.getGlobalError().getCode(), equalTo("errors.duplicate"));
     }
 
     @Test
@@ -73,7 +73,7 @@ public class UniquenessValidatorTest extends BaseSpringTestCase {
         customer.setCustomerStatusIdfk(CustomerStatus.ACTIVE.code());
         invokeValidator();
 
-        assertThat(errors.getFieldError("email").getCode(), equalTo("duplicate"));
+        assertThat(errors.getFieldError("email").getCode(), equalTo("errors.duplicate"));
     }
 
     private void mockQueryByNameAndDob() {

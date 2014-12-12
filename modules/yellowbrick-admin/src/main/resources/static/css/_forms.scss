@@ -1,0 +1,36 @@
+@import 'colors';
+
+.section {
+  background-color: $bg-color;
+  padding: 20px 10px;
+  margin-bottom: 18px;
+}
+
+.field {
+  padding: 3px;
+}
+
+.field input {
+  display: inline-block;
+}
+
+.field-label {
+  display: inline-block;
+  width: 200px;
+}
+
+.field-value {
+  line-height: 22px;
+}
+
+input.field-error {
+  border: 2px solid #f00;
+}
+
+span.field-error {
+  color: #f00;
+}
+
+.global-errors {
+  color: #f00;
+}

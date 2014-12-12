@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html layout:decorator="layout">
+<html layout:decorator="layouts/default">
 <head>
     <title>Provisioning</title>
 </head>
@@ -15,7 +15,7 @@
 
         <div class="main-body">
             <div class="section" th:if="${#lists.isEmpty(customers)}">
-                <h3>No customers pending activation.</h3>
+                <h3>No customers pending validation.</h3>
             </div>
 
             <div class="section" th:unless="${#lists.isEmpty(customers)}">
@@ -29,6 +29,7 @@
                             <th>Client name</th>
                             <th>Location</th>
                             <th>Product group</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -38,6 +39,9 @@
                             <td th:text="${cust.fullName}"></td>
                             <td th:text="${cust.accountCity}"></td>
                             <td th:text="${cust.productGroup}"></td>
+                            <td>
+                                <a th:href="${'/provisioning/' + cust.customerId}">validate</a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

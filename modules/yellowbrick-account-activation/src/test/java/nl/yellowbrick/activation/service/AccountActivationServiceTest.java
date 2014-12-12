@@ -3,7 +3,6 @@ package nl.yellowbrick.activation.service;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.dao.MembershipDao;
-import nl.yellowbrick.data.dao.PriceModelDao;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.Membership;
 import nl.yellowbrick.data.domain.PriceModel;
@@ -15,8 +14,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.util.Optional;
-
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
@@ -26,7 +23,6 @@ public class AccountActivationServiceTest {
 
     @InjectMocks AccountActivationService activationService;
 
-    @Mock PriceModelDao priceModelDao;
     @Mock CustomerDao customerDao;
     @Mock MembershipDao membershipDao;
     @Mock CardOrderDao cardOrderDao;
@@ -47,18 +43,9 @@ public class AccountActivationServiceTest {
     }
 
     @Test
-    public void no_op_if_missing_price_model() {
-        when(priceModelDao.findForCustomer(eq(customer))).thenReturn(Optional.empty());
-
-        activationService.activateCustomerAccount(customer);
-
-        verifyZeroInteractions(customerDao, membershipDao, cardOrderDao, emailNotificationService);
-    }
-
-    @Test
     public void assigns_next_customer_nr() {
         mockCollaborations();
-        activationService.activateCustomerAccount(customer);
+        activationService.activateCustomerAccount(customer, priceModel);
 
         assertThat(customer.getCustomerNr(), equalTo("ABC123"));
     }
@@ -66,7 +53,7 @@ public class AccountActivationServiceTest {
     @Test
     public void saves_special_tarif_and_validates_card_orders() {
         mockCollaborations();
-        activationService.activateCustomerAccount(customer);
+        activationService.activateCustomerAccount(customer, priceModel);
 
         verify(cardOrderDao).saveSpecialTarifIfApplicable(eq(customer));
         verify(cardOrderDao).validateCardOrders(eq(customer));
@@ -75,7 +62,7 @@ public class AccountActivationServiceTest {
     @Test
     public void saves_new_membership_and_notifies_customer() {
         mockCollaborations();
-        activationService.activateCustomerAccount(customer);
+        activationService.activateCustomerAccount(customer, priceModel);
 
         Membership expectedMembership = new Membership(customer, priceModel);
 
@@ -88,13 +75,12 @@ public class AccountActivationServiceTest {
         mockCollaborations();
 
         customer.setNumberOfTCards(0);
-        activationService.activateCustomerAccount(customer);
+        activationService.activateCustomerAccount(customer, priceModel);
 
         verifyZeroInteractions(membershipDao, emailNotificationService);
     }
 
     private void mockCollaborations() {
-        when(priceModelDao.findForCustomer(eq(customer))).thenReturn(Optional.of(priceModel));
         doAnswer(setCustomerNr()).when(customerDao).assignNextCustomerNr(eq(customer));
     }
 

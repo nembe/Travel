@@ -19,4 +19,6 @@ public interface CustomerDao {
     void assignNextCustomerNr(Customer customer);
 
     Optional<String> getRegistrationLocale(Customer customer);
+
+    void savePrivateCustomer(Customer customer);
 }
