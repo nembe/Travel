@@ -21,3 +21,20 @@ spring:
   datasource:
     driverClassName: org.hsqldb.jdbcDriver
     url: jdbc:hsqldb:mem:PUBLIC:syntax.ora=true
+
+---
+
+spring:
+  profiles: acceptance
+
+mail:
+  host: ybmail
+
+datasource:
+  driverClassName: oracle.jdbc.OracleDriver
+  url: >
+        jdbc:oracle:thin:@(DESCRIPTION = (FAILOVER = ON)(LOAD_BALANCE = ON)(ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.1.4)(PORT = 1521))
+        (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.1.4)(PORT = 1521))
+        (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = telepay)(FAILOVER_MODE=(TYPE=select)(METHOD=basic))))
+  username: test_nl_brickparking
+  password: test_nl_brickparking
