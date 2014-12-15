@@ -47,6 +47,12 @@ public class Customer {
     private String invoiceEmail = "";
     private boolean extraInvoiceAnnotations = false;
 
+    public PaymentMethod getPaymentMethodType() {
+        int billingAgent = Long.valueOf(this.getBillingAgentId()).intValue();
+
+        return PaymentMethod.forCode(billingAgent);
+    }
+
     public String getAccountCity() {
         return accountCity;
     }

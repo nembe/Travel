@@ -4,6 +4,7 @@ import nl.yellowbrick.activation.service.AccountActivationService;
 import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.dao.CustomerAddressDao;
 import nl.yellowbrick.data.dao.CustomerDao;
+import nl.yellowbrick.data.dao.DirectDebitDetailsDao;
 import nl.yellowbrick.data.database.DbHelper;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
@@ -42,6 +43,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
     // spy on collaborators
     @Autowired @Spy CustomerDao customerDao;
     @Autowired @Spy CustomerAddressDao addressDao;
+    @Autowired @Spy DirectDebitDetailsDao directDebitDetailsDao;
     @Autowired @Mock AccountActivationService accountActivationService;
 
     // test helpers
@@ -75,6 +77,13 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
         assertThat(res.getResponse().getStatus(), equalTo(200));
         assertThat(res.getResponse().getContentAsString(), containsString("must be specified"));
+    }
+
+    @Test
+    public void shows_iban_if_direct_debit() throws Exception {
+        MvcResult res = mockMvc.perform(get("/provisioning/" + CUSTOMER_ID)).andReturn();
+
+        assertThat(res.getResponse().getContentAsString(), containsString("NL39 RABO 0300 0652 64"));
     }
 
     @Test

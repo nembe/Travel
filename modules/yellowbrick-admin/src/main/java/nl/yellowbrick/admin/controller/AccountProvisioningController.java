@@ -5,10 +5,7 @@ import nl.yellowbrick.activation.validation.AccountRegistrationValidator;
 import nl.yellowbrick.admin.exceptions.InconsistentDataException;
 import nl.yellowbrick.admin.exceptions.ResourceNotFoundException;
 import nl.yellowbrick.admin.form.AccountProvisioningForm;
-import nl.yellowbrick.data.dao.CustomerAddressDao;
-import nl.yellowbrick.data.dao.CustomerDao;
-import nl.yellowbrick.data.dao.MarketingActionDao;
-import nl.yellowbrick.data.dao.PriceModelDao;
+import nl.yellowbrick.data.dao.*;
 import nl.yellowbrick.data.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +38,7 @@ public class AccountProvisioningController {
     @Autowired private CustomerAddressDao addressDao;
     @Autowired private PriceModelDao priceModelDao;
     @Autowired private MarketingActionDao marketingActionDao;
+    @Autowired private DirectDebitDetailsDao directDebitDetailsDao;
     @Autowired private AccountActivationService accountActivationService;
 
     // validators
@@ -74,6 +72,12 @@ public class AccountProvisioningController {
         model.addAttribute("form", form);
         model.addAttribute(BindingResult.MODEL_KEY_PREFIX + "form", errors);
         model.addAttribute("customer", customer);
+
+        if(customer.getPaymentMethodType().equals(PaymentMethod.DIRECT_DEBIT)) {
+            directDebitDetailsDao.findForCustomer(id).ifPresent((details) -> {
+                model.addAttribute("iban", details.getSepaNumber());
+            });
+        }
 
         return "provisioning/validate";
     }

@@ -137,6 +137,25 @@
                         <span class="field-error" th:if="${#fields.hasErrors('numberOfPPlusCards')}" th:errors="*{numberOfPPlusCards}"></span>
                     </div>
 
+                    <h3>Payment data</h3>
+
+                    <div class="field">
+                        <span class="field-label">Payment method</span>
+                        <span class="field-value" th:text="${customer.agentName}"></span>
+                    </div>
+
+                    <div class="field">
+                        <span class="field-label">Account number</span>
+                        <span class="field-value" th:text="${iban}"></span>
+                    </div>
+
+                    <div class="field">
+                        <span class="field-label">Account holder name</span>
+                        <span class="field-value" th:text="${customer.accountHolderName}"></span>
+                    </div>
+
+                    <h3>Fees</h3>
+
                     <div class="field">
                         <label for="registrationFee" class="field-label">Subscription fee</label>
                         <input type="text" th:field="*{subscriptionFee}" th:errorclass="field-error" disabled="disabled" />
