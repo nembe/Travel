@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html layout:decorator="layouts/_default">
+<head>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div id="main-menu">
+            <ul>
+                <li>
+                    <a th:href="@{/provisioning}">PENDING VALIDATION</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-body">
+            <div layout:fragment="content-inner"></div>
+        </div>
+    </div>
+</body>
+</html>

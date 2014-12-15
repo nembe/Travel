@@ -1,51 +1,41 @@
 <!DOCTYPE HTML>
-<html layout:decorator="layouts/default">
+<html layout:decorator="provisioning/_layout">
 <head>
     <title>Provisioning</title>
 </head>
 <body>
-    <div layout:fragment="content">
-        <div id="main-menu">
-            <ul>
-                <li>
-                    <a th:href="@{/provisioning}">PENDING VALIDATION</a>
-                </li>
-            </ul>
+    <div layout:fragment="content-inner">
+        <div class="section" th:if="${#lists.isEmpty(customers)}">
+            <h3>No customers pending validation.</h3>
         </div>
 
-        <div class="main-body">
-            <div class="section" th:if="${#lists.isEmpty(customers)}">
-                <h3>No customers pending validation.</h3>
-            </div>
+        <div class="section" th:unless="${#lists.isEmpty(customers)}">
+            <h3>List of Yellowbrick customers pending validation</h3>
 
-            <div class="section" th:unless="${#lists.isEmpty(customers)}">
-                <h3>List of Yellowbrick customers pending validation</h3>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Registration time</th>
-                            <th>Customer type</th>
-                            <th>Client name</th>
-                            <th>Location</th>
-                            <th>Product group</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="cust : ${customers}">
-                            <td th:text="${cust.applicationDate}"></td>
-                            <td th:text="${cust.accountType}"></td>
-                            <td th:text="${cust.fullName}"></td>
-                            <td th:text="${cust.accountCity}"></td>
-                            <td th:text="${cust.productGroup}"></td>
-                            <td>
-                                <a th:href="${'/provisioning/' + cust.customerId}">validate</a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Registration time</th>
+                        <th>Customer type</th>
+                        <th>Client name</th>
+                        <th>Location</th>
+                        <th>Product group</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="cust : ${customers}">
+                        <td th:text="${cust.applicationDate}"></td>
+                        <td th:text="${cust.accountType}"></td>
+                        <td th:text="${cust.fullName}"></td>
+                        <td th:text="${cust.accountCity}"></td>
+                        <td th:text="${cust.productGroup}"></td>
+                        <td>
+                            <a th:href="${'/provisioning/' + cust.customerId}">validate</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </body>
