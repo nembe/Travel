@@ -87,6 +87,19 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
     }
 
     @Test
+    public void shows_card_type_and_last_4_digits_if_credit_card() throws Exception {
+        db.accept((t) -> {
+            // change billing agent to match visa
+            t.update("UPDATE CUSTOMER SET BILLINGAGENTIDFK = ? WHERE CUSTOMERID = ?", 601, CUSTOMER_ID);
+        });
+
+        MvcResult res = mockMvc.perform(get("/provisioning/" + CUSTOMER_ID)).andReturn();
+
+        assertThat(res.getResponse().getContentAsString(), containsString("Visa"));
+        assertThat(res.getResponse().getContentAsString(), containsString("8900"));
+    }
+
+    @Test
     public void saves_changes_to_customer_and_address() throws Exception {
         // TODO get rid of these mocks
         doNothing().when(customerDao).savePrivateCustomer(any());

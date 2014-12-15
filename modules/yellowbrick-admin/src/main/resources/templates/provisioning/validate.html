@@ -144,14 +144,24 @@
                         <span class="field-value" th:text="${customer.agentName}"></span>
                     </div>
 
-                    <div class="field">
+                    <div class="field" th:if="${iban}">
                         <span class="field-label">Account number</span>
                         <span class="field-value" th:text="${iban}"></span>
                     </div>
 
-                    <div class="field">
+                    <div class="field" th:if="${iban}">
                         <span class="field-label">Account holder name</span>
                         <span class="field-value" th:text="${customer.accountHolderName}"></span>
+                    </div>
+
+                    <div class="field" th:if="${ccname}">
+                        <span class="field-label">Card type</span>
+                        <span class="field-value" th:text="${ccname}"></span>
+                    </div>
+
+                    <div class="field" th:if="${ccdigits}">
+                        <span class="field-label">Card number</span>
+                        <span class="field-value" th:text="${ccdigits}"></span>
                     </div>
 
                     <h3>Fees</h3>

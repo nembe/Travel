@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -73,13 +74,29 @@ public class AccountProvisioningController {
         model.addAttribute(BindingResult.MODEL_KEY_PREFIX + "form", errors);
         model.addAttribute("customer", customer);
 
-        if(customer.getPaymentMethodType().equals(PaymentMethod.DIRECT_DEBIT)) {
-            directDebitDetailsDao.findForCustomer(id).ifPresent((details) -> {
+        addPaymentData(model, customer);
+
+        return "provisioning/validate";
+    }
+
+    private void addPaymentData(Model model, Customer customer) {
+        PaymentMethod payMethod = customer.getPaymentMethodType();
+
+        if(payMethod.equals(PaymentMethod.DIRECT_DEBIT)) {
+            directDebitDetailsDao.findForCustomer(customer.getCustomerId()).ifPresent((details) -> {
                 model.addAttribute("iban", details.getSepaNumber());
             });
         }
 
-        return "provisioning/validate";
+        if(Arrays.asList(PaymentMethod.MASTERCARD, PaymentMethod.VISA).contains(payMethod)) {
+            String accountNr = customer.getAccountNr();
+            String last4digits = accountNr.length() > 3
+                    ? accountNr.substring(accountNr.length() - 4)
+                    : "";
+
+            model.addAttribute("ccname", payMethod.name());
+            model.addAttribute("ccdigits", last4digits);
+        }
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"validate"})
