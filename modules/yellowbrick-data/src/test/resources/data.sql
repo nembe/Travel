@@ -311,7 +311,6 @@ INSERT INTO SYSTEMUSER VALUES (
              NULL,
              NULL);
 
-
 INSERT INTO MARKETINGACTION VALUES (
              'AFCIJBURG',
              10,
@@ -323,3 +322,10 @@ INSERT INTO MARKETINGACTION VALUES (
              0,
              TO_DATE ('11/12/2014 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
              TO_DATE ('01/01/2199 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+
+INSERT INTO PAYMENT_DIRECT_DEBIT_DETAILS(ID, CUSTOMERID, SEPANUMBER, BIC, VERIFIED) VALUES (
+             1,
+             394744,
+             'NL39 RABO 0300 0652 64',
+             'RABONL2U',
+             'Y');

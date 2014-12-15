@@ -195,3 +195,17 @@ CREATE TABLE MARKETINGACTION
    VALID_FROM          DATE,
    VALID_TO            DATE
 );
+
+-- this is a synonym in the real database
+CREATE TABLE PAYMENT_DIRECT_DEBIT_DETAILS
+(
+   ID                     NUMBER (19),
+   CUSTOMERID             NUMBER (19),
+   SEPANUMBER             VARCHAR2 (40),
+   BIC                    VARCHAR2 (12),
+   MANDATE_REFERENCE      VARCHAR2 (34),
+   B2B                    CHAR (1) DEFAULT 'N',
+   LAST_COLLECTION_DATE   DATE,
+   VERIFICATION_CODE      VARCHAR2 (4),
+   VERIFIED               CHAR (1) DEFAULT 'N'
+);
