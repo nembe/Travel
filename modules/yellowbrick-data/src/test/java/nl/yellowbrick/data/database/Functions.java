@@ -81,6 +81,21 @@ public class Functions {
         });
     }
 
+    public static void customerSaveBusinessData(int customerId, String businessName, int businessTypeId,
+                                                String gender, String initials, String firstName,
+                                                String infix, String lastName, String email, String phoneNr,
+                                                String fax, Date dateOfBirth, int productGroupId, String invoiceAttn,
+                                                String invoiceEmail, String invoiceAnnotations, String mutator) {
+
+        CALL_RECORDERS.forEach((recorder) -> {
+            Object[] args = { customerId, businessName, businessTypeId, gender, initials, firstName, infix,
+                    lastName, email, phoneNr, fax, dateOfBirth, productGroupId, invoiceAttn,
+                    invoiceEmail, invoiceAnnotations, mutator };
+
+            recorder.accept(new FunctionCall("customerSaveBusinessData", args));
+        });
+    }
+
     public static class FunctionCall {
 
         public final String functionName;

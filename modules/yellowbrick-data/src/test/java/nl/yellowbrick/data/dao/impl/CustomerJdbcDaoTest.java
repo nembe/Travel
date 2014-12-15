@@ -191,6 +191,50 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(args[11], equalTo("TEST MUTATOR"));
     }
 
+    @Test
+    public void delegates_saving_business_customer_to_stored_procedure() throws Exception {
+        CountDownLatch lock = new CountDownLatch(1);
+        LinkedList<Functions.FunctionCall> calls = new LinkedList<>();
+
+        Functions.CALL_RECORDERS.add((functionCall) -> {
+            calls.add(functionCall);
+            lock.countDown();
+        });
+
+        Customer customer = testCustomer();
+        customer.setBusinessName("test business");
+        customer.setBusinessTypeId(1);
+        String invoiceAttn = "attn";
+        String invoiceEmail = "test@test.com";
+        final boolean invoiceAnnotations = true;
+
+        customerDao.saveBusinessCustomer(customer, invoiceAttn, invoiceEmail, invoiceAnnotations);
+
+        lock.await(2, TimeUnit.SECONDS);
+
+        Object[] args = calls.getFirst().arguments;
+        String fnName = calls.getFirst().functionName;
+
+        assertThat(fnName, Matchers.equalTo("customerSaveBusinessData"));
+        assertThat(Long.parseLong(args[0].toString()), equalTo(customer.getCustomerId()));
+        assertThat(args[1], equalTo(customer.getBusinessName()));
+        assertThat(Long.parseLong(args[2].toString()), equalTo(customer.getBusinessTypeId()));
+        assertThat(args[3], equalTo(customer.getGender()));
+        assertThat(args[4], equalTo(customer.getInitials()));
+        assertThat(args[5], equalTo(customer.getFirstName()));
+        assertThat(args[6], equalTo(customer.getInfix()));
+        assertThat(args[7], equalTo(customer.getLastName()));
+        assertThat(args[8], equalTo(customer.getEmail()));
+        assertThat(args[9], equalTo(customer.getPhoneNr()));
+        assertThat(args[10], equalTo(customer.getFax()));
+        assertThat(args[11], equalTo(customer.getDateOfBirth()));
+        assertThat(args[12], equalTo(customer.getProductGroupId()));
+        assertThat(args[13], equalTo(invoiceAttn));
+        assertThat(args[14], equalTo(invoiceEmail));
+        assertThat(args[15], equalTo("Y"));
+        assertThat(args[16], equalTo("TEST MUTATOR"));
+    }
+
     private int fetchCustomerStatus(long customerId) {
         return db.apply((template) -> {
             return template.queryForObject("SELECT customerstatusidfk FROM CUSTOMER WHERE customerid = ?",

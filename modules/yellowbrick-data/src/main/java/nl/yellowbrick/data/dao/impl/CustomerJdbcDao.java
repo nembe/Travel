@@ -30,7 +30,8 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
 
     private static final Logger log = LoggerFactory.getLogger(CustomerJdbcDao.class);
     private static final String PACKAGE = "WEBAPP";
-    private static final String PROCEDURE = "CustomerSavePrivateData";
+    private static final String SAVE_PRIVATE_DATA = "CustomerSavePrivateData";
+    private static final String SAVE_BUSINESS_DATA = "CustomerSaveBusinessData";
 
     private static final int ACTIVATION_FAILED_STATUS = 0;
 
@@ -40,10 +41,11 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     @Value("${mutator}")
     private String mutator;
     private SimpleJdbcCall saveCustomerCall;
+    private SimpleJdbcCall saveBusinessCustomerCall;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        compileJdbcCall();
+        compileJdbcCalls();
     }
 
     @Override
@@ -150,10 +152,34 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
         );
     }
 
-    private void compileJdbcCall() {
+    @Override
+    public void saveBusinessCustomer(Customer customer,
+                                     String invoiceAttn, String invoiceEmail, boolean invoiceAnnotations) {
+        saveBusinessCustomerCall.execute(
+                customer.getCustomerId(),
+                customer.getBusinessName(),
+                customer.getBusinessTypeId(),
+                customer.getGender(),
+                customer.getInitials(),
+                customer.getFirstName(),
+                customer.getInfix(),
+                customer.getLastName(),
+                customer.getEmail(),
+                customer.getPhoneNr(),
+                customer.getFax(),
+                customer.getDateOfBirth(),
+                customer.getProductGroupId(),
+                invoiceAttn,
+                invoiceEmail,
+                invoiceAnnotations? 'Y' : 'N',
+                mutator
+        );
+    }
+
+    private void compileJdbcCalls() {
         saveCustomerCall = new SimpleJdbcCall(template)
                 .withCatalogName(PACKAGE)
-                .withProcedureName(PROCEDURE)
+                .withProcedureName(SAVE_PRIVATE_DATA)
                 .declareParameters(
                         new SqlParameter("CustomerId_in", Types.NUMERIC),
                         new SqlParameter("Gender_in", Types.CHAR),
@@ -169,7 +195,31 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                         new SqlParameter("Mutator_in", Types.VARCHAR)
                 );
 
+        saveBusinessCustomerCall = new SimpleJdbcCall(template)
+                .withCatalogName(PACKAGE)
+                .withProcedureName(SAVE_BUSINESS_DATA)
+                .declareParameters(
+                        new SqlParameter("CustomerId_in", Types.NUMERIC),
+                        new SqlParameter("BusinessName_in", Types.VARCHAR),
+                        new SqlParameter("BusinessTypeId_in", Types.NUMERIC),
+                        new SqlParameter("Gender_in", Types.CHAR),
+                        new SqlParameter("Initials_in", Types.VARCHAR),
+                        new SqlParameter("FirstName_in", Types.VARCHAR),
+                        new SqlParameter("Infix_in", Types.VARCHAR),
+                        new SqlParameter("LastName_in", Types.VARCHAR),
+                        new SqlParameter("Email_in", Types.VARCHAR),
+                        new SqlParameter("PhoneNr_in", Types.VARCHAR),
+                        new SqlParameter("Fax_in", Types.VARCHAR),
+                        new SqlParameter("DateOfBirth_in", Types.DATE),
+                        new SqlParameter("ProductGroup_in", Types.NUMERIC),
+                        new SqlParameter("InvoiceAttn_in", Types.VARCHAR),
+                        new SqlParameter("InvoiceEmail_in", Types.VARCHAR),
+                        new SqlParameter("InvoiceAnnotations_in", Types.CHAR),
+                        new SqlParameter("Mutator_in", Types.VARCHAR)
+                );
+
         saveCustomerCall.compile();
+        saveBusinessCustomerCall.compile();
     }
 
     private String buildQuery(String... parts) {

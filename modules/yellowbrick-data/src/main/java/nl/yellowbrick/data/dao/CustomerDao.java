@@ -21,4 +21,6 @@ public interface CustomerDao {
     Optional<String> getRegistrationLocale(Customer customer);
 
     void savePrivateCustomer(Customer customer);
+
+    void saveBusinessCustomer(Customer customer, String invoiceAttn, String invoiceEmail, boolean invoiceAnnotations);
 }
