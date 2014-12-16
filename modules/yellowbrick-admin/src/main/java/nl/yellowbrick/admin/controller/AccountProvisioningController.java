@@ -139,7 +139,7 @@ public class AccountProvisioningController {
     }
 
     private CustomerAddress addressForCustomer(int customerId) {
-        Optional<CustomerAddress> address = addressDao.findByCustomerId(customerId);
+        Optional<CustomerAddress> address = addressDao.findByCustomerId(customerId, AddressType.MAIN);
 
         if(address.isPresent())
             return address.get();

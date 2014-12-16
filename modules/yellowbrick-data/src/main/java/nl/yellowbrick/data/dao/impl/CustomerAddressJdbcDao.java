@@ -33,13 +33,13 @@ public class CustomerAddressJdbcDao implements CustomerAddressDao, InitializingB
     }
 
     @Override
-    public Optional<CustomerAddress> findByCustomerId(long customerId) {
+    public Optional<CustomerAddress> findByCustomerId(long customerId, AddressType addressType) {
         String sql = "SELECT * FROM CUSTOMERADDRESS " +
                 "WHERE CUSTOMERIDFK = ? " +
-                "AND ADDRESSTYPEIDFK = 1 OR ADDRESSTYPEIDFK = NULL " +
+                "AND ADDRESSTYPEIDFK = ? " +
                 "AND ROWNUM <= 1";
 
-        return template.query(sql, rowMapper(), customerId).stream().findFirst();
+        return template.query(sql.toString(), rowMapper(), customerId, addressType.code()).stream().findFirst();
     }
 
     @Override

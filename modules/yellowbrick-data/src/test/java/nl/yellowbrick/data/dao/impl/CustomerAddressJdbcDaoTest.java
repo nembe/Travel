@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import static nl.yellowbrick.data.database.Functions.CALL_RECORDERS;
 import static nl.yellowbrick.data.database.Functions.FunctionCall;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class CustomerAddressJdbcDaoTest extends BaseSpringTestCase {
@@ -29,7 +30,7 @@ public class CustomerAddressJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void finds_customer_by_id() {
-        CustomerAddress actualAddress = addressDao.findByCustomerId(2364).get();
+        CustomerAddress actualAddress = addressDao.findByCustomerId(2364, AddressType.MAIN).get();
         CustomerAddress expectedAddress = new CustomerAddress();
 
         expectedAddress.setAddress("Turnhoutplantsoen");
@@ -46,8 +47,21 @@ public class CustomerAddressJdbcDaoTest extends BaseSpringTestCase {
     }
 
     @Test
+    public void filters_by_address_type() {
+        db.accept((t) -> t.update("UPDATE CUSTOMERADDRESS SET ADDRESSTYPEIDFK = 1"));
+
+        assertThat(addressDao.findByCustomerId(2364, AddressType.MAIN).isPresent(), is(true));
+        assertThat(addressDao.findByCustomerId(2364, AddressType.BILLING).isPresent(), is(false));
+
+        db.accept((t) -> t.update("UPDATE CUSTOMERADDRESS SET ADDRESSTYPEIDFK = 2"));
+
+        assertThat(addressDao.findByCustomerId(2364, AddressType.BILLING).isPresent(), is(true));
+        assertThat(addressDao.findByCustomerId(2364, AddressType.MAIN).isPresent(), is(false));
+    }
+
+    @Test
     public void returns_empty_if_id_unknown() {
-        assertThat(addressDao.findByCustomerId(123456), equalTo(Optional.empty()));
+        assertThat(addressDao.findByCustomerId(123456, AddressType.MAIN), equalTo(Optional.empty()));
     }
 
     @Test

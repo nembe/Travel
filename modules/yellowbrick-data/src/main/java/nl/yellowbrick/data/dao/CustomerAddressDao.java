@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface CustomerAddressDao {
 
-    Optional<CustomerAddress> findByCustomerId(long customerId);
+    Optional<CustomerAddress> findByCustomerId(long customerId, AddressType addressType);
 
     void savePrivateCustomerAddress(long customerId, CustomerAddress address);
 
