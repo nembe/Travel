@@ -1,6 +1,7 @@
 package nl.yellowbrick.data.dao.impl;
 
 import nl.yellowbrick.data.dao.CustomerAddressDao;
+import nl.yellowbrick.data.domain.AddressType;
 import nl.yellowbrick.data.domain.CustomerAddress;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ public class CustomerAddressJdbcDao implements CustomerAddressDao, InitializingB
 
     private static final String PACKAGE = "WEBAPP";
     private static final String PROCEDURE = "CustomerSaveAddress";
-    private static final int ADDRESS_TYPE_ID = 1;
 
     @Autowired
     private JdbcTemplate template;
@@ -44,10 +44,19 @@ public class CustomerAddressJdbcDao implements CustomerAddressDao, InitializingB
 
     @Override
     public void savePrivateCustomerAddress(long customerId, CustomerAddress address) {
+        saveAddress(customerId, address, AddressType.MAIN);
+    }
+
+    @Override
+    public void saveBusinessCustomerAddress(long customerId, CustomerAddress address, AddressType addressType) {
+        saveAddress(customerId, address, addressType);
+    }
+
+    private void saveAddress(long customerId, CustomerAddress address, AddressType addressType) {
         saveAddressCall.execute(
                 address.getCustomerAddressId(),
                 customerId,
-                ADDRESS_TYPE_ID,
+                addressType.code(),
                 address.getAddress(),
                 address.getHouseNr(),
                 address.getSupplement(),
