@@ -153,8 +153,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     }
 
     @Override
-    public void saveBusinessCustomer(Customer customer,
-                                     String invoiceAttn, String invoiceEmail, boolean invoiceAnnotations) {
+    public void saveBusinessCustomer(Customer customer) {
         saveBusinessCustomerCall.execute(
                 customer.getCustomerId(),
                 customer.getBusinessName(),
@@ -169,9 +168,9 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 customer.getFax(),
                 customer.getDateOfBirth(),
                 customer.getProductGroupId(),
-                invoiceAttn,
-                invoiceEmail,
-                invoiceAnnotations? 'Y' : 'N',
+                customer.getInvoiceAttn(),
+                customer.getInvoiceEmail(),
+                customer.isExtraInvoiceAnnotations()? 'Y' : 'N',
                 mutator
         );
     }

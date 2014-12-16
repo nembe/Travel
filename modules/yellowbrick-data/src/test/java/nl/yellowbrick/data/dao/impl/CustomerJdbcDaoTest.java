@@ -32,8 +32,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 
 public class CustomerJdbcDaoTest extends BaseSpringTestCase {
 
-    @Autowired
-    CustomerJdbcDao customerDao;
+    @Autowired CustomerJdbcDao customerDao;
     @Autowired DbHelper db;
 
     @Test
@@ -204,11 +203,11 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         Customer customer = testCustomer();
         customer.setBusinessName("test business");
         customer.setBusinessTypeId(1);
-        String invoiceAttn = "attn";
-        String invoiceEmail = "test@test.com";
-        final boolean invoiceAnnotations = true;
+        customer.setInvoiceAttn("attn");
+        customer.setInvoiceEmail("test@test.com");
+        customer.setExtraInvoiceAnnotations(true);
 
-        customerDao.saveBusinessCustomer(customer, invoiceAttn, invoiceEmail, invoiceAnnotations);
+        customerDao.saveBusinessCustomer(customer);
 
         lock.await(2, TimeUnit.SECONDS);
 
@@ -229,8 +228,8 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(args[10], equalTo(customer.getFax()));
         assertThat(args[11], equalTo(customer.getDateOfBirth()));
         assertThat(args[12], equalTo(customer.getProductGroupId()));
-        assertThat(args[13], equalTo(invoiceAttn));
-        assertThat(args[14], equalTo(invoiceEmail));
+        assertThat(args[13], equalTo(customer.getInvoiceAttn()));
+        assertThat(args[14], equalTo(customer.getInvoiceEmail()));
         assertThat(args[15], equalTo("Y"));
         assertThat(args[16], equalTo("TEST MUTATOR"));
     }

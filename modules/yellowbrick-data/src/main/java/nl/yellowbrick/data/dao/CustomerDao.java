@@ -22,5 +22,5 @@ public interface CustomerDao {
 
     void savePrivateCustomer(Customer customer);
 
-    void saveBusinessCustomer(Customer customer, String invoiceAttn, String invoiceEmail, boolean invoiceAnnotations);
+    void saveBusinessCustomer(Customer customer);
 }
