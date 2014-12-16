@@ -9,10 +9,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +31,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     private static final String SAVE_BUSINESS_DATA = "CustomerSaveBusinessData";
 
     private static final int ACTIVATION_FAILED_STATUS = 0;
+    private static final String BUSINESS_REGISTRATION_NUMBER_LABEL = "businessRegistrationNumber";
 
     @Autowired
     private JdbcTemplate template;
@@ -173,6 +171,19 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 customer.isExtraInvoiceAnnotations()? 'Y' : 'N',
                 mutator
         );
+    }
+
+    @Override
+    public Optional<String> getBusinessRegistrationNumber(long customerId) {
+        String sql = "SELECT c.value " +
+                "FROM CUSTOMER_IDENTIFICATION c " +
+                "INNER JOIN IDENTIFICATION_FIELD f ON c.fieldidfk = f.id " +
+                "AND c.CUSTOMERIDFK = ? " +
+                "AND f.label = ?";
+
+        return template.query(sql, new SingleColumnRowMapper<String>(), customerId, BUSINESS_REGISTRATION_NUMBER_LABEL)
+                .stream()
+                .findFirst();
     }
 
     private void compileJdbcCalls() {

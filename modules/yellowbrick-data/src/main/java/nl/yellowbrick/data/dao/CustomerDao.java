@@ -23,4 +23,6 @@ public interface CustomerDao {
     void savePrivateCustomer(Customer customer);
 
     void saveBusinessCustomer(Customer customer);
+
+    Optional<String> getBusinessRegistrationNumber(long customerId);
 }
