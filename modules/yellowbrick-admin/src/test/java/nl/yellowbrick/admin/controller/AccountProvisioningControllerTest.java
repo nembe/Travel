@@ -174,6 +174,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
     private MvcResult postBusinessAccountProvisioningForm() throws Exception  {
         return mockMvc.perform(post("/provisioning/" + BUSINESS_CUSTOMER_ID)
+                .param("businessName", "ACME inc")
                 .param("email", "ceo@business.com")
                 .param("street", "North Orange")
                 .param("houseNr", "1209")
@@ -209,6 +210,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
                 Customer cust = (Customer) o;
 
                 return cust.getCustomerId() == BUSINESS_CUSTOMER_ID
+                        && cust.getBusinessName().equals("ACME inc")
                         && cust.getEmail().equals("ceo@business.com")
                         && cust.getNumberOfQCards() == 1
                         && cust.getDateOfBirth().equals(Date.valueOf("1985-09-07"));

@@ -138,8 +138,9 @@
     </div>
 
     <div th:fragment="businessName" class="field">
-        <span class="field-label">Company name</span>
-        <span class="field-value" th:text="${customer.businessName}"></span>
+        <label for="businessName" class="field-label">Company name</label>
+        <input type="text" th:field="*{businessName}" th:errorclass="field-error" />
+        <span class="field-error" th:if="${#fields.hasErrors('businessName')}" th:errors="*{businessName}"></span>
     </div>
 
     <div th:fragment="businessRegistrationNumber" class="field">

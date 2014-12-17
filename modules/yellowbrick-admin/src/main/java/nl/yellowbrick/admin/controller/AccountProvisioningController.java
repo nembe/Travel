@@ -144,7 +144,7 @@ public class AccountProvisioningController {
 
         PriceModel priceModel = priceModelForCustomer(id, customer.getActionCode());
 
-        updateCustomer(customer, form);
+        updateBusinessCustomer(customer, form);
         updateAddress(businessAddress, form);
 
         if(form.isBillingAddressSameAsMailingAddress())
@@ -225,6 +225,12 @@ public class AccountProvisioningController {
         customer.setNumberOfQCards(form.getNumberOfPPlusCards());
 
         return customer;
+    }
+
+    private Customer updateBusinessCustomer(Customer customer, BusinessAccountProvisioningForm form) {
+        customer.setBusinessName(form.getBusinessName());
+
+        return updateCustomer(customer, form);
     }
 
     private void updateAddress(CustomerAddress address, PersonalAccountProvisioningForm form) {
