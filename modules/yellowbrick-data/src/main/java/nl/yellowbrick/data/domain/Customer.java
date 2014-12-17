@@ -1,5 +1,7 @@
 package nl.yellowbrick.data.domain;
 
+import com.google.common.base.Joiner;
+
 import java.util.Date;
 
 public class Customer {
@@ -137,6 +139,12 @@ public class Customer {
 
     public String getFirstName() {
         return firstName;
+    }
+
+    public String getFullName() {
+        return isBusinessCustomer()
+                ? businessName.trim()
+                : Joiner.on(" ").skipNulls().join(firstName.trim(), infix.trim(), lastName.trim());
     }
 
     public String getGender() {

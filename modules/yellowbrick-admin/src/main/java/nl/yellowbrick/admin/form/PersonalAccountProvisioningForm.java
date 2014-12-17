@@ -1,10 +1,13 @@
 package nl.yellowbrick.admin.form;
 
+import nl.yellowbrick.data.domain.Customer;
+import nl.yellowbrick.data.domain.CustomerAddress;
+import nl.yellowbrick.data.domain.PriceModel;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-public class AccountProvisioningForm {
+public class PersonalAccountProvisioningForm implements FormData {
 
     // personal details
     private String gender;
@@ -34,6 +37,34 @@ public class AccountProvisioningForm {
     // fees
     private double subscriptionFee;
     private double registrationFee;
+
+    // 0-arg constructor for javabeans compliance
+    public PersonalAccountProvisioningForm() {
+    }
+
+    public PersonalAccountProvisioningForm(Customer customer, CustomerAddress address, PriceModel priceModel) {
+        setGender(customer.getGender());
+        setInitials(customer.getInitials());
+        setFirstName(customer.getFirstName());
+        setInfix(customer.getInfix());
+        setLastName(customer.getLastName());
+        setDateOfBirth(new Date());
+        setEmail(customer.getEmail());
+        setPhoneNr(customer.getPhoneNr());
+
+        setStreet(address.getAddress());
+        setHouseNr(address.getHouseNr());
+        setSupplement(address.getSupplement());
+        setPostalCode(address.getZipCode());
+        setCity(address.getCity());
+        setCountry(address.getCountryCode());
+
+        setNumberOfTransponderCards(customer.getNumberOfTCards());
+        setNumberOfPPlusCards(customer.getNumberOfQCards());
+
+        setSubscriptionFee(priceModel.getSubscriptionCostEuroCents() / 100);
+        setRegistrationFee(priceModel.getRegistratiekosten() / 100);
+    }
 
     public String getGender() {
         return gender;

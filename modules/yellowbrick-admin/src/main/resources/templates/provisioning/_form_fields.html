@@ -125,11 +125,6 @@
         <span class="field-value" th:text="${ccname}"></span>
     </div>
 
-    <div th:fragment="cardNumber" th:if="${ccdigits}" class="field">
-        <span class="field-label">Card number</span>
-        <span class="field-value" th:text="${ccdigits}"></span>
-    </div>
-
     <div th:fragment="subscriptionFee" class="field">
         <label for="subscriptionFee" class="field-label">Subscription fee</label>
         <input type="text" th:field="*{subscriptionFee}" th:errorclass="field-error" disabled="disabled" />
@@ -141,5 +136,67 @@
         <input type="text" th:field="*{registrationFee}" th:errorclass="field-error" disabled="disabled" />
         <span class="field-error" th:if="${#fields.hasErrors('registrationFee')}" th:errors="*{registrationFee}"></span>
     </div>
+
+    <div th:fragment="businessName" class="field">
+        <span class="field-label">Company name</span>
+        <span class="field-value" th:text="${customer.businessName}"></span>
+    </div>
+
+    <div th:fragment="businessRegistrationNumber" class="field">
+        <span class="field-label">Business registration number</span>
+        <span class="field-value" th:text="${form.businessRegistrationNumber}"></span>
+    </div>
+
+    <div th:fragment="billingAddressSameAsMailingAddress" class="field">
+        <span class="field-label">Billing address is the same as establishment address</span>
+        <input type="radio" th:field="*{billingAddressSameAsMailingAddress}" th:value="true" />
+        <label th:for="${#ids.prev('billingAddressSameAsMailingAddress')}">Yes</label>
+        <input type="radio" th:field="*{billingAddressSameAsMailingAddress}" th:value="false" />
+        <label th:for="${#ids.prev('billingAddressSameAsMailingAddress')}">No</label>
+    </div>
+
+    <div th:fragment="billingAddressIsPoBox" class="field">
+        <span class="field-label">Billing address is a PO box address</span>
+        <input type="radio" th:field="*{billingAddressIsPoBox}" th:value="true" />
+        <label th:for="${#ids.prev('billingAddressIsPoBox')}">Yes</label>
+        <input type="radio" th:field="*{billingAddressIsPoBox}" th:value="false" />
+        <label th:for="${#ids.prev('billingAddressIsPoBox')}">No</label>
+    </div>
+
+    <div th:fragment="billingAddressPoBox" class="field">
+        <span class="field-label">POBox number</span>
+        <span class="field-value" th:text="${form.billingAddressPoBox}"></span>
+    </div>
+
+    <div th:fragment="billingAddressStreet" class="field">
+        <span class="field-label">Street</span>
+        <span class="field-value" th:text="${form.billingAddressStreet}"></span>
+    </div>
+
+    <div th:fragment="billingAddressHouseNr" class="field">
+        <span class="field-label">House number</span>
+        <span class="field-value" th:text="${form.billingAddressHouseNr}"></span>
+    </div>
+
+    <div th:fragment="billingAddressSupplement" class="field">
+        <span class="field-label">supplement</span>
+        <span class="field-value" th:text="${form.billingAddressSupplement}"></span>
+    </div>
+
+    <div th:fragment="billingAddressPostalCode" class="field">
+        <span class="field-label">Postal code</span>
+        <span class="field-value" th:text="${form.billingAddressPostalCode}"></span>
+    </div>
+
+    <div th:fragment="billingAddressCity" class="field">
+        <span class="field-label">City</span>
+        <span class="field-value" th:text="${form.billingAddressCity}"></span>
+    </div>
+
+    <div th:fragment="billingAddressCountry" class="field">
+        <span class="field-label">Country</span>
+        <span class="field-value" th:text="${form.billingAddressCountry}"></span>
+    </div>
+
 </body>
 </html>

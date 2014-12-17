@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html layout:decorator="provisioning/_layout">
 <head>
-    <title>Validate Account</title>
+    <title>Validate Business Account</title>
 </head>
 <body>
     <div layout:fragment="content-inner">
@@ -17,6 +17,13 @@
 
                 <h2>General data</h2>
 
+                <h3>Company data</h3>
+
+                <div th:replace="provisioning/_form_fields :: businessName"></div>
+                <div th:replace="provisioning/_form_fields :: businessRegistrationNumber"></div>
+
+                <h3>Contact person</h3>
+
                 <div th:replace="provisioning/_form_fields :: gender"></div>
                 <div th:replace="provisioning/_form_fields :: initials"></div>
                 <div th:replace="provisioning/_form_fields :: firstName"></div>
@@ -28,7 +35,7 @@
                 <div th:replace="provisioning/_form_fields :: email"></div>
                 <div th:replace="provisioning/_form_fields :: phoneNr"></div>
 
-                <h3>Address details</h3>
+                <h3>Establishment address</h3>
 
                 <div th:replace="provisioning/_form_fields :: street"></div>
                 <div th:replace="provisioning/_form_fields :: houseNr"></div>
@@ -36,6 +43,18 @@
                 <div th:replace="provisioning/_form_fields :: postalCode"></div>
                 <div th:replace="provisioning/_form_fields :: city"></div>
                 <div th:replace="provisioning/_form_fields :: country"></div>
+
+                <h3>Billing address</h3>
+
+                <div th:replace="provisioning/_form_fields :: billingAddressSameAsMailingAddress"></div>
+                <div th:replace="provisioning/_form_fields :: billingAddressIsPoBox"></div>
+                <div th:replace="provisioning/_form_fields :: billingAddressPoBox"></div>
+                <div th:replace="provisioning/_form_fields :: billingAddressStreet"></div>
+                <div th:replace="provisioning/_form_fields :: billingAddressHouseNr"></div>
+                <div th:replace="provisioning/_form_fields :: billingAddressSupplement"></div>
+                <div th:replace="provisioning/_form_fields :: billingAddressPostalCode"></div>
+                <div th:replace="provisioning/_form_fields :: billingAddressCity"></div>
+                <div th:replace="provisioning/_form_fields :: billingAddressCountry"></div>
             </div>
 
             <div class="section">
@@ -61,7 +80,7 @@
             </div>
 
             <div class="section">
-                <input type="submit" name="validate" value="Submit" />
+                <input type="submit" name="validateBusinessAccount" value="Submit" />
             </div>
         </form>
     </div>

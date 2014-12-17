@@ -87,7 +87,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void shows_card_type_and_last_4_digits_if_credit_card() throws Exception {
+    public void shows_credit_card_type() throws Exception {
         db.accept((t) -> {
             // change billing agent to match visa
             t.update("UPDATE CUSTOMER SET BILLINGAGENTIDFK = ? WHERE CUSTOMERID = ?", 601, CUSTOMER_ID);
@@ -96,16 +96,11 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
         MvcResult res = mockMvc.perform(get("/provisioning/" + CUSTOMER_ID)).andReturn();
 
         assertThat(res.getResponse().getContentAsString(), containsString("Visa"));
-        assertThat(res.getResponse().getContentAsString(), containsString("8900"));
     }
 
     @Test
     public void saves_changes_to_customer_and_address() throws Exception {
-        // TODO get rid of these mocks
-        doNothing().when(customerDao).savePrivateCustomer(any());
-        doNothing().when(addressDao).savePrivateCustomerAddress(anyLong(), any());
-
-        postAccountProvisioningForm();
+        postPersonalAccountProvisioningForm();
 
         verify(customerDao).savePrivateCustomer(argThat(isUpdatedCustomer()));
         verify(addressDao).savePrivateCustomerAddress(eq(CUSTOMER_ID), argThat(isUpdatedAddress()));
@@ -113,23 +108,18 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
     @Test
     public void activates_customer_account() throws Exception {
-        // TODO get rid of these mocks
-        doNothing().when(customerDao).savePrivateCustomer(any());
-        doNothing().when(addressDao).savePrivateCustomerAddress(anyLong(), any());
-
-        postAccountProvisioningForm();
+        postPersonalAccountProvisioningForm();
 
         verify(accountActivationService).activateCustomerAccount(any(), any());
     }
 
-    private MvcResult postAccountProvisioningForm() throws Exception {
+    private MvcResult postPersonalAccountProvisioningForm() throws Exception {
         return mockMvc.perform(post("/provisioning/" + CUSTOMER_ID)
                 .param("email", "some.other.email@test.com")
                 .param("street", "middle of nowhere")
                 .param("numberOfPPlusCards", "2")
                 .param("dateOfBirth", "07-09-1985")
-                .param("validate", "Submit") // TODO do we need this here ?
-                // TODO change and test remaining fields
+                .param("validatePersonalAccount", "Submit")
         ).andReturn();
     }
 
