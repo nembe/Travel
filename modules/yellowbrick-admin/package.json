@@ -5,7 +5,8 @@
     "dependencies": {},
     "devDependencies": {
         "gulp": "3.8.10",
-        "gulp-sass": "1.1.0"
+        "gulp-sass": "1.1.0",
+        "gulp-coffee": "2.2.0"
     },
     "scripts": {
         "build": "gulp build"

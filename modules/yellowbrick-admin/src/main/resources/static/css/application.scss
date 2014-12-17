@@ -15,6 +15,10 @@ a, a:active, a:hover, a:visited {
   color: $text-color;
 }
 
+.hidden {
+  display: none;
+}
+
 #logo {
   background-image: url("/images/logo.png");
   background-size: contain;
