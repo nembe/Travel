@@ -46,7 +46,7 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     public void returns_customers_if_data_is_in_place() {
         List<Customer> customers = customerDao.findAllPendingActivation();
 
-        assertThat(customers.size(), equalTo(3));
+        assertThat(customers.size(), equalTo(4));
     }
 
     @Test
@@ -232,6 +232,12 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(args[14], equalTo(customer.getInvoiceEmail()));
         assertThat(args[15], equalTo("Y"));
         assertThat(args[16], equalTo("TEST MUTATOR"));
+    }
+
+    @Test
+    public void retrieves_business_registration_number_or_empty() {
+        assertThat(customerDao.getBusinessRegistrationNumber(398734), equalTo(Optional.of("14090089")));
+        assertThat(customerDao.getBusinessRegistrationNumber(12345), equalTo(Optional.empty()));
     }
 
     private int fetchCustomerStatus(long customerId) {

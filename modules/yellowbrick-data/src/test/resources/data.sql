@@ -165,6 +165,46 @@ INSERT INTO CUSTOMER VALUES (
              NULL,
              '0');
 
+INSERT INTO CUSTOMER VALUES (
+             703,
+             398734,
+             NULL,
+             'Y',
+             NULL,
+             NULL,
+             NULL,
+             NULL,
+             'M',
+             'kabisa',
+             'Salgado',
+             'Rui',
+             'van',
+             'M.R.',
+             'rui.salgado@kabisa.nl',
+             0,
+             0,
+             '+31495430798',
+             NULL,
+             1,
+             0,
+             NULL,
+             TO_DATE ('12/15/2014 16:07:07', 'MM/DD/YYYY HH24:MI:SS'),
+             NULL,
+             NULL,
+             NULL,
+             TO_DATE ('09/07/1985 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             'Kabisa',
+             NULL,
+             1,
+             1,
+             'YBBEHEER:ron',
+             NULL,
+             '+31495430798',
+             '39-LB-40',
+             NULL,
+             NULL,
+             '0');
+
 INSERT INTO CUSTOMERADDRESS VALUES (
              5803,
              4776,
@@ -329,3 +369,15 @@ INSERT INTO PAYMENT_DIRECT_DEBIT_DETAILS(ID, CUSTOMERID, SEPANUMBER, BIC, VERIFI
              'NL39 RABO 0300 0652 64',
              'RABONL2U',
              'Y');
+
+INSERT INTO CUSTOMER_IDENTIFICATION VALUES (
+             35481,
+             1,
+             398734,
+             '14090089',
+             'YBBEHEER:ron',
+             TO_DATE ('12/03/2014 20:04:34', 'MM/DD/YYYY HH24:MI:SS'));
+
+INSERT INTO IDENTIFICATION_FIELD VALUES (2, 'ext_membershipcode_4', '[0-9]{9,10}', '1', '0');
+INSERT INTO IDENTIFICATION_FIELD VALUES (1, 'businessRegistrationNumber', '.*[0-9]+.*', '1', '0');
+INSERT INTO IDENTIFICATION_FIELD VALUES (3, 'vatNumber', '\w{7,14}', '0', '0');

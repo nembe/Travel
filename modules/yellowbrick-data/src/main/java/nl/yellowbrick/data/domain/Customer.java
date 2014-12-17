@@ -139,27 +139,6 @@ public class Customer {
         return firstName;
     }
 
-    public String getFullName() {
-        String retval = "";
-        if ("N".equals(business)) {
-            if (firstName != null) {
-                retval += firstName.trim() + " ";
-            }
-            if (infix != null) {
-                retval += infix.trim() + " ";
-            }
-            if (lastName != null) {
-                retval += lastName.trim();
-            }
-            return retval;
-        } else {
-            if (businessName != null) {
-                retval += businessName.trim();
-            }
-            return retval;
-        }
-    }
-
     public String getGender() {
         return gender;
     }
@@ -220,8 +199,8 @@ public class Customer {
         return status;
     }
 
-    public String isBussiness() {
-        return business;
+    public boolean isBusinessCustomer() {
+        return business.equals("Y");
     }
 
     public void setAccountCity(String accountCity) {
