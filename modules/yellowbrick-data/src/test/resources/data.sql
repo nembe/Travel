@@ -18,6 +18,14 @@ INSERT INTO PRODUCT_SUBGROUP VALUES (
              'SYSTEM',
              null);
 
+INSERT INTO PRODUCT_SUBGROUP VALUES (
+             1,
+             1,
+             'Zakelijk',
+             'Y',
+             'SYSTEM',
+             TO_DATE ('06/01/2012 00:46:39', 'MM/DD/YYYY HH24:MI:SS'));
+
 INSERT INTO PRICEMODEL VALUES (
              81,
              'Yellowbrick particulier hoesje',
@@ -37,6 +45,25 @@ INSERT INTO PRICEMODEL VALUES (
              500,
              500);
 
+INSERT INTO PRICEMODEL VALUES (
+             91.00,
+             'Yellowbrick zakelijk hoesje',
+             0,
+             39,
+             39,
+             91,
+             182,
+             1210,
+             'YBBEHEER:ron',
+             TO_DATE ('05/16/2013 11:33:15', 'MM/DD/YYYY HH24:MI:SS'),
+             121,
+             100,
+             0,
+             605,
+             0,
+             605,
+             605);
+
 INSERT INTO PRODUCT_SUBGROUP_PRICEMODEL VALUES (
              82,
              2,
@@ -44,6 +71,14 @@ INSERT INTO PRODUCT_SUBGROUP_PRICEMODEL VALUES (
              TO_DATE ('05/01/2013 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
              'YBBEHEER:martijn',
              TO_DATE ('04/29/2013 17:10:12', 'MM/DD/YYYY HH24:MI:SS'));
+
+INSERT INTO PRODUCT_SUBGROUP_PRICEMODEL VALUES (
+             83,
+             1,
+             91,
+             TO_DATE ('05/01/2013 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             'YBBEHEER:martijn',
+             TO_DATE ('04/29/2013 17:10:37', 'MM/DD/YYYY HH24:MI:SS'));
 
 INSERT INTO CUSTOMER VALUES (
              602,
@@ -248,7 +283,37 @@ INSERT INTO CUSTOMERADDRESS VALUES (
              'NL',
              NULL,
              'YBAANMELDEN:Scheltinga',
-             NULL);COMMIT;
+             NULL);
+
+INSERT INTO CUSTOMERADDRESS VALUES (
+             401319,
+             398734,
+             1,
+             'Marconilaan',
+             '8',
+             NULL,
+             NULL,
+             '6003 DD',
+             'Weert',
+             'NL',
+             NULL,
+             'YBBEHEER:ron',
+             NULL);
+
+INSERT INTO CUSTOMERADDRESS VALUES (
+             401320,
+             398734,
+             2,
+             'Kleine Gartmanplantsoen',
+             '10',
+             NULL,
+             NULL,
+             '1017 RR',
+             'Amsterdam',
+             'NL',
+             NULL,
+             'YBBEHEER:ron',
+             NULL);
 
 INSERT INTO TBLBILLINGAGENT VALUES (104, 'TravelCard', 'TravelCard', NULL);
 INSERT INTO TBLBILLINGAGENT VALUES (601, 'creditcard per dag(Visa)', NULL, NULL);
