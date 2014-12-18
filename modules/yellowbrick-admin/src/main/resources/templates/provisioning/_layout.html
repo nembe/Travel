@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<html layout:decorator="layouts/_default">
+<head>
+    <script type="text/javascript" charset="utf-8" th:src="@{/javascript/provisioning.js}"></script>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div id="main-menu">
+            <ul>
+                <li>
+                    <a th:href="@{/provisioning}">PENDING VALIDATION</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-body">
+            <div layout:fragment="content-inner"></div>
+        </div>
+    </div>
+</body>
+</html>

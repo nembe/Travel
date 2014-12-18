@@ -1,5 +1,7 @@
 package nl.yellowbrick.data.domain;
 
+import com.google.common.base.Joiner;
+
 import java.util.Date;
 
 public class Customer {
@@ -15,13 +17,11 @@ public class Customer {
     private String businessName = "";
     private long businessTypeId = 0;
     private String business = "N";
-    private String cardName = "";
     private long creditLimit = 0;
     private long customerId = 0;
     private String customerNr = "";
     private int customerStatusIdfk = 0;
     private Date dateOfBirth = null;
-    private String displayCard = "";
     private String email = "";
     private Date exitDate = null;
     private String fax = "";
@@ -46,6 +46,12 @@ public class Customer {
     private String invoiceAttn = "";
     private String invoiceEmail = "";
     private boolean extraInvoiceAnnotations = false;
+
+    public PaymentMethod getPaymentMethodType() {
+        int billingAgent = Long.valueOf(this.getBillingAgentId()).intValue();
+
+        return PaymentMethod.forCode(billingAgent);
+    }
 
     public String getAccountCity() {
         return accountCity;
@@ -91,10 +97,6 @@ public class Customer {
         return business;
     }
 
-    public String getCardName() {
-        return cardName;
-    }
-
     public long getCreditLimit() {
         return creditLimit;
     }
@@ -113,10 +115,6 @@ public class Customer {
 
     public Date getDateOfBirth() {
         return dateOfBirth;
-    }
-
-    public String getDisplayCard() {
-        return displayCard;
     }
 
     public String getEmail() {
@@ -144,24 +142,9 @@ public class Customer {
     }
 
     public String getFullName() {
-        String retval = "";
-        if ("N".equals(business)) {
-            if (firstName != null) {
-                retval += firstName.trim() + " ";
-            }
-            if (infix != null) {
-                retval += infix.trim() + " ";
-            }
-            if (lastName != null) {
-                retval += lastName.trim();
-            }
-            return retval;
-        } else {
-            if (businessName != null) {
-                retval += businessName.trim();
-            }
-            return retval;
-        }
+        return isBusinessCustomer()
+                ? businessName.trim()
+                : Joiner.on(" ").skipNulls().join(firstName.trim(), infix.trim(), lastName.trim());
     }
 
     public String getGender() {
@@ -224,8 +207,8 @@ public class Customer {
         return status;
     }
 
-    public String isBussiness() {
-        return business;
+    public boolean isBusinessCustomer() {
+        return business.equals("Y");
     }
 
     public void setAccountCity(String accountCity) {
@@ -272,10 +255,6 @@ public class Customer {
         this.business = business;
     }
 
-    public void setCardName(String cardName) {
-        this.cardName = (cardName != null) ? cardName : "<geen>";
-    }
-
     public void setCreditLimit(long creditLimit) {
         this.creditLimit = creditLimit;
     }
@@ -294,10 +273,6 @@ public class Customer {
 
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
-    }
-
-    public void setDisplayCard(String displayCard) {
-        this.displayCard = (displayCard != null) ? displayCard : "";
     }
 
     public void setEmail(String email) {

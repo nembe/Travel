@@ -18,6 +18,14 @@ INSERT INTO PRODUCT_SUBGROUP VALUES (
              'SYSTEM',
              null);
 
+INSERT INTO PRODUCT_SUBGROUP VALUES (
+             1,
+             1,
+             'Zakelijk',
+             'Y',
+             'SYSTEM',
+             TO_DATE ('06/01/2012 00:46:39', 'MM/DD/YYYY HH24:MI:SS'));
+
 INSERT INTO PRICEMODEL VALUES (
              81,
              'Yellowbrick particulier hoesje',
@@ -37,6 +45,25 @@ INSERT INTO PRICEMODEL VALUES (
              500,
              500);
 
+INSERT INTO PRICEMODEL VALUES (
+             91.00,
+             'Yellowbrick zakelijk hoesje',
+             0,
+             39,
+             39,
+             91,
+             182,
+             1210,
+             'YBBEHEER:ron',
+             TO_DATE ('05/16/2013 11:33:15', 'MM/DD/YYYY HH24:MI:SS'),
+             121,
+             100,
+             0,
+             605,
+             0,
+             605,
+             605);
+
 INSERT INTO PRODUCT_SUBGROUP_PRICEMODEL VALUES (
              82,
              2,
@@ -44,6 +71,14 @@ INSERT INTO PRODUCT_SUBGROUP_PRICEMODEL VALUES (
              TO_DATE ('05/01/2013 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
              'YBBEHEER:martijn',
              TO_DATE ('04/29/2013 17:10:12', 'MM/DD/YYYY HH24:MI:SS'));
+
+INSERT INTO PRODUCT_SUBGROUP_PRICEMODEL VALUES (
+             83,
+             1,
+             91,
+             TO_DATE ('05/01/2013 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             'YBBEHEER:martijn',
+             TO_DATE ('04/29/2013 17:10:37', 'MM/DD/YYYY HH24:MI:SS'));
 
 INSERT INTO CUSTOMER VALUES (
              602,
@@ -165,6 +200,46 @@ INSERT INTO CUSTOMER VALUES (
              NULL,
              '0');
 
+INSERT INTO CUSTOMER VALUES (
+             703,
+             398734,
+             NULL,
+             'Y',
+             NULL,
+             NULL,
+             NULL,
+             NULL,
+             'M',
+             'kabisa',
+             'Salgado',
+             'Rui',
+             'van',
+             'M.R.',
+             'rui.salgado@kabisa.nl',
+             0,
+             0,
+             '+31495430798',
+             NULL,
+             1,
+             0,
+             NULL,
+             TO_DATE ('12/15/2014 16:07:07', 'MM/DD/YYYY HH24:MI:SS'),
+             NULL,
+             NULL,
+             NULL,
+             TO_DATE ('09/07/1985 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             'Kabisa',
+             NULL,
+             1,
+             1,
+             'YBBEHEER:ron',
+             NULL,
+             '+31495430798',
+             '39-LB-40',
+             NULL,
+             NULL,
+             '0');
+
 INSERT INTO CUSTOMERADDRESS VALUES (
              5803,
              4776,
@@ -208,7 +283,37 @@ INSERT INTO CUSTOMERADDRESS VALUES (
              'NL',
              NULL,
              'YBAANMELDEN:Scheltinga',
-             NULL);COMMIT;
+             NULL);
+
+INSERT INTO CUSTOMERADDRESS VALUES (
+             401319,
+             398734,
+             1,
+             'Marconilaan',
+             '8',
+             NULL,
+             NULL,
+             '6003 DD',
+             'Weert',
+             'NL',
+             NULL,
+             'YBBEHEER:ron',
+             NULL);
+
+INSERT INTO CUSTOMERADDRESS VALUES (
+             401320,
+             398734,
+             2,
+             'Kleine Gartmanplantsoen',
+             '10',
+             NULL,
+             NULL,
+             '1017 RR',
+             'Amsterdam',
+             'NL',
+             NULL,
+             'YBBEHEER:ron',
+             NULL);
 
 INSERT INTO TBLBILLINGAGENT VALUES (104, 'TravelCard', 'TravelCard', NULL);
 INSERT INTO TBLBILLINGAGENT VALUES (601, 'creditcard per dag(Visa)', NULL, NULL);
@@ -311,7 +416,6 @@ INSERT INTO SYSTEMUSER VALUES (
              NULL,
              NULL);
 
-
 INSERT INTO MARKETINGACTION VALUES (
              'AFCIJBURG',
              10,
@@ -323,3 +427,30 @@ INSERT INTO MARKETINGACTION VALUES (
              0,
              TO_DATE ('11/12/2014 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
              TO_DATE ('01/01/2199 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+
+INSERT INTO PAYMENT_DIRECT_DEBIT_DETAILS(ID, CUSTOMERID, SEPANUMBER, BIC, VERIFIED) VALUES (
+             1,
+             394744,
+             'NL39 RABO 0300 0652 64',
+             'RABONL2U',
+             'Y');
+
+INSERT INTO CUSTOMER_IDENTIFICATION VALUES (
+             35481,
+             1,
+             398734,
+             '14090089',
+             'YBBEHEER:ron',
+             TO_DATE ('12/03/2014 20:04:34', 'MM/DD/YYYY HH24:MI:SS'));
+
+INSERT INTO CUSTOMER_IDENTIFICATION VALUES (
+             35482,
+             3,
+             398734,
+             NULL,
+             'YBBEHEER:ron',
+             TO_DATE ('12/03/2014 20:04:34', 'MM/DD/YYYY HH24:MI:SS'));
+
+INSERT INTO IDENTIFICATION_FIELD VALUES (1, 'businessRegistrationNumber', '.*[0-9]+.*', '1', '0');
+INSERT INTO IDENTIFICATION_FIELD VALUES (2, 'ext_membershipcode_4', '[0-9]{9,10}', '1', '0');
+INSERT INTO IDENTIFICATION_FIELD VALUES (3, 'vatNumber', '\w{7,14}', '0', '0');

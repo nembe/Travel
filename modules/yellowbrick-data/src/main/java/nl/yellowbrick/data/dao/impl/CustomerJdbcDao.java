@@ -2,6 +2,7 @@ package nl.yellowbrick.data.dao.impl;
 
 import com.google.common.base.Joiner;
 import nl.yellowbrick.data.dao.CustomerDao;
+import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,10 +10,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +29,8 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
 
     private static final Logger log = LoggerFactory.getLogger(CustomerJdbcDao.class);
     private static final String PACKAGE = "WEBAPP";
-    private static final String PROCEDURE = "CustomerSavePrivateData";
+    private static final String SAVE_PRIVATE_DATA = "CustomerSavePrivateData";
+    private static final String SAVE_BUSINESS_DATA = "CustomerSaveBusinessData";
 
     private static final int ACTIVATION_FAILED_STATUS = 0;
 
@@ -40,10 +40,11 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     @Value("${mutator}")
     private String mutator;
     private SimpleJdbcCall saveCustomerCall;
+    private SimpleJdbcCall saveBusinessCustomerCall;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        compileJdbcCall();
+        compileJdbcCalls();
     }
 
     @Override
@@ -66,7 +67,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 "ORDER BY applicationdate"
         );
 
-        return template.query(sql, beanRowMapper());
+        return template.query(sql, beanRowMapper(Customer.class));
     }
 
     @Override
@@ -92,7 +93,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 "AND TRIM(LOWER(lastname)) = ?"
         );
 
-        return template.query(query, beanRowMapper(),
+        return template.query(query, beanRowMapper(Customer.class),
                 dayOfBirth,
                 firstName.toLowerCase().trim(),
                 lastName.toLowerCase().trim());
@@ -100,7 +101,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
 
     @Override
     public List<Customer> findAllByEmail(String email) {
-        return template.query("SELECT * FROM CUSTOMER WHERE email = ?", beanRowMapper(), email);
+        return template.query("SELECT * FROM CUSTOMER WHERE email = ?", beanRowMapper(Customer.class), email);
     }
 
     @Override
@@ -150,13 +151,55 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
         );
     }
 
-    private void compileJdbcCall() {
+    @Override
+    public void saveBusinessCustomer(Customer customer) {
+        saveBusinessCustomerCall.execute(
+                customer.getCustomerId(),
+                customer.getBusinessName(),
+                customer.getBusinessTypeId(),
+                customer.getGender(),
+                customer.getInitials(),
+                customer.getFirstName(),
+                customer.getInfix(),
+                customer.getLastName(),
+                customer.getEmail(),
+                customer.getPhoneNr(),
+                customer.getFax(),
+                customer.getDateOfBirth(),
+                customer.getProductGroupId(),
+                customer.getInvoiceAttn(),
+                customer.getInvoiceEmail(),
+                customer.isExtraInvoiceAnnotations()? '1' : '0',
+                mutator
+        );
+    }
+
+    @Override
+    public List<BusinessIdentifier> getBusinessIdentifiers(long customerId) {
+        String sql = "SELECT c.id, c.value, f.label, f.required " +
+                "FROM IDENTIFICATION_FIELD f " +
+                "LEFT OUTER JOIN CUSTOMER_IDENTIFICATION c ON c.fieldidfk = f.id AND CUSTOMERIDFK = ? " +
+                "WHERE NOT REGEXP_LIKE(f.LABEL, '.*_\\d+$')";
+
+        return template.query(sql, beanRowMapper(BusinessIdentifier.class), customerId);
+    }
+
+    @Override
+    public void updateBusinessIdentifier(BusinessIdentifier bi) {
+        String sql = "UPDATE CUSTOMER_IDENTIFICATION " +
+                "SET VALUE = ?, MUTATOR = ?, MUTATION_DATE = CURRENT_DATE " +
+                "WHERE ID = ?";
+
+        template.update(sql, bi.getValue(), mutator, bi.getId());
+    }
+
+    private void compileJdbcCalls() {
         saveCustomerCall = new SimpleJdbcCall(template)
                 .withCatalogName(PACKAGE)
-                .withProcedureName(PROCEDURE)
+                .withProcedureName(SAVE_PRIVATE_DATA)
                 .declareParameters(
                         new SqlParameter("CustomerId_in", Types.NUMERIC),
-                        new SqlParameter("Gender_in", Types.CHAR),
+                        new SqlParameter("Gender_in", Types.VARCHAR),
                         new SqlParameter("Initials_in", Types.VARCHAR),
                         new SqlParameter("FirstName_in", Types.VARCHAR),
                         new SqlParameter("Infix_in", Types.VARCHAR),
@@ -169,15 +212,39 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                         new SqlParameter("Mutator_in", Types.VARCHAR)
                 );
 
+        saveBusinessCustomerCall = new SimpleJdbcCall(template)
+                .withCatalogName(PACKAGE)
+                .withProcedureName(SAVE_BUSINESS_DATA)
+                .declareParameters(
+                        new SqlParameter("CustomerId_in", Types.NUMERIC),
+                        new SqlParameter("BusinessName_in", Types.VARCHAR),
+                        new SqlParameter("BusinessTypeId_in", Types.NUMERIC),
+                        new SqlParameter("Gender_in", Types.VARCHAR),
+                        new SqlParameter("Initials_in", Types.VARCHAR),
+                        new SqlParameter("FirstName_in", Types.VARCHAR),
+                        new SqlParameter("Infix_in", Types.VARCHAR),
+                        new SqlParameter("LastName_in", Types.VARCHAR),
+                        new SqlParameter("Email_in", Types.VARCHAR),
+                        new SqlParameter("PhoneNr_in", Types.VARCHAR),
+                        new SqlParameter("Fax_in", Types.VARCHAR),
+                        new SqlParameter("DateOfBirth_in", Types.DATE),
+                        new SqlParameter("ProductGroup_in", Types.NUMERIC),
+                        new SqlParameter("InvoiceAttn_in", Types.VARCHAR),
+                        new SqlParameter("InvoiceEmail_in", Types.VARCHAR),
+                        new SqlParameter("InvoiceAnnotations_in", Types.VARCHAR),
+                        new SqlParameter("Mutator_in", Types.VARCHAR)
+                );
+
         saveCustomerCall.compile();
+        saveBusinessCustomerCall.compile();
     }
 
     private String buildQuery(String... parts) {
         return Joiner.on(' ').join(parts);
     }
 
-    private RowMapper<Customer> beanRowMapper() {
-        BeanPropertyRowMapper<Customer> rowMapper = new BeanPropertyRowMapper<>(Customer.class);
+    private <T> RowMapper<T> beanRowMapper(Class<T> clazz) {
+        BeanPropertyRowMapper<T> rowMapper = new BeanPropertyRowMapper<>(clazz);
         rowMapper.setPrimitivesDefaultedForNullValue(true);
 
         return rowMapper;

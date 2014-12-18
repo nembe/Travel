@@ -1,0 +1,205 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+</head>
+<body>
+    <div th:fragment="gender" class="field">
+        <span class="field-label">Gender</span>
+        <input type="radio" th:field="*{gender}" th:value="M" />
+        <label th:for="${#ids.prev('gender')}">Mr.</label>
+        <input type="radio" th:field="*{gender}" th:value="F" />
+        <label th:for="${#ids.prev('gender')}">Mrs.</label>
+    </div>
+
+    <div th:fragment="initials" class="field">
+        <label for="initials" class="field-label">Initial(s)</label>
+        <input type="text" th:field="*{initials}" th:errorclass="field-error" />
+        <span class="field-error" th:if="${#fields.hasErrors('initials')}" th:errors="*{initials}"></span>
+    </div>
+
+    <div th:fragment="firstName" class="field">
+        <label for="firstname" class="field-label">First name</label>
+        <input type="text" th:field="*{firstName}" th:errorclass="field-error" />
+        <span class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+    </div>
+
+    <div th:fragment="lastName" class="field">
+        <label for="lastName" class="field-label">Last name</label>
+        <input type="text" th:field="*{lastName}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+    </div>
+
+    <div th:fragment="dateOfBirth" class="field">
+        <label for="dateOfBirth" class="field-label">Date of birth</label>
+        <input type="text" th:field="*{{dateOfBirth}}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></span>
+    </div>
+
+    <div th:fragment="email" class="field">
+        <label for="email" class="field-label">Email address</label>
+        <input type="text" th:field="*{email}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+    </div>
+
+    <div th:fragment="phoneNr" class="field">
+        <label for="phoneNr" class="field-label">Telephone</label>
+        <input type="text" th:field="*{phoneNr}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('phoneNr')}" th:errors="*{phoneNr}"></span>
+    </div>
+
+    <div th:fragment="street" class="field">
+        <label for="street" class="field-label">Street</label>
+        <input type="text" th:field="*{street}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('street')}" th:errors="*{street}"></span>
+    </div>
+
+    <div th:fragment="houseNr" class="field">
+        <label for="houseNr" class="field-label">House number</label>
+        <input type="text" th:field="*{houseNr}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('houseNr')}" th:errors="*{houseNr}"></span>
+    </div>
+
+    <div th:fragment="supplement" class="field">
+        <label for="supplement" class="field-label">supplement</label>
+        <input type="text" th:field="*{supplement}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('supplement')}" th:errors="*{supplement}"></span>
+    </div>
+
+    <div th:fragment="postalCode" class="field">
+        <label for="postalCode" class="field-label">Postal code</label>
+        <input type="text" th:field="*{postalCode}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('postalCode')}" th:errors="*{postalCode}"></span>
+    </div>
+
+    <div th:fragment="city" class="field">
+        <label for="city" class="field-label">City</label>
+        <input type="text" th:field="*{city}"/>
+        <span class="field-error" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></span>
+    </div>
+
+    <div th:fragment="country" class="field">
+        <label for="country" class="field-label">Country</label>
+        <input type="text" th:field="*{country}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('country')}" th:errors="*{country}"></span>
+    </div>
+
+    <div th:fragment="applicationDate" class="field">
+        <span class="field-label">Applied on</span>
+        <span class="field-value" th:text="${customer.applicationDate}"></span>
+    </div>
+
+    <div th:fragment="actionCode" class="field">
+        <span class="field-label">Action code</span>
+        <span class="field-value" th:text="${customer.actionCode}"></span>
+    </div>
+
+    <div th:fragment="numberOfTransponderCards" class="field">
+        <label for="numberOfTransponderCards" class="field-label">Number of transponder cards</label>
+        <input type="text" th:field="*{numberOfTransponderCards}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('numberOfTransponderCards')}" th:errors="*{numberOfTransponderCards}"></span>
+    </div>
+
+    <div th:fragment="numberOfPPlusCards" class="field">
+        <label for="numberOfPPlusCards" class="field-label">Number of P+ cards</label>
+        <input type="text" th:field="*{numberOfPPlusCards}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('numberOfPPlusCards')}" th:errors="*{numberOfPPlusCards}"></span>
+    </div>
+
+    <div th:fragment="paymentMethod" class="field">
+        <span class="field-label">Payment method</span>
+        <span class="field-value" th:text="${customer.agentName}"></span>
+    </div>
+
+    <div th:fragment="accountNumber" th:if="${iban}" class="field">
+        <span class="field-label">Account number</span>
+        <span class="field-value" th:text="${iban}"></span>
+    </div>
+
+    <div th:fragment="accountHolderName" th:if="${iban}" class="field" >
+        <span class="field-label">Account holder name</span>
+        <span class="field-value" th:text="${customer.accountHolderName}"></span>
+    </div>
+
+    <div th:fragment="cardType" class="field" th:if="${ccname}">
+        <span class="field-label">Card type</span>
+        <span class="field-value" th:text="${ccname}"></span>
+    </div>
+
+    <div th:fragment="subscriptionFee" class="field">
+        <label for="subscriptionFee" class="field-label">Subscription fee</label>
+        <input type="text" th:field="*{subscriptionFee}" th:errorclass="field-error" disabled="disabled" />
+        <span class="field-error" th:if="${#fields.hasErrors('subscriptionFee')}" th:errors="*{subscriptionFee}"></span>
+    </div>
+
+    <div th:fragment="registrationFee" class="field">
+        <label for="registrationFee" class="field-label">Registration fee</label>
+        <input type="text" th:field="*{registrationFee}" th:errorclass="field-error" disabled="disabled" />
+        <span class="field-error" th:if="${#fields.hasErrors('registrationFee')}" th:errors="*{registrationFee}"></span>
+    </div>
+
+    <div th:fragment="businessName" class="field">
+        <label for="businessName" class="field-label">Company name</label>
+        <input type="text" th:field="*{businessName}" th:errorclass="field-error" />
+        <span class="field-error" th:if="${#fields.hasErrors('businessName')}" th:errors="*{businessName}"></span>
+    </div>
+
+    <div th:fragment="billingAddressSameAsMailingAddress" class="field">
+        <span class="field-label">Billing address is the same as establishment address</span>
+        <input type="radio" th:field="*{billingAddressSameAsMailingAddress}" th:value="true" />
+        <label th:for="${#ids.prev('billingAddressSameAsMailingAddress')}">Yes</label>
+        <input type="radio" th:field="*{billingAddressSameAsMailingAddress}" th:value="false" />
+        <label th:for="${#ids.prev('billingAddressSameAsMailingAddress')}">No</label>
+    </div>
+
+    <div th:fragment="billingAddressIsPoBox" class="field billingAddress">
+        <span class="field-label">Billing address is a PO box address</span>
+        <input type="radio" th:field="*{billingAddressIsPoBox}" th:value="true" />
+        <label th:for="${#ids.prev('billingAddressIsPoBox')}">Yes</label>
+        <input type="radio" th:field="*{billingAddressIsPoBox}" th:value="false" />
+        <label th:for="${#ids.prev('billingAddressIsPoBox')}">No</label>
+    </div>
+
+    <div th:fragment="billingAddressPoBox" class="field billingAddress">
+        <label for="billingAddressPoBox" class="field-label">POBox number</label>
+        <input type="text" th:field="*{billingAddressPoBox}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('billingAddressPoBox')}" th:errors="*{billingAddressPoBox}"></span>
+    </div>
+
+    <div th:fragment="billingAddressStreet" class="field billingAddress">
+        <label for="billingAddressStreet" class="field-label">Street</label>
+        <input type="text" th:field="*{billingAddressStreet}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('billingAddressStreet')}" th:errors="*{billingAddressStreet}"></span>
+    </div>
+
+    <div th:fragment="billingAddressHouseNr" class="field billingAddress">
+        <label for="billingAddressHouseNr" class="field-label">House number</label>
+        <input type="text" th:field="*{billingAddressHouseNr}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('billingAddressHouseNr')}" th:errors="*{billingAddressHouseNr}"></span>
+    </div>
+
+    <div th:fragment="billingAddressSupplement" class="field billingAddress">
+        <label for="billingAddressSupplement" class="field-label">supplement</label>
+        <input type="text" th:field="*{billingAddressSupplement}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('billingAddressSupplement')}" th:errors="*{billingAddressSupplement}"></span>
+    </div>
+
+    <div th:fragment="billingAddressPostalCode" class="field billingAddress">
+        <label for="billingAddressPostalCode" class="field-label">Postal code</label>
+        <input type="text" th:field="*{billingAddressPostalCode}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('billingAddressPostalCode')}" th:errors="*{billingAddressPostalCode}"></span>
+    </div>
+
+    <div th:fragment="billingAddressCity" class="field billingAddress">
+        <label for="billingAddressCity" class="field-label">City</label>
+        <input type="text" th:field="*{billingAddressCity}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('billingAddressCity')}" th:errors="*{billingAddressCity}"></span>
+    </div>
+
+    <div th:fragment="billingAddressCountry" class="field billingAddress">
+        <label for="billingAddressCountry" class="field-label">Country</label>
+        <input type="text" th:field="*{billingAddressCountry}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('billingAddressCountry')}" th:errors="*{billingAddressCountry}"></span>
+    </div>
+
+</body>
+</html>
