@@ -228,7 +228,7 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(args[12], equalTo(customer.getProductGroupId()));
         assertThat(args[13], equalTo(customer.getInvoiceAttn()));
         assertThat(args[14], equalTo(customer.getInvoiceEmail()));
-        assertThat(args[15], equalTo("Y"));
+        assertThat(args[15], equalTo("1"));
         assertThat(args[16], equalTo("TEST MUTATOR"));
     }
 

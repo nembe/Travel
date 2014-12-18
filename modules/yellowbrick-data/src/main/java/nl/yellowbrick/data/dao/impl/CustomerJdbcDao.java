@@ -169,7 +169,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 customer.getProductGroupId(),
                 customer.getInvoiceAttn(),
                 customer.getInvoiceEmail(),
-                customer.isExtraInvoiceAnnotations()? 'Y' : 'N',
+                customer.isExtraInvoiceAnnotations()? '1' : '0',
                 mutator
         );
     }
@@ -199,7 +199,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 .withProcedureName(SAVE_PRIVATE_DATA)
                 .declareParameters(
                         new SqlParameter("CustomerId_in", Types.NUMERIC),
-                        new SqlParameter("Gender_in", Types.CHAR),
+                        new SqlParameter("Gender_in", Types.VARCHAR),
                         new SqlParameter("Initials_in", Types.VARCHAR),
                         new SqlParameter("FirstName_in", Types.VARCHAR),
                         new SqlParameter("Infix_in", Types.VARCHAR),
@@ -219,7 +219,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                         new SqlParameter("CustomerId_in", Types.NUMERIC),
                         new SqlParameter("BusinessName_in", Types.VARCHAR),
                         new SqlParameter("BusinessTypeId_in", Types.NUMERIC),
-                        new SqlParameter("Gender_in", Types.CHAR),
+                        new SqlParameter("Gender_in", Types.VARCHAR),
                         new SqlParameter("Initials_in", Types.VARCHAR),
                         new SqlParameter("FirstName_in", Types.VARCHAR),
                         new SqlParameter("Infix_in", Types.VARCHAR),
@@ -231,7 +231,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                         new SqlParameter("ProductGroup_in", Types.NUMERIC),
                         new SqlParameter("InvoiceAttn_in", Types.VARCHAR),
                         new SqlParameter("InvoiceEmail_in", Types.VARCHAR),
-                        new SqlParameter("InvoiceAnnotations_in", Types.CHAR),
+                        new SqlParameter("InvoiceAnnotations_in", Types.VARCHAR),
                         new SqlParameter("Mutator_in", Types.VARCHAR)
                 );
 
