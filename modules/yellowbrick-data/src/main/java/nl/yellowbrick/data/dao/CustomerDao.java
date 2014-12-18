@@ -26,4 +26,6 @@ public interface CustomerDao {
     void saveBusinessCustomer(Customer customer);
 
     List<BusinessIdentifier> getBusinessIdentifiers(long customerId);
+
+    void updateBusinessIdentifier(BusinessIdentifier businessIdentifier);
 }

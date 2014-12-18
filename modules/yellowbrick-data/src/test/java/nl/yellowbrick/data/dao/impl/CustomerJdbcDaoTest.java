@@ -6,26 +6,25 @@ import nl.yellowbrick.data.database.DbHelper;
 import nl.yellowbrick.data.database.Functions;
 import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
-import nl.yellowbrick.data.domain.CustomerAddress;
 import org.hamcrest.Matchers;
-import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
 
@@ -248,6 +247,18 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
 
         assertThat(customerDao.getBusinessIdentifiers(398734),
                 containsInAnyOrder(businessRegistrationNumber, vatNumber));
+    }
+
+    @Test
+    public void updates_business_identifier_value() {
+        Supplier<BusinessIdentifier> biSupplier = () -> customerDao.getBusinessIdentifiers(398734).get(0);
+
+        BusinessIdentifier businessIdentifier = biSupplier.get();
+        businessIdentifier.setValue("booyakasha");
+
+        customerDao.updateBusinessIdentifier(businessIdentifier);
+
+        assertThat(biSupplier.get().getValue(), equalTo("booyakasha"));
     }
 
     private int fetchCustomerStatus(long customerId) {

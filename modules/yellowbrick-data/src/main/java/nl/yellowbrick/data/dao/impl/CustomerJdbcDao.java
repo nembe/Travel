@@ -184,6 +184,15 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
         return template.query(sql, beanRowMapper(BusinessIdentifier.class), customerId);
     }
 
+    @Override
+    public void updateBusinessIdentifier(BusinessIdentifier bi) {
+        String sql = "UPDATE CUSTOMER_IDENTIFICATION " +
+                "SET VALUE = ?, MUTATOR = ?, MUTATION_DATE = CURRENT_DATE " +
+                "WHERE ID = ?";
+
+        template.update(sql, bi.getValue(), mutator, bi.getId());
+    }
+
     private void compileJdbcCalls() {
         saveCustomerCall = new SimpleJdbcCall(template)
                 .withCatalogName(PACKAGE)
