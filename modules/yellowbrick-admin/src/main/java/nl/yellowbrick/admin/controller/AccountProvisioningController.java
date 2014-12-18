@@ -158,6 +158,7 @@ public class AccountProvisioningController {
         customerDao.saveBusinessCustomer(customer);
         addressDao.saveBusinessCustomerAddress(id, businessAddress, AddressType.MAIN);
         addressDao.saveBusinessCustomerAddress(id, billingAddress, AddressType.BILLING);
+        form.getBusinessIdentifiers().forEach(customerDao::updateBusinessIdentifier);
 
         // and activate customer
         accountActivationService.activateCustomerAccount(customer, priceModel);

@@ -7,6 +7,7 @@ import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.dao.DirectDebitDetailsDao;
 import nl.yellowbrick.data.database.DbHelper;
 import nl.yellowbrick.data.domain.AddressType;
+import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
 import org.hamcrest.Matcher;
@@ -123,7 +124,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void saves_business_customer_and_his_billing_address() throws Exception {
+    public void saves_business_customer_data() throws Exception {
         postBusinessAccountProvisioningForm();
 
         Matcher<CustomerAddress> isMainAddress = new ArgumentMatcher<CustomerAddress>() {
@@ -148,11 +149,26 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
             }
         };
 
+        Matcher<BusinessIdentifier> isUpdatedBusinessIdentifier = new ArgumentMatcher<BusinessIdentifier>() {
+            @Override
+            public boolean matches(Object o) {
+                BusinessIdentifier bi = (BusinessIdentifier) o;
+
+                return bi.getValue().equals("12345678") && bi.getId() == 123;
+            }
+        };
+
+
+        // saves customer data
         verify(customerDao).saveBusinessCustomer(argThat(isUpdatedBusinessCustomer()));
+        // saves main address
         verify(addressDao).saveBusinessCustomerAddress(eq(BUSINESS_CUSTOMER_ID), argThat(isMainAddress),
                 eq(AddressType.MAIN));
+        // saves billing address
         verify(addressDao).saveBusinessCustomerAddress(eq(BUSINESS_CUSTOMER_ID), argThat(isBillingAddress),
                 eq(AddressType.BILLING));
+        // updates business identifiers
+        verify(customerDao).updateBusinessIdentifier(argThat(isUpdatedBusinessIdentifier));
     }
 
     @Test
@@ -184,6 +200,8 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
                 .param("billingAddressCity", "Springfield")
                 .param("numberOfPPlusCards", "1")
                 .param("dateOfBirth", "07-09-1985")
+                .param("businessIdentifiers[0].id", "123")
+                .param("businessIdentifiers[0].value", "12345678")
                 .param("validateBusinessAccount", "Submit")
         ).andReturn();
     }
