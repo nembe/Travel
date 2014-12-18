@@ -1,5 +1,6 @@
 package nl.yellowbrick.data.dao;
 
+import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
 
 import java.util.Date;
@@ -24,5 +25,5 @@ public interface CustomerDao {
 
     void saveBusinessCustomer(Customer customer);
 
-    Optional<String> getBusinessRegistrationNumber(long customerId);
+    List<BusinessIdentifier> getBusinessIdentifiers(long customerId);
 }

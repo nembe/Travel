@@ -2,6 +2,7 @@ package nl.yellowbrick.data.dao.impl;
 
 import com.google.common.base.Joiner;
 import nl.yellowbrick.data.dao.CustomerDao;
+import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.*;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +33,6 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     private static final String SAVE_BUSINESS_DATA = "CustomerSaveBusinessData";
 
     private static final int ACTIVATION_FAILED_STATUS = 0;
-    private static final String BUSINESS_REGISTRATION_NUMBER_LABEL = "businessRegistrationNumber";
 
     @Autowired
     private JdbcTemplate template;
@@ -66,7 +67,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 "ORDER BY applicationdate"
         );
 
-        return template.query(sql, beanRowMapper());
+        return template.query(sql, beanRowMapper(Customer.class));
     }
 
     @Override
@@ -92,7 +93,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 "AND TRIM(LOWER(lastname)) = ?"
         );
 
-        return template.query(query, beanRowMapper(),
+        return template.query(query, beanRowMapper(Customer.class),
                 dayOfBirth,
                 firstName.toLowerCase().trim(),
                 lastName.toLowerCase().trim());
@@ -100,7 +101,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
 
     @Override
     public List<Customer> findAllByEmail(String email) {
-        return template.query("SELECT * FROM CUSTOMER WHERE email = ?", beanRowMapper(), email);
+        return template.query("SELECT * FROM CUSTOMER WHERE email = ?", beanRowMapper(Customer.class), email);
     }
 
     @Override
@@ -174,16 +175,13 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     }
 
     @Override
-    public Optional<String> getBusinessRegistrationNumber(long customerId) {
-        String sql = "SELECT c.value " +
-                "FROM CUSTOMER_IDENTIFICATION c " +
-                "INNER JOIN IDENTIFICATION_FIELD f ON c.fieldidfk = f.id " +
-                "AND c.CUSTOMERIDFK = ? " +
-                "AND f.label = ?";
+    public List<BusinessIdentifier> getBusinessIdentifiers(long customerId) {
+        String sql = "SELECT c.id, c.value, f.label, f.required " +
+                "FROM IDENTIFICATION_FIELD f " +
+                "LEFT OUTER JOIN CUSTOMER_IDENTIFICATION c ON c.fieldidfk = f.id AND CUSTOMERIDFK = ? " +
+                "WHERE NOT REGEXP_LIKE(f.LABEL, '.*_\\d+$')";
 
-        return template.query(sql, new SingleColumnRowMapper<String>(), customerId, BUSINESS_REGISTRATION_NUMBER_LABEL)
-                .stream()
-                .findFirst();
+        return template.query(sql, beanRowMapper(BusinessIdentifier.class), customerId);
     }
 
     private void compileJdbcCalls() {
@@ -236,8 +234,8 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
         return Joiner.on(' ').join(parts);
     }
 
-    private RowMapper<Customer> beanRowMapper() {
-        BeanPropertyRowMapper<Customer> rowMapper = new BeanPropertyRowMapper<>(Customer.class);
+    private <T> RowMapper<T> beanRowMapper(Class<T> clazz) {
+        BeanPropertyRowMapper<T> rowMapper = new BeanPropertyRowMapper<>(clazz);
         rowMapper.setPrimitivesDefaultedForNullValue(true);
 
         return rowMapper;

@@ -68,9 +68,9 @@ public class AccountProvisioningController {
 
         if(customer.isBusinessCustomer()) {
             CustomerAddress billingAddress = addressForCustomer(id, AddressType.BILLING);
-            String businessRegistrationNumber = customerDao.getBusinessRegistrationNumber(id).orElse("");
+            List<BusinessIdentifier> businessIdentifiers = customerDao.getBusinessIdentifiers(id);
             form = new BusinessAccountProvisioningForm(customer, address, priceModel,
-                    billingAddress, businessRegistrationNumber);
+                    billingAddress, businessIdentifiers);
         } else {
             form = new PersonalAccountProvisioningForm(customer, address, priceModel);
         }

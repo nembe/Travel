@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.database.DbHelper;
 import nl.yellowbrick.data.database.Functions;
+import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
 import org.hamcrest.Matchers;
@@ -22,9 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.*;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -235,9 +234,20 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void retrieves_business_registration_number_or_empty() {
-        assertThat(customerDao.getBusinessRegistrationNumber(398734), equalTo(Optional.of("14090089")));
-        assertThat(customerDao.getBusinessRegistrationNumber(12345), equalTo(Optional.empty()));
+    public void retrieves_business_identifiers() {
+        BusinessIdentifier businessRegistrationNumber = new BusinessIdentifier();
+        businessRegistrationNumber.setId(35481);
+        businessRegistrationNumber.setLabel("businessRegistrationNumber");
+        businessRegistrationNumber.setRequired(true);
+        businessRegistrationNumber.setValue("14090089");
+
+        BusinessIdentifier vatNumber = new BusinessIdentifier();
+        vatNumber.setId(35482);
+        vatNumber.setLabel("vatNumber");
+        vatNumber.setRequired(false);
+
+        assertThat(customerDao.getBusinessIdentifiers(398734),
+                containsInAnyOrder(businessRegistrationNumber, vatNumber));
     }
 
     private int fetchCustomerStatus(long customerId) {

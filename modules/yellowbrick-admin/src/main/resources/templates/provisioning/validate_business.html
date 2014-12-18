@@ -20,7 +20,15 @@
                 <h3>Company data</h3>
 
                 <div th:replace="provisioning/_form_fields :: businessName"></div>
-                <div th:replace="provisioning/_form_fields :: businessRegistrationNumber"></div>
+
+                <div th:each="identifier,rowStat : *{businessIdentifiers}">
+                    <div class="field">
+                        <label th:for="'businessIdentifiers' + ${__${rowStat.index}__} + '.value'" class="field-label" th:text="${identifier.label}">vat number</label>
+                        <input type="text" th:field="*{businessIdentifiers[__${rowStat.index}__].value}" th:errorclass="field-error" />
+                        <input type="hidden" th:field="*{businessIdentifiers[__${rowStat.index}__].id}" />
+                        <input type="hidden" th:field="*{businessIdentifiers[__${rowStat.index}__].label}" />
+                    </div>
+                </div>
 
                 <h3>Contact person</h3>
 

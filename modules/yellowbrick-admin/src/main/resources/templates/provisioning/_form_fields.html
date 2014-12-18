@@ -143,11 +143,6 @@
         <span class="field-error" th:if="${#fields.hasErrors('businessName')}" th:errors="*{businessName}"></span>
     </div>
 
-    <div th:fragment="businessRegistrationNumber" class="field">
-        <span class="field-label">Business registration number</span>
-        <span class="field-value" th:text="${form.businessRegistrationNumber}"></span>
-    </div>
-
     <div th:fragment="billingAddressSameAsMailingAddress" class="field">
         <span class="field-label">Billing address is the same as establishment address</span>
         <input type="radio" th:field="*{billingAddressSameAsMailingAddress}" th:value="true" />

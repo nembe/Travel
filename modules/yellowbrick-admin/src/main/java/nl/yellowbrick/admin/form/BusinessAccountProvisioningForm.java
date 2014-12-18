@@ -1,14 +1,17 @@
 package nl.yellowbrick.admin.form;
 
 import com.google.common.base.Strings;
+import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
 import nl.yellowbrick.data.domain.PriceModel;
 
+import java.util.List;
+
 public class BusinessAccountProvisioningForm extends PersonalAccountProvisioningForm {
 
     private String businessName;
-    private String businessRegistrationNumber;
+    private List<BusinessIdentifier> businessIdentifiers;
     private boolean billingAddressSameAsMailingAddress;
     private boolean billingAddressIsPoBox;
     private String billingAddressPoBox;
@@ -27,10 +30,10 @@ public class BusinessAccountProvisioningForm extends PersonalAccountProvisioning
                                            CustomerAddress address,
                                            PriceModel priceModel,
                                            CustomerAddress billingAddress,
-                                           String businessRegistrationNumber) {
+                                           List<BusinessIdentifier> businessIdentifiers) {
         super(customer, address, priceModel);
         setBusinessName(customer.getBusinessName());
-        setBusinessRegistrationNumber(businessRegistrationNumber);
+        setBusinessIdentifiers(businessIdentifiers);
         setBillingAddressIsPoBox(!Strings.isNullOrEmpty(billingAddress.getPoBox()));
         setBillingAddressPoBox(billingAddress.getPoBox());
         setBillingAddressStreet(billingAddress.getAddress());
@@ -49,12 +52,12 @@ public class BusinessAccountProvisioningForm extends PersonalAccountProvisioning
         this.businessName = businessName;
     }
 
-    public String getBusinessRegistrationNumber() {
-        return businessRegistrationNumber;
+    public List<BusinessIdentifier> getBusinessIdentifiers() {
+        return businessIdentifiers;
     }
 
-    public void setBusinessRegistrationNumber(String businessRegistrationNumber) {
-        this.businessRegistrationNumber = businessRegistrationNumber;
+    public void setBusinessIdentifiers(List<BusinessIdentifier> businessIdentifiers) {
+        this.businessIdentifiers = businessIdentifiers;
     }
 
     public boolean isBillingAddressSameAsMailingAddress() {

@@ -443,6 +443,14 @@ INSERT INTO CUSTOMER_IDENTIFICATION VALUES (
              'YBBEHEER:ron',
              TO_DATE ('12/03/2014 20:04:34', 'MM/DD/YYYY HH24:MI:SS'));
 
-INSERT INTO IDENTIFICATION_FIELD VALUES (2, 'ext_membershipcode_4', '[0-9]{9,10}', '1', '0');
+INSERT INTO CUSTOMER_IDENTIFICATION VALUES (
+             35482,
+             3,
+             398734,
+             NULL,
+             'YBBEHEER:ron',
+             TO_DATE ('12/03/2014 20:04:34', 'MM/DD/YYYY HH24:MI:SS'));
+
 INSERT INTO IDENTIFICATION_FIELD VALUES (1, 'businessRegistrationNumber', '.*[0-9]+.*', '1', '0');
+INSERT INTO IDENTIFICATION_FIELD VALUES (2, 'ext_membershipcode_4', '[0-9]{9,10}', '1', '0');
 INSERT INTO IDENTIFICATION_FIELD VALUES (3, 'vatNumber', '\w{7,14}', '0', '0');
