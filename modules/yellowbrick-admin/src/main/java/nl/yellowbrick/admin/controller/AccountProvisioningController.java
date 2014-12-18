@@ -7,6 +7,7 @@ import nl.yellowbrick.admin.exceptions.ResourceNotFoundException;
 import nl.yellowbrick.admin.form.BusinessAccountProvisioningForm;
 import nl.yellowbrick.admin.form.FormData;
 import nl.yellowbrick.admin.form.PersonalAccountProvisioningForm;
+import nl.yellowbrick.admin.service.RateTranslationService;
 import nl.yellowbrick.data.dao.*;
 import nl.yellowbrick.data.domain.*;
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -46,6 +48,7 @@ public class AccountProvisioningController {
     @Autowired private DirectDebitDetailsDao directDebitDetailsDao;
     @Autowired private SubscriptionDao subscriptionDao;
     @Autowired private AccountActivationService accountActivationService;
+    @Autowired private RateTranslationService rateTranslationService;
 
     // validators
     @Autowired private List<AccountRegistrationValidator> accountRegistrationValidators;
@@ -61,7 +64,7 @@ public class AccountProvisioningController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "{id}")
-    public String validate(Model model, @PathVariable("id") int id) {
+    public String validate(Model model, @PathVariable("id") int id, Locale locale) {
         Customer customer = customerById(id);
         CustomerAddress address = addressForCustomer(id, AddressType.MAIN);
         PriceModel priceModel = priceModelForCustomer(id, customer.getActionCode());
@@ -86,6 +89,7 @@ public class AccountProvisioningController {
         model.addAttribute("form", form);
         model.addAttribute(BindingResult.MODEL_KEY_PREFIX + "form", errors);
         model.addAttribute("customer", customer);
+        model.addAttribute("specialRateDescription", rateTranslationService.describeRateForCustomer(customer, locale));
 
         addPaymentData(model, customer);
 

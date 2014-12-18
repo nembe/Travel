@@ -207,5 +207,10 @@
         <span class="field-value" th:unless="${activeSubscription}" th:text="#{subscription.inactive}"></span>
     </div>
 
+    <div th:fragment="specialRateDescription" class="field">
+        <span class="field-label">Special rate</span>
+        <span class="field-value" th:text="${specialRateDescription}"></span>
+    </div>
+
 </body>
 </html>
