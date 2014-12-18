@@ -466,3 +466,29 @@ INSERT INTO SUBSCRIPTION VALUES (
 
 INSERT INTO SUBSCRIPTION_TYPE VALUES (1, 'WEKELIJKS'); -- weekly
 INSERT INTO SUBSCRIPTION_TYPE VALUES (2, 'AIRMILES');
+
+INSERT INTO SPECIALRATE_TEMPLATE VALUES (
+             21,
+             1,
+             NULL,
+             0,
+             'EUROCENT',
+             999999,
+             1,
+             NULL,
+             TO_DATE ('09/03/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             9,
+             'UUR');
+
+INSERT INTO SPECIALRATE_TEMPLATE VALUES (
+             22,
+             5,
+             NULL,
+             0,
+             'EUROCENT',
+             5,
+             1,
+             NULL,
+             TO_DATE ('09/03/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             9,
+             'UUR');
