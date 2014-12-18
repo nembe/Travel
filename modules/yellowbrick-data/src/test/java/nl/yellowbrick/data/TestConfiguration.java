@@ -20,7 +20,7 @@ public class TestConfiguration {
         return new EmbeddedDatabaseBuilder()
                 .setDataSourceFactory(new SingleConnectionDataSourceFactory())
                 .setType(EmbeddedDatabaseType.HSQL)
-                .addScript("functions.sql")
+                .addScripts("cleanup.sql", "functions.sql")
                 .build();
     }
 }
