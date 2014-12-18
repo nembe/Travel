@@ -30,6 +30,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebAppConfiguration
@@ -176,6 +177,17 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
         postBusinessAccountProvisioningForm();
 
         verify(accountActivationService).activateCustomerAccount(argThat(isUpdatedBusinessCustomer()), any());
+    }
+
+    @Test
+    public void shows_subscription_status() throws Exception {
+        mockMvc.perform(get("/provisioning/" + PRIVATE_CUSTOMER_ID)).andExpect(content().string(containsString(
+                "Subscription active"
+        )));
+
+        mockMvc.perform(get("/provisioning/" + BUSINESS_CUSTOMER_ID)).andExpect(content().string(containsString(
+                "Subscription inactive"
+        )));
     }
 
     private MvcResult postPersonalAccountProvisioningForm() throws Exception {

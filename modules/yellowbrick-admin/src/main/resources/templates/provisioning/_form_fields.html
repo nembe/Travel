@@ -201,5 +201,11 @@
         <span class="field-error" th:if="${#fields.hasErrors('billingAddressCountry')}" th:errors="*{billingAddressCountry}"></span>
     </div>
 
+    <div th:fragment="subscriptionStatus" class="field">
+        <span class="field-label">Subscription status</span>
+        <span class="field-value" th:if="${activeSubscription}" th:text="#{subscription.active}"></span>
+        <span class="field-value" th:unless="${activeSubscription}" th:text="#{subscription.inactive}"></span>
+    </div>
+
 </body>
 </html>

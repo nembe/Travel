@@ -44,6 +44,7 @@ public class AccountProvisioningController {
     @Autowired private PriceModelDao priceModelDao;
     @Autowired private MarketingActionDao marketingActionDao;
     @Autowired private DirectDebitDetailsDao directDebitDetailsDao;
+    @Autowired private SubscriptionDao subscriptionDao;
     @Autowired private AccountActivationService accountActivationService;
 
     // validators
@@ -87,6 +88,10 @@ public class AccountProvisioningController {
         model.addAttribute("customer", customer);
 
         addPaymentData(model, customer);
+
+        subscriptionDao.findForCustomer(id).ifPresent((subscription) -> {
+            model.addAttribute("activeSubscription", subscription.isSubscriptionActive());
+        });
 
         if(customer.isBusinessCustomer())
             return "provisioning/validate_business";
