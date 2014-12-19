@@ -212,5 +212,15 @@
         <span class="field-value" th:text="${specialRateDescription}"></span>
     </div>
 
+    <div th:fragment="firstCardLicensePlate" class="field">
+        <span class="field-label">Plate number for 1st transponder card</span>
+        <span class="field-value" th:text="${customer.firstCardLicensePlate} ?: #{not.specified}"></span>
+    </div>
+
+    <div th:fragment="firstCardMobile" class="field">
+        <span class="field-label">Mobile phone number for 1st transponder card</span>
+        <span class="field-value" th:text="${customer.firstCardMobile} ?: #{not.specified}"></span>
+    </div>
+
 </body>
 </html>
