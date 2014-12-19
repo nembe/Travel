@@ -95,6 +95,40 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                 lastUsedCardNumber.orElse("0"),
                 numberOfCards);
     }
+
+    @Override
+    public List<CardOrder> findForCustomer(Customer customer, CardOrderStatus orderStatus, CardType cardType) {
+        String sql = "SELECT * FROM CARDORDER " +
+                "WHERE CUSTOMERID = ? " +
+                "AND ORDERSTATUS = ? " +
+                "AND UPPER(CARDTYPE) = UPPER(?)";
+
+        return template.query(sql, cardOrderRowMapper(),
+                customer.getCustomerId(),
+                orderStatus.code(),
+                cardType.description());
+    }
+
+    private RowMapper<CardOrder> cardOrderRowMapper() {
+        return new RowMapper<CardOrder>() {
+            @Override
+            public CardOrder mapRow(ResultSet rs, int rowNum) throws SQLException {
+                CardOrder co = new CardOrder();
+
+                co.setId(rs.getLong("ORDERID"));
+                co.setDate(rs.getDate("ORDERDATE"));
+                co.setStatus(CardOrderStatus.byCode(rs.getInt("ORDERSTATUS")));
+                co.setCustomerId(rs.getLong("CUSTOMERID"));
+                co.setCardType(CardType.fromDescription(rs.getString("CARDTYPE")));
+                co.setBriefCode(rs.getString("BRIEFCODE"));
+                co.setAmount(rs.getInt("AMOUNT"));
+                co.setPricePerCard(rs.getDouble("PRICEPERCARD"));
+
+                return co;
+            }
+        };
+    }
+
     private void saveAndAcceptCardOrder(double orderId, double pricePerCard, int amount) {
         cardOrderUpdateCall.execute(orderId, CardOrderStatus.ACCEPTED.code(), pricePerCard, amount);
     }

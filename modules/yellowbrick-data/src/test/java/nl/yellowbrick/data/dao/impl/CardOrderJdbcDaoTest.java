@@ -2,11 +2,15 @@ package nl.yellowbrick.data.dao.impl;
 
 import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.database.DbHelper;
+import nl.yellowbrick.data.domain.CardOrder;
+import nl.yellowbrick.data.domain.CardOrderStatus;
+import nl.yellowbrick.data.domain.CardType;
 import nl.yellowbrick.data.domain.Customer;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.sql.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -178,6 +182,22 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         // should be empty as there are no cards in the pool for the supplied product group id
         cardNumbers = cardOrderDao.nextTransponderCardNumbers(12345, 1, Optional.empty());
         assertThat(cardNumbers, empty());
+    }
+
+    @Test
+    public void returns_card_orders_per_customer() {
+        CardOrder expectedCardOrder = new CardOrder();
+        expectedCardOrder.setId(72031);
+        expectedCardOrder.setDate(Date.valueOf("2010-12-23"));
+        expectedCardOrder.setStatus(CardOrderStatus.INSERTED);
+        expectedCardOrder.setCustomerId(4776);
+        expectedCardOrder.setCardType(CardType.QPARK_CARD);
+        expectedCardOrder.setBriefCode("2");
+        expectedCardOrder.setAmount(1);
+        expectedCardOrder.setPricePerCard(0);
+
+        List<CardOrder> cardOrders = cardOrderDao.findForCustomer(customer, CardOrderStatus.INSERTED, CardType.QPARK_CARD);
+        assertThat(cardOrders, contains(expectedCardOrder));
     }
 
     private void updateCardType(String cardType) {
