@@ -32,7 +32,7 @@ public class NonTestAccountValidator extends AccountRegistrationValidator {
             });
 
         } catch (Exception e) {
-            log.error(String.format("an error occurred during automatic validation: %s", e.getMessage()));
+            log.error("an error occurred during automatic validation: {}", e.getMessage());
             errors.reject("errors.validation.failure");
         }
     }

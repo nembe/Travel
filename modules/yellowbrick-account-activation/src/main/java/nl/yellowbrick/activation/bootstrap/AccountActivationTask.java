@@ -53,7 +53,7 @@ public class AccountActivationTask {
         log.debug("starting validateAndActivateAccounts");
 
         List<Customer> customers = newlyRegisteredCustomers();
-        log.info(String.format("processing %d customers", customers.size()));
+        log.info("processing {} customers", customers.size());
 
         customers.forEach(this::validateAndActivateAccount);
     }
@@ -91,9 +91,9 @@ public class AccountActivationTask {
                         log.error("unacceptable action code " + customer.getActionCode());
                         customerDao.markAsPendingHumanReview(customer);
                     } else {
-                        log.info(String.format("applying action code %s to customer ID %s",
+                        log.info("applying action code {} to customer ID {}",
                                 customer.getActionCode(),
-                                customer.getCustomerId()));
+                                customer.getCustomerId());
                         priceModel.get().setRegistratiekosten(marketingAction.get().getRegistrationCost());
                     }
                 }
