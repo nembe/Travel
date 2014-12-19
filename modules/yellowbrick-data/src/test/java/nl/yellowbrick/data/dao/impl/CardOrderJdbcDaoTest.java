@@ -96,7 +96,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void maps_transponder_card_description_to_type_1() throws Exception {
-        updateCardType("transponderSOMETHING_OR_OTHER");
+        updateCardType("transponderkaart");
 
         CountDownLatch lock = new CountDownLatch(2);
         LinkedList<FunctionCall> calls = new LinkedList<>();
@@ -114,7 +114,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void maps_rtp_card_description_to_type_2() throws Exception {
-        updateCardType("rtp_AND_SOME_IRRELEVANT_STUFF");
+        updateCardType("rtp kaart");
 
         CountDownLatch lock = new CountDownLatch(2);
         LinkedList<FunctionCall> calls = new LinkedList<>();
@@ -132,7 +132,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void maps_q_card_description_to_type_3() throws Exception {
-        updateCardType("qcard_SOMETHING_OR_OTHER");
+        updateCardType("qcard");
 
         CountDownLatch lock = new CountDownLatch(2);
         LinkedList<FunctionCall> calls = new LinkedList<>();
