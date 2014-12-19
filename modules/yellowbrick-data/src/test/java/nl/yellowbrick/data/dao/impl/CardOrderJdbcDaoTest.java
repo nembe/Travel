@@ -21,6 +21,7 @@ import static nl.yellowbrick.data.database.Functions.CALL_RECORDERS;
 import static nl.yellowbrick.data.database.Functions.FunctionCall;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -198,6 +199,29 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
 
         List<CardOrder> cardOrders = cardOrderDao.findForCustomer(customer, CardOrderStatus.INSERTED, CardType.QPARK_CARD);
         assertThat(cardOrders, contains(expectedCardOrder));
+    }
+
+    @Test
+    public void delegates_processing_transponder_card_to_stored_procedure() throws Exception {
+        CountDownLatch lock = new CountDownLatch(1);
+        LinkedList<FunctionCall> calls = new LinkedList<>();
+
+        CALL_RECORDERS.add((functionCall) -> {
+            calls.add(functionCall);
+            lock.countDown();
+        });
+
+        cardOrderDao.processTransponderCard("123456", customer, true);
+
+        lock.await(2, TimeUnit.SECONDS);
+
+        FunctionCall call = calls.getFirst();
+
+        assertThat(call.functionName, equalTo("PROCESS_TRANSPONDERCARDS"));
+        assertThat(call.getNumericArg(0).longValue(), equalTo(customer.getCustomerId()));
+        assertThat(call.arguments[1], equalTo("123456"));
+        assertThat(call.arguments[2], equalTo("TEST MUTATOR"));
+        assertThat(call.arguments[3], is(1));
     }
 
     private void updateCardType(String cardType) {

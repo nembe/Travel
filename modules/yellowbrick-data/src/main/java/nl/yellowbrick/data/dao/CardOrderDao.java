@@ -17,4 +17,6 @@ public interface CardOrderDao {
     public List<String> nextTransponderCardNumbers(int productGroupId, int numberOfCards, Optional<String> lastUsedCardNumber);
 
     public List<CardOrder> findForCustomer(Customer customer, CardOrderStatus orderStatus, CardType cardType);
+
+    public void processTransponderCard(String cardNumber, Customer customer, boolean updateMobileWithCard);
 }

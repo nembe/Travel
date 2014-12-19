@@ -30,15 +30,20 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     private static final String SAVE_SPECIAL_TARIF_PROC = "saveSignupSpecialRate";
     private static final String CARD_ORDER_UPDATE_PROC = "cardorderUpdate";
     private static final String CARD_ORDER_VALIDATE_PROC = "CardOrderValidate";
+    private static final String PROCESS_TRANSPONDERCARDS_PROC = "PROCESS_TRANSPONDERCARDS";
 
     private static final String PROSPECT_CARD_TYPE = "Hoesje";
 
     @Autowired
     private JdbcTemplate template;
 
+    @Value("${mutator}")
+    private String mutator;
+
     private SimpleJdbcCall saveSpecialTarifCall;
     private SimpleJdbcCall cardOrderUpdateCall;
     private SimpleJdbcCall cardOrderValidateCall;
+    private SimpleJdbcCall processTransponderCardsCall;
 
     private Logger log = LoggerFactory.getLogger(CardOrderJdbcDao.class);
 
@@ -109,6 +114,15 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                 cardType.description());
     }
 
+    @Override
+    public void processTransponderCard(String cardNumber, Customer customer, boolean updateMobileWithCard) {
+        processTransponderCardsCall.execute(
+                customer.getCustomerId(),
+                cardNumber,
+                mutator,
+                updateMobileWithCard ? 1 : 0);
+    }
+
     private RowMapper<CardOrder> cardOrderRowMapper() {
         return new RowMapper<CardOrder>() {
             @Override
@@ -138,8 +152,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         String returnStr = res.get("Return_out").toString();
 
         Runnable logUnmetExpectation = () -> {
-            log.error(String.format("Expected %s.%s to return -1 but instead got %s",
-                    PACKAGE, CARD_ORDER_UPDATE_PROC, returnStr));
+            log.error("Expected {}.{} to return -1 but instead got {}", PACKAGE, CARD_ORDER_UPDATE_PROC, returnStr);
         };
 
         try {
@@ -175,6 +188,16 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                         new SqlParameter("NumberOfTCards_in", Types.NUMERIC),
                         new SqlParameter("TypeOfCard_in", Types.VARCHAR),
                         new SqlOutParameter("Return_out", Types.INTEGER)
+                );
+
+        processTransponderCardsCall = new SimpleJdbcCall(template)
+                .withCatalogName(PACKAGE)
+                .withProcedureName(PROCESS_TRANSPONDERCARDS_PROC)
+                .declareParameters(
+                        new SqlParameter("p_customerID", Types.NUMERIC),
+                        new SqlParameter("p_cardnr", Types.VARCHAR),
+                        new SqlParameter("p_mutator", Types.VARCHAR),
+                        new SqlParameter("p_updateMobileWithCard", Types.NUMERIC)
                 );
 
         saveSpecialTarifCall.compile();
