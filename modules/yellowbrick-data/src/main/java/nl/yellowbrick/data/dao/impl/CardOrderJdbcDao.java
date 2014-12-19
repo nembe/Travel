@@ -3,22 +3,25 @@ package nl.yellowbrick.data.dao.impl;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import nl.yellowbrick.data.dao.CardOrderDao;
-import nl.yellowbrick.data.domain.Customer;
+import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.CardOrderStatus;
 import nl.yellowbrick.data.domain.CardType;
+import nl.yellowbrick.data.domain.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.SqlOutParameter;
-import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Types;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
@@ -76,6 +79,22 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                 CardOrderStatus.INSERTED.code(), PROSPECT_CARD_TYPE, customer.getCustomerId());
     }
 
+    @Override
+    public List<String> nextTransponderCardNumbers(int productGroupId, int numberOfCards, Optional<String> lastUsedCardNumber) {
+        String sql = "SELECT * FROM ( " +
+                "SELECT CARDNR FROM TRANSPONDERCARDPOOL " +
+                "WHERE CARDSTATUS_ID = ? " +
+                "AND PRODUCTGROUP_ID = ? " +
+                "AND CARDNR > ? " +
+                "ORDER BY RANGE_INDEX, CARDNR ASC " +
+                ") WHERE ROWNUM <= ?";
+
+        return template.query(sql, new SingleColumnRowMapper<>(String.class),
+                CardOrderStatus.ACCEPTED.code(),
+                productGroupId,
+                lastUsedCardNumber.orElse("0"),
+                numberOfCards);
+    }
     private void saveAndAcceptCardOrder(double orderId, double pricePerCard, int amount) {
         cardOrderUpdateCall.execute(orderId, CardOrderStatus.ACCEPTED.code(), pricePerCard, amount);
     }

@@ -8,11 +8,15 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static nl.yellowbrick.data.database.Functions.CALL_RECORDERS;
 import static nl.yellowbrick.data.database.Functions.FunctionCall;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -155,6 +159,25 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         lock.await(2, TimeUnit.SECONDS);
 
         assertThat(calls.getLast().arguments[3], equalTo("0"));
+    }
+
+    @Test
+    public void returns_next_transponder_card_numbers_from_pool() {
+        // should return the single first accepted number
+        List<String> cardNumbers = cardOrderDao.nextTransponderCardNumbers(1, 1, Optional.empty());
+        assertThat(cardNumbers, contains("162826"));
+
+        // should return the single following accepted number
+        cardNumbers = cardOrderDao.nextTransponderCardNumbers(1, 1, Optional.of("162826"));
+        assertThat(cardNumbers, contains("162827"));
+
+        // should return both the available accepted numbers
+        cardNumbers = cardOrderDao.nextTransponderCardNumbers(1, 5, Optional.empty());
+        assertThat(cardNumbers, contains("162826", "162827"));
+
+        // should be empty as there are no cards in the pool for the supplied product group id
+        cardNumbers = cardOrderDao.nextTransponderCardNumbers(12345, 1, Optional.empty());
+        assertThat(cardNumbers, empty());
     }
 
     private void updateCardType(String cardType) {
