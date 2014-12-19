@@ -22,6 +22,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import static nl.yellowbrick.data.database.Functions.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
@@ -160,7 +161,7 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         CountDownLatch lock = new CountDownLatch(1);
         LinkedList<Functions.FunctionCall> calls = new LinkedList<>();
 
-        Functions.CALL_RECORDERS.add((functionCall) -> {
+        CALL_RECORDERS.add((functionCall) -> {
             calls.add(functionCall);
             lock.countDown();
         });
@@ -170,11 +171,12 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
 
         lock.await(2, TimeUnit.SECONDS);
 
-        Object[] args = calls.getFirst().arguments;
-        String fnName = calls.getFirst().functionName;
+        FunctionCall call = calls.getFirst();
+        Object[] args = call.arguments;
+        String fnName = call.functionName;
 
         assertThat(fnName, Matchers.equalTo("customerSavePrivateData"));
-        assertThat(Long.parseLong(args[0].toString()), equalTo(customer.getCustomerId()));
+        assertThat(call.getNumericArg(0).longValue(), equalTo(customer.getCustomerId()));
         assertThat(args[1], equalTo(customer.getGender()));
         assertThat(args[2], equalTo(customer.getInitials()));
         assertThat(args[3], equalTo(customer.getFirstName()));
@@ -193,7 +195,7 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         CountDownLatch lock = new CountDownLatch(1);
         LinkedList<Functions.FunctionCall> calls = new LinkedList<>();
 
-        Functions.CALL_RECORDERS.add((functionCall) -> {
+        CALL_RECORDERS.add((functionCall) -> {
             calls.add(functionCall);
             lock.countDown();
         });
@@ -209,13 +211,14 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
 
         lock.await(2, TimeUnit.SECONDS);
 
-        Object[] args = calls.getFirst().arguments;
-        String fnName = calls.getFirst().functionName;
+        FunctionCall call = calls.getFirst();
+        Object[] args = call.arguments;
+        String fnName = call.functionName;
 
         assertThat(fnName, Matchers.equalTo("customerSaveBusinessData"));
-        assertThat(Long.parseLong(args[0].toString()), equalTo(customer.getCustomerId()));
+        assertThat(call.getNumericArg(0).longValue(), equalTo(customer.getCustomerId()));
         assertThat(args[1], equalTo(customer.getBusinessName()));
-        assertThat(Long.parseLong(args[2].toString()), equalTo(customer.getBusinessTypeId()));
+        assertThat(call.getNumericArg(2).longValue(), equalTo(customer.getBusinessTypeId()));
         assertThat(args[3], equalTo(customer.getGender()));
         assertThat(args[4], equalTo(customer.getInitials()));
         assertThat(args[5], equalTo(customer.getFirstName()));

@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static nl.yellowbrick.data.database.Functions.FunctionCall;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -46,7 +47,7 @@ public class MembershipJdbcDaoTest extends BaseSpringTestCase {
     @Test
     public void delegates_to_stored_procedure() throws Exception {
         CountDownLatch lock = new CountDownLatch(1);
-        LinkedList<Functions.FunctionCall> calls = new LinkedList<>();
+        LinkedList<FunctionCall> calls = new LinkedList<>();
 
         Functions.CALL_RECORDERS.add((functionCall) -> {
             calls.add(functionCall);
@@ -57,11 +58,12 @@ public class MembershipJdbcDaoTest extends BaseSpringTestCase {
 
         lock.await(2, TimeUnit.SECONDS);
         assertThat("customerValidateMembership was never called", lock.getCount(), equalTo(0l));
-        assertThat(calls.getFirst().functionName, equalTo("customerValidateMembership"));
+        FunctionCall call = calls.getFirst();
+        assertThat(call.functionName, equalTo("customerValidateMembership"));
 
-        Object[] args = calls.getFirst().arguments;
+        Object[] args = call.arguments;
 
-        assertThat(Long.parseLong(args[0].toString()), equalTo(customer.getCustomerId()));
+        assertThat(call.getNumericArg(0).longValue(), equalTo(customer.getCustomerId()));
         assertThat(args[1], equalTo(customer.getCustomerNr()));
         assertThat(args[2], equalTo(customer.getParkadammerTotal()));
         assertThat(args[3], equalTo(customer.getNumberOfTCards()));
