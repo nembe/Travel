@@ -26,6 +26,9 @@ public class AccountActivationService {
     private CardOrderDao cardOrderDao;
 
     @Autowired
+    private CardAssignmentService cardAssignmentService;
+
+    @Autowired
     private EmailNotificationService emailNotificationService;
 
     private Logger log = LoggerFactory.getLogger(AccountActivationService.class);
@@ -37,7 +40,6 @@ public class AccountActivationService {
         customerDao.assignNextCustomerNr(customer);
         cardOrderDao.saveSpecialTarifIfApplicable(customer);
 
-        // TODO how do these cards get assigned now?
         if(customer.getNumberOfTCards() > 0) {
             Membership membership = new Membership(customer, priceModel);
             membershipDao.saveValidatedMembership(membership);
@@ -45,12 +47,12 @@ public class AccountActivationService {
             log.info("Saved validated membership for customer ID " + customer.getCustomerId());
 
             cardOrderDao.validateCardOrders(customer);
+            cardAssignmentService.assignToCustomer(customer);
             emailNotificationService.notifyAccountAccepted(customer);
 
             log.info("Finished activation of customer ID " + customer.getCustomerId());
         } else {
-            log.error(String.format("Customer ID %s expected to have transponder cards at this point",
-                    customer.getCustomerId()));
+            log.error("Customer ID {} expected to have transponder cards at this point", customer.getCustomerId());
         }
     }
 }
