@@ -114,8 +114,8 @@ INSERT INTO CUSTOMER VALUES (
              NULL,
              'YBWATCHDOG',
              NULL,
-             NULL,
-             NULL,
+             '+31495430798',
+             '39-LB-40',
              'foo',
              'bar',
              '1');

@@ -74,8 +74,8 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(c.getEmail(), equalTo("bestaatniet@taxameter.nl"));
         assertThat(c.getExitDate(), nullValue());
         assertThat(c.getFax(), equalTo(""));
-        assertThat(c.getFirstCardLicensePlate(), nullValue());
-        assertThat(c.getFirstCardMobile(), nullValue());
+        assertThat(c.getFirstCardLicensePlate(), is("39-LB-40"));
+        assertThat(c.getFirstCardMobile(), is("+31495430798"));
         assertThat(c.getFirstName(), equalTo("Mathijn"));
         assertThat(c.getGender(), equalTo("M"));
         assertThat(c.getInfix(), equalTo(""));

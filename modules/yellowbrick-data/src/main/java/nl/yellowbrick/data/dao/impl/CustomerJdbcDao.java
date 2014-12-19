@@ -54,6 +54,8 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 "c.productgroup_id AS product_group_id,",
                 "c.billingagentidfk AS billing_agent_id,",
                 "c.invoice_annotations AS extra_invoice_annotations,",
+                "c.phonenr_tcard AS first_card_mobile,",
+                "c.license_plate_tcard AS first_card_license_plate,",
                 "ba.agentnaam AS agentname,",
                 "cs.label AS status,",
                 "pg.description product_group,",
