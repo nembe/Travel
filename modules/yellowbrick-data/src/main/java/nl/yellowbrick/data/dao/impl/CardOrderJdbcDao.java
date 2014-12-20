@@ -32,8 +32,6 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     private static final String CARD_ORDER_VALIDATE_PROC = "CardOrderValidate";
     private static final String PROCESS_TRANSPONDERCARDS_PROC = "PROCESS_TRANSPONDERCARDS";
 
-    private static final String PROSPECT_CARD_TYPE = "Hoesje";
-
     @Autowired
     private JdbcTemplate template;
 
@@ -81,7 +79,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         };
 
         template.query(sql, processCardOrder,
-                CardOrderStatus.INSERTED.code(), PROSPECT_CARD_TYPE, customer.getCustomerId());
+                CardOrderStatus.INSERTED.code(), CardType.SLEEVE.description(), customer.getCustomerId());
     }
 
     @Override
@@ -95,7 +93,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                 ") WHERE ROWNUM <= ?";
 
         return template.query(sql, new SingleColumnRowMapper<>(String.class),
-                CardOrderStatus.ACCEPTED.code(),
+                3, // TODO confirm that this is correct. Note that PROCESS_TRANSPONDERCARDS sets CARDSTATUS_ID to 1
                 productGroupId,
                 lastUsedCardNumber.orElse("0"),
                 numberOfCards);
