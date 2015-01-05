@@ -45,6 +45,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-actuator</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-ldap</artifactId>
+            <version>3.2.4.RELEASE</version>
+        </dependency>
 
         <!-- Tests -->
         <dependency>
@@ -122,10 +131,20 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
-                <!-- exclude assets that require preprocessing -->
                 <excludes>
+                    <!-- exclude assets that require preprocessing -->
                     <exclude>**/*.scss</exclude>
+                    <!-- exclude keystores as filtering corrupts them -->
+                    <exclude>**/*.jks</exclude>
                 </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <!-- unfiltered keystores -->
+                    <include>**/*.jks</include>
+                </includes>
             </resource>
         </resources>
     </build>
