@@ -43,7 +43,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired(required = false)
     public void configureLdapAuth(AuthenticationManagerBuilder auth, LdapContextSource ldapContextSource) throws Exception {
         auth.ldapAuthentication()
-                .userSearchBase("OU=BP Users,OU=Waysis - BP,DC=waysis,DC=local")
+                .userSearchBase("OU=YB Users,OU=Waysis - YB,DC=waysis,DC=local")
                 .userSearchFilter("(sAMAccountName={0})")
                 .contextSource(ldapContextSource)
                 .ldapAuthoritiesPopulator(new StaticLdapAuthoritiesPopulator());
