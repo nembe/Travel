@@ -1,12 +1,15 @@
 package nl.yellowbrick.data.dao.impl;
 
+import nl.yellowbrick.data.audit.Mutator;
 import nl.yellowbrick.data.dao.CustomerAddressDao;
 import nl.yellowbrick.data.domain.AddressType;
 import nl.yellowbrick.data.domain.CustomerAddress;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jdbc.core.*;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +25,8 @@ public class CustomerAddressJdbcDao implements CustomerAddressDao, InitializingB
     @Autowired
     private JdbcTemplate template;
 
-    @Value("${mutator}")
-    private String mutator;
+    @Autowired
+    private Mutator mutator;
 
     private SimpleJdbcCall saveAddressCall;
 
@@ -65,7 +68,7 @@ public class CustomerAddressJdbcDao implements CustomerAddressDao, InitializingB
                 address.getCity(),
                 address.getCountryCode(),
                 address.getExtraInfo(),
-                mutator
+                mutator.get()
         );
     }
 
