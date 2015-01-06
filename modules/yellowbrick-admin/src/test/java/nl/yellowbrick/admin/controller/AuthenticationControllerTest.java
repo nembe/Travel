@@ -53,27 +53,34 @@ public class AuthenticationControllerTest extends BaseMvcTestCase {
 
     @Test
     public void authenticates_user_and_redirects_to_home() throws Exception {
-        String csrf = extractCsrfToken(mockMvc.perform(get("/login").session(mockHttpSession)).andReturn());
-
         MvcResult result = mockMvc.perform(post("/login")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .session(mockHttpSession)
-                .param("_csrf", csrf)
-                .param("username", "testUser")
+                .param("_csrf", getCsrfToken())
+                .param("username", "testUser") // our "in-memory" user
                 .param("password", "testPassword")).andReturn();
 
-        assertThat(result.getResponse().getStatus(), is(302));
-        assertThat(result.getResponse().getHeader(HttpHeaders.LOCATION), is("/"));
+        assertSuccessfulLogin(result);
+    }
+
+    @Test
+    public void fallsback_to_jdbc_authentication() throws Exception {
+        MvcResult result = mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .session(mockHttpSession)
+                .param("_csrf", getCsrfToken())
+                .param("username", "ruisalgado") // our database user
+                .param("password", "123123")).andReturn();
+
+        assertSuccessfulLogin(result);
     }
 
     @Test
     public void sets_error_param_on_failed_authentication() throws Exception {
-        String csrf = extractCsrfToken(mockMvc.perform(get("/login").session(mockHttpSession)).andReturn());
-
         MvcResult result = mockMvc.perform(post("/login")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .session(mockHttpSession)
-                .param("_csrf", csrf)
+                .param("_csrf", getCsrfToken())
                 .param("username", "testUser")
                 .param("password", "wrongPassword")).andReturn();
 
@@ -85,6 +92,15 @@ public class AuthenticationControllerTest extends BaseMvcTestCase {
     public void displays_authentication_error() throws Exception {
         mockMvc.perform(get("/login?error").session(mockHttpSession))
                 .andExpect(content().string(containsString("class=\"global-errors\"")));
+    }
+
+    private void assertSuccessfulLogin(MvcResult result) {
+        assertThat(result.getResponse().getStatus(), is(302));
+        assertThat(result.getResponse().getHeader(HttpHeaders.LOCATION), is("/"));
+    }
+
+    private String getCsrfToken() throws Exception {
+        return extractCsrfToken(mockMvc.perform(get("/login").session(mockHttpSession)).andReturn());
     }
 
     private String extractCsrfToken(MvcResult mvcResult) throws Exception {
