@@ -496,3 +496,14 @@ INSERT INTO SPECIALRATE_TEMPLATE VALUES (
 INSERT INTO TRANSPONDERCARDPOOL VALUES ('162825', 1, 1, 1); -- inserted
 INSERT INTO TRANSPONDERCARDPOOL VALUES ('162826', 3, 1, 1); -- exported
 INSERT INTO TRANSPONDERCARDPOOL VALUES ('162827', 3, 1, 1); -- exported
+
+INSERT INTO TBLADMINISTRATOR VALUES (
+             '$2a$10$MhiNXVFrkfl4kmbgiYyO6uisavxSrExbXeWO0yvcj/CjkQ8hc6SBe', -- 123123
+             'ruisalgado',
+             NULL,
+             -1,
+             1,
+             'YBBEHEER:salgado',
+             NULL,
+             99,
+             NULL);
