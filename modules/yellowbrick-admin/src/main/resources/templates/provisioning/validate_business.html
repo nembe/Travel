@@ -5,7 +5,7 @@
 </head>
 <body>
     <div layout:fragment="content-inner">
-        <form th:object="${form}" method="post">
+        <form th:object="${form}" th:action="@{#}" method="post">
             <div class="section">
 
                 <div th:if="${#fields.hasErrors('global')}" class="global-errors">
