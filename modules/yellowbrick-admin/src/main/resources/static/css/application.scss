@@ -84,6 +84,11 @@ a, a:active, a:hover, a:visited {
       @include active-highlight($provisioning-color);
     }
   }
+
+  ul.baseline {
+    position: absolute;
+    bottom: 0;
+  }
 }
 
 #main {
@@ -129,3 +134,8 @@ table th {
 table td {
   padding: 9px 8px 0;
 }
+
+#logout-btn {
+  display: inline-block;
+}
+

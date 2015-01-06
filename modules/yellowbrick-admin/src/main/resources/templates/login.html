@@ -8,7 +8,7 @@
         <div th:if="${param.error}" th:text="#{login.error}" class="global-errors">
             Invalid username and/or password.
         </div>
-        <div th:if="${param.logout}" th:text="#{login.logout}">
+        <div th:if="${param.logout}" th:text="#{login.logout}" class="flash-notice">
             You have been logged out.
         </div>
         <form th:action="@{/login}" method="post">

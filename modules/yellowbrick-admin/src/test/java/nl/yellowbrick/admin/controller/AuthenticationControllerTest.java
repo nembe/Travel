@@ -94,6 +94,12 @@ public class AuthenticationControllerTest extends BaseMvcTestCase {
                 .andExpect(content().string(containsString("class=\"global-errors\"")));
     }
 
+    @Test
+    public void displays_message_on_logout() throws Exception {
+        mockMvc.perform(get("/login?logout").session(mockHttpSession))
+                .andExpect(content().string(containsString("class=\"flash-notice\"")));
+    }
+
     private void assertSuccessfulLogin(MvcResult result) {
         assertThat(result.getResponse().getStatus(), is(302));
         assertThat(result.getResponse().getHeader(HttpHeaders.LOCATION), is("/"));

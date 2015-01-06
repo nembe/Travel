@@ -30,6 +30,15 @@
                 <a th:href="@{/provisioning}">PROVISIONING</a>
             </li>
         </ul>
+
+        <ul class="baseline">
+            <li>
+                <form id="logout-btn" th:action="@{/logout}" method="post">
+                    <input type="submit" value="Sign out"/>
+                </form>
+                <span th:inline="text">[[${#httpServletRequest.remoteUser}]]</span>
+            </li>
+        </ul>
     </div>
 
     <div id="main">
