@@ -5,16 +5,24 @@
         <title>Yellowbrick Admin</title>
     </head>
     <body>
-        <div th:if="${param.error}">
-            Invalid username and password.
+        <div th:if="${param.error}" th:text="#{login.error}" class="global-errors">
+            Invalid username and/or password.
         </div>
-        <div th:if="${param.logout}">
+        <div th:if="${param.logout}" th:text="#{login.logout}">
             You have been logged out.
         </div>
         <form th:action="@{/login}" method="post">
-            <div><label> User Name : <input type="text" name="username"/> </label></div>
-            <div><label> Password: <input type="password" name="password"/> </label></div>
-            <div><input type="submit" value="Sign In"/></div>
+            <div>
+                <label for="username">User Name:</label>
+                <input type="text" id="username" name="username"/>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password"/>
+            </div>
+            <div>
+                <input type="submit" value="Sign In"/>
+            </div>
         </form>
     </body>
 </html>
