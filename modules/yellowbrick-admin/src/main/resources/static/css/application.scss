@@ -6,6 +6,7 @@ $side-menu-width: 200px;
 
 html, body {
   height: 100%;
+  width: 100%;
   color: $text-color;
   font-size: $base-font-size;
 }
@@ -139,3 +140,6 @@ table td {
   display: inline-block;
 }
 
+.flash-notice {
+  color: #53B369;
+}
