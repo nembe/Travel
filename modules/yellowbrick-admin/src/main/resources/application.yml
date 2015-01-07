@@ -32,6 +32,9 @@ ldap:
 spring:
   profiles: acceptance
 
+server:
+  contextPath: /brickwall
+
 mail:
   host: ybmail
 
