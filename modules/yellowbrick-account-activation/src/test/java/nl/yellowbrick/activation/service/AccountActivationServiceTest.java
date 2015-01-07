@@ -8,9 +8,7 @@ import nl.yellowbrick.data.domain.Membership;
 import nl.yellowbrick.data.domain.PriceModel;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -26,6 +24,7 @@ public class AccountActivationServiceTest {
     @Mock CustomerDao customerDao;
     @Mock MembershipDao membershipDao;
     @Mock CardOrderDao cardOrderDao;
+    @Mock CardAssignmentService cardAssignmentService;
     @Mock EmailNotificationService emailNotificationService;
 
     Customer customer;
@@ -51,12 +50,15 @@ public class AccountActivationServiceTest {
     }
 
     @Test
-    public void saves_special_tarif_and_validates_card_orders() {
+    public void saves_special_tarif_and_validates_card_orders_and_then_assigns_cards_to_customer() {
         mockCollaborations();
         activationService.activateCustomerAccount(customer, priceModel);
 
-        verify(cardOrderDao).saveSpecialTarifIfApplicable(eq(customer));
-        verify(cardOrderDao).validateCardOrders(eq(customer));
+        InOrder inOrder = Mockito.inOrder(cardOrderDao, cardAssignmentService);
+
+        inOrder.verify(cardOrderDao).saveSpecialTarifIfApplicable(eq(customer));
+        inOrder.verify(cardOrderDao).validateCardOrders(eq(customer));
+        inOrder.verify(cardAssignmentService).assignToCustomer(customer);
     }
 
     @Test

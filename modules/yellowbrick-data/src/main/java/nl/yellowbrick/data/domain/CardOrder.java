@@ -1,0 +1,114 @@
+package nl.yellowbrick.data.domain;
+
+import java.util.Date;
+
+public class CardOrder {
+
+    private long id;
+    private Date date;
+    private CardOrderStatus status;
+    private long customerId;
+    private CardType cardType;
+    private String briefCode;
+    private int amount;
+    private double pricePerCard;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public CardOrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CardOrderStatus status) {
+        this.status = status;
+    }
+
+    public long getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(long customerId) {
+        this.customerId = customerId;
+    }
+
+    public CardType getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(CardType cardType) {
+        this.cardType = cardType;
+    }
+
+    public String getBriefCode() {
+        return briefCode;
+    }
+
+    public void setBriefCode(String briefCode) {
+        this.briefCode = briefCode;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public double getPricePerCard() {
+        return pricePerCard;
+    }
+
+    public void setPricePerCard(double pricePerCard) {
+        this.pricePerCard = pricePerCard;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CardOrder cardOrder = (CardOrder) o;
+
+        if (amount != cardOrder.amount) return false;
+        if (customerId != cardOrder.customerId) return false;
+        if (id != cardOrder.id) return false;
+        if (Double.compare(cardOrder.pricePerCard, pricePerCard) != 0) return false;
+        if (briefCode != null ? !briefCode.equals(cardOrder.briefCode) : cardOrder.briefCode != null) return false;
+        if (cardType != cardOrder.cardType) return false;
+        if (date != null ? !date.equals(cardOrder.date) : cardOrder.date != null) return false;
+        if (status != cardOrder.status) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (int) (customerId ^ (customerId >>> 32));
+        result = 31 * result + (cardType != null ? cardType.hashCode() : 0);
+        result = 31 * result + (briefCode != null ? briefCode.hashCode() : 0);
+        result = 31 * result + amount;
+        temp = Double.doubleToLongBits(pricePerCard);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
+}

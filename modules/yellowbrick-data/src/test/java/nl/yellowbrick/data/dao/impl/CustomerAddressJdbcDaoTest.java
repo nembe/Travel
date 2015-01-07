@@ -106,7 +106,7 @@ public class CustomerAddressJdbcDaoTest extends BaseSpringTestCase {
         Object[] args = call.arguments;
 
         assertThat(call.functionName, equalTo("customerSaveAddress"));
-        assertThat(Long.parseLong(args[0].toString()), IsEqual.equalTo(address.getCustomerAddressId()));
+        assertThat(call.getNumericArg(0).longValue(), IsEqual.equalTo(address.getCustomerAddressId()));
         assertThat(args[1], IsEqual.equalTo(2364));
         assertThat(args[2], IsEqual.equalTo(addressType.code()));
         assertThat(args[3], IsEqual.equalTo(address.getAddress()));

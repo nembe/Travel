@@ -114,8 +114,8 @@ INSERT INTO CUSTOMER VALUES (
              NULL,
              'YBWATCHDOG',
              NULL,
-             NULL,
-             NULL,
+             '+31495430798',
+             '39-LB-40',
              'foo',
              'bar',
              '1');
@@ -492,3 +492,7 @@ INSERT INTO SPECIALRATE_TEMPLATE VALUES (
              TO_DATE ('09/03/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
              9,
              'UUR');
+
+INSERT INTO TRANSPONDERCARDPOOL VALUES ('162825', 1, 1, 1); -- inserted
+INSERT INTO TRANSPONDERCARDPOOL VALUES ('162826', 3, 1, 1); -- exported
+INSERT INTO TRANSPONDERCARDPOOL VALUES ('162827', 3, 1, 1); -- exported

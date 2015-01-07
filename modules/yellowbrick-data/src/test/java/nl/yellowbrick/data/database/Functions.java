@@ -96,6 +96,14 @@ public class Functions {
         });
     }
 
+    public static void processTransponderCards(int customerId, String cardNr, String mutator, int updateMobileWithCard) {
+        CALL_RECORDERS.forEach((recorder) -> {
+            Object[] args = { customerId, cardNr, mutator, updateMobileWithCard };
+
+            recorder.accept(new FunctionCall("PROCESS_TRANSPONDERCARDS", args));
+        });
+    }
+
     public static class FunctionCall {
 
         public final String functionName;

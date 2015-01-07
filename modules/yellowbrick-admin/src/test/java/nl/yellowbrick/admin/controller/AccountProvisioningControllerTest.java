@@ -103,6 +103,14 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
     }
 
     @Test
+    public void shows_transponder_card_association_data() throws Exception {
+        MvcResult res = mockMvc.perform(get("/provisioning/" + PRIVATE_CUSTOMER_ID)).andReturn();
+
+        assertThat(res.getResponse().getContentAsString(), containsString("0616545500"));
+        assertThat(res.getResponse().getContentAsString(), containsString("27-HZZ-9"));
+    }
+
+    @Test
     public void saves_changes_to_customer_and_address() throws Exception {
         postPersonalAccountProvisioningForm();
 

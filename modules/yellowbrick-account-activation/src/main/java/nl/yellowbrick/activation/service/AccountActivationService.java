@@ -10,8 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class AccountActivationService {
@@ -26,18 +24,19 @@ public class AccountActivationService {
     private CardOrderDao cardOrderDao;
 
     @Autowired
+    private CardAssignmentService cardAssignmentService;
+
+    @Autowired
     private EmailNotificationService emailNotificationService;
 
     private Logger log = LoggerFactory.getLogger(AccountActivationService.class);
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void activateCustomerAccount(Customer customer, PriceModel priceModel) {
         log.info("Starting acceptance for customer ID: " + customer.getCustomerId());
 
         customerDao.assignNextCustomerNr(customer);
         cardOrderDao.saveSpecialTarifIfApplicable(customer);
 
-        // TODO how do these cards get assigned now?
         if(customer.getNumberOfTCards() > 0) {
             Membership membership = new Membership(customer, priceModel);
             membershipDao.saveValidatedMembership(membership);
@@ -45,12 +44,12 @@ public class AccountActivationService {
             log.info("Saved validated membership for customer ID " + customer.getCustomerId());
 
             cardOrderDao.validateCardOrders(customer);
+            cardAssignmentService.assignToCustomer(customer);
             emailNotificationService.notifyAccountAccepted(customer);
 
             log.info("Finished activation of customer ID " + customer.getCustomerId());
         } else {
-            log.error(String.format("Customer ID %s expected to have transponder cards at this point",
-                    customer.getCustomerId()));
+            log.error("Customer ID {} expected to have transponder cards at this point", customer.getCustomerId());
         }
     }
 }
