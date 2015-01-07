@@ -11,7 +11,21 @@ spring:
 mail:
   host: 127.0.0.1
 
+ldap:
+  enabled: true
+  url: ldaps://vm-dc-01:636
+  userDn: CN=ldap_user,CN=Users,DC=waysis,DC=local
+  password: ldap_user
+
 mutator: ADMIN
+
+---
+
+spring:
+  profiles: test
+
+ldap:
+  enabled: false
 
 ---
 

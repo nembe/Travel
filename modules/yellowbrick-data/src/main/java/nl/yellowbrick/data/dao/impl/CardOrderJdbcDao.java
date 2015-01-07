@@ -2,6 +2,7 @@ package nl.yellowbrick.data.dao.impl;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import nl.yellowbrick.data.audit.Mutator;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.CardOrderStatus;
@@ -11,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
@@ -35,8 +35,8 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     @Autowired
     private JdbcTemplate template;
 
-    @Value("${mutator}")
-    private String mutator;
+    @Autowired
+    private Mutator mutator;
 
     private SimpleJdbcCall saveSpecialTarifCall;
     private SimpleJdbcCall cardOrderUpdateCall;
@@ -117,7 +117,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         processTransponderCardsCall.execute(
                 customer.getCustomerId(),
                 cardNumber,
-                mutator,
+                mutator.get(),
                 updateMobileWithCard ? 1 : 0);
     }
 

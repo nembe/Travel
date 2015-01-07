@@ -5,12 +5,22 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import java.net.URL;
+
 @ComponentScan(basePackages = { "nl.yellowbrick" })
 @EnableTransactionManagement
 @EnableAutoConfiguration
 public class Application {
 
     public static void main(String[] args) {
+        setSslEnvironment();
         SpringApplication.run(Application.class, args);
+    }
+
+    public static void setSslEnvironment() {
+        URL trustStoreUrl = Application.class.getClassLoader().getResource("truststore.jks");
+
+        System.setProperty("javax.net.ssl.trustStore", trustStoreUrl.getPath());
+        System.setProperty("javax.net.ssl.trustStoreType", "jks");
     }
 }

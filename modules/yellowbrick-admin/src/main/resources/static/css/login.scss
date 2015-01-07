@@ -1,0 +1,43 @@
+@import 'colors';
+
+$bg-color: #F6F7F9;
+
+#login-wrapper {
+  width: 500px;
+  margin: 150px auto;
+}
+
+#login {
+  width: 100%;
+  min-height: 600px;
+  background-color: $bg-color;
+  text-align: center;
+  padding: 15px 25px;
+
+  .logo {
+    background: url("/images/login-logo.png") no-repeat center;
+    background-size: contain;
+    height: 200px;
+  }
+
+  .field {
+    margin-top: 5px;
+  }
+
+  input, button {
+    border-style: none;
+    line-height: 30px;
+    width: 80%;
+    font-size: 20px;
+    padding: 10px;
+  }
+
+  button {
+    box-sizing: content-box;
+    text-align: left;
+    margin-top: 20px;
+    background-color: #FED201;
+    color: #FFFFFF;
+    border-bottom: 4px solid #DBB102;
+  }
+}

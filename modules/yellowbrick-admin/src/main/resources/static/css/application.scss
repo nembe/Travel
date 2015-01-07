@@ -6,6 +6,7 @@ $side-menu-width: 200px;
 
 html, body {
   height: 100%;
+  width: 100%;
   color: $text-color;
   font-size: $base-font-size;
 }
@@ -33,6 +34,8 @@ a, a:active, a:hover, a:visited {
   height: 100%;
   width: $side-menu-width;
   background-color: $bg-color;
+  max-height: 600px;
+  position: relative;
   float: left;
 
   ul {
@@ -84,6 +87,11 @@ a, a:active, a:hover, a:visited {
       @include active-highlight($provisioning-color);
     }
   }
+
+  ul.baseline {
+    position: absolute;
+    bottom: 0;
+  }
 }
 
 #main {
@@ -128,4 +136,12 @@ table th {
 
 table td {
   padding: 9px 8px 0;
+}
+
+#logout-btn {
+  display: inline-block;
+}
+
+.flash-notice {
+  color: #53B369;
 }

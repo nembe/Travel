@@ -1,11 +1,12 @@
 var sass = require('gulp-sass'),
     coffee = require('gulp-coffee'),
-    gulp = require('gulp');
+    gulp = require('gulp'),
+    argv = require('yargs').argv;
 
 var paths = {
     scss: 'src/main/resources/static/css/*.scss',
     coffee: 'src/main/resources/static/javascript/*.coffee',
-    static: './target/classes/static'
+    target: argv.target || './target/classes/static'
 };
 
 var displayError = function(err) {
@@ -25,14 +26,14 @@ gulp.task('sass', function() {
     gulp.src(paths.scss)
         .pipe(sass())
         .on('error', displayError)
-        .pipe(gulp.dest(paths.static + '/css'));
+        .pipe(gulp.dest(paths.target + '/css'));
 });
 
 gulp.task('coffee', function() {
     gulp.src(paths.coffee)
         .pipe(coffee({ bare: true })
         .on('error', displayError))
-        .pipe(gulp.dest(paths.static + '/javascript'));
+        .pipe(gulp.dest(paths.target + '/javascript'));
 });
 
 gulp.task('watch', function() {

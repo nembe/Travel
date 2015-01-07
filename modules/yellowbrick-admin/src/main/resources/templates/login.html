@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>Yellowbrick Admin</title>
+    <link rel="stylesheet" type="text/css" media="all" th:href="@{/css/application.css}" />
+    <link rel="stylesheet" type="text/css" media="all" th:href="@{/css/login.css}" />
+</head>
+<body>
+    <div id="login-wrapper">
+        <div id="login">
+            <div class="logo"></div>
+            <hr />
+            <h1>SIGN IN</h1>
+            <form th:action="@{/login}" method="post">
+                <div class="field">
+                    <input type="text" id="username" name="username" placeholder="User name"/>
+                </div>
+                <div class="field">
+                    <input type="password" id="password" name="password" placeholder="Password"/>
+                </div>
+                <h2 th:if="${param.error}" th:text="#{login.error}" class="global-errors">
+                    Invalid username and/or password.
+                </h2>
+                <h2 th:if="${param.logout}" th:text="#{login.logout}" class="flash-notice">
+                    You have been logged out.
+                </h2>
+                <div>
+                    <button type="submit">LOG ME IN</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

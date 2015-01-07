@@ -1,5 +1,6 @@
 package nl.yellowbrick.data.dao.impl;
 
+import nl.yellowbrick.data.audit.Mutator;
 import nl.yellowbrick.data.dao.MembershipDao;
 import nl.yellowbrick.data.domain.Membership;
 import nl.yellowbrick.data.domain.RandomPassword;
@@ -9,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
@@ -30,8 +30,8 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
     @Autowired
     private JdbcTemplate template;
 
-    @Value("${mutator}")
-    private String mutator;
+    @Autowired
+    private Mutator mutator;
 
     private SimpleJdbcCall jdbcCall;
     private Logger log = LoggerFactory.getLogger(MembershipJdbcDao.class);
@@ -61,7 +61,7 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
             put("AdditionalRTPCardFee_in", membership.getPriceModel().getRtpCardCost());
             put("PinCode_in", pinCode.get());
             put("Password_in", password.get());
-            put("Mutator_in", mutator);
+            put("Mutator_in", mutator.get());
         }}));
 
         int result = Integer.parseInt(results.get("Return_out").toString());

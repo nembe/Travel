@@ -46,6 +46,12 @@
             <artifactId>jbcrypt</artifactId>
             <version>${bcrypt.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Tests -->
         <dependency>
@@ -74,6 +80,17 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                  <classpathDependencyExcludes>
+                    <!-- Make sure maven runs the tests without spring security in its classpath -->
+                    <classpathDependencyExcludes>org.springframework.boot:spring-boot-starter-security</classpathDependencyExcludes>
+                  </classpathDependencyExcludes>
+                </configuration>
+              </plugin>
         </plugins>
 
         <resources>

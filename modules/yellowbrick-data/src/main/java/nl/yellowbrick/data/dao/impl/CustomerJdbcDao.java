@@ -1,6 +1,7 @@
 package nl.yellowbrick.data.dao.impl;
 
 import com.google.common.base.Joiner;
+import nl.yellowbrick.data.audit.Mutator;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
@@ -8,10 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.*;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
@@ -37,8 +39,9 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     @Autowired
     private JdbcTemplate template;
 
-    @Value("${mutator}")
-    private String mutator;
+    @Autowired
+    private Mutator mutator;
+
     private SimpleJdbcCall saveCustomerCall;
     private SimpleJdbcCall saveBusinessCustomerCall;
 
@@ -149,7 +152,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 customer.getFax(),
                 customer.getDateOfBirth(),
                 customer.getProductGroupId(),
-                mutator
+                mutator.get()
         );
     }
 
@@ -172,7 +175,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 customer.getInvoiceAttn(),
                 customer.getInvoiceEmail(),
                 customer.isExtraInvoiceAnnotations()? '1' : '0',
-                mutator
+                mutator.get()
         );
     }
 
@@ -192,7 +195,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 "SET VALUE = ?, MUTATOR = ?, MUTATION_DATE = CURRENT_DATE " +
                 "WHERE ID = ?";
 
-        template.update(sql, bi.getValue(), mutator, bi.getId());
+        template.update(sql, bi.getValue(), mutator.get(), bi.getId());
     }
 
     private void compileJdbcCalls() {

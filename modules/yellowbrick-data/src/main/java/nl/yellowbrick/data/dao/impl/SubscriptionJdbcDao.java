@@ -5,6 +5,7 @@ import nl.yellowbrick.data.domain.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -15,7 +16,6 @@ public class SubscriptionJdbcDao implements SubscriptionDao {
     @Autowired
     private JdbcTemplate template;
 
-
     @Override
     public Optional<Subscription> findForCustomer(long customerId) {
         String sql = "SELECT s.id, s.customer_id, s.begin_time, s.end_time, s.subscription_type_id type_id, t.description " +
@@ -24,6 +24,8 @@ public class SubscriptionJdbcDao implements SubscriptionDao {
                 "AND s.subscription_type_id = t.id " +
                 "AND ROWNUM <= 1";
 
-        return template.query(sql, new BeanPropertyRowMapper(Subscription.class), customerId).stream().findFirst();
+        RowMapper<Subscription> rowMapper = new BeanPropertyRowMapper(Subscription.class);
+
+        return template.query(sql, rowMapper, customerId).stream().findFirst();
     }
 }
