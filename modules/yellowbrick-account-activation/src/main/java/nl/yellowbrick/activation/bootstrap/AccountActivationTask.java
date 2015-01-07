@@ -1,6 +1,8 @@
 package nl.yellowbrick.activation.bootstrap;
 
 import com.google.common.base.Strings;
+import nl.yellowbrick.activation.service.AccountActivationService;
+import nl.yellowbrick.activation.validation.AccountRegistrationValidator;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.dao.MarketingActionDao;
 import nl.yellowbrick.data.dao.PriceModelDao;
@@ -9,15 +11,11 @@ import nl.yellowbrick.data.domain.CustomerStatus;
 import nl.yellowbrick.data.domain.MarketingAction;
 import nl.yellowbrick.data.domain.PriceModel;
 import nl.yellowbrick.data.errors.ActivationException;
-import nl.yellowbrick.activation.service.AccountActivationService;
-import nl.yellowbrick.activation.validation.AccountRegistrationValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.DataBinder;
 
 import java.util.List;
@@ -48,7 +46,6 @@ public class AccountActivationTask {
     }
 
     @Scheduled(fixedDelayString = "${activation.delay}")
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void validateAndActivateAccounts()  {
         log.debug("starting validateAndActivateAccounts");
 
