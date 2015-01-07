@@ -34,6 +34,8 @@ a, a:active, a:hover, a:visited {
   height: 100%;
   width: $side-menu-width;
   background-color: $bg-color;
+  max-height: 600px;
+  position: relative;
   float: left;
 
   ul {
