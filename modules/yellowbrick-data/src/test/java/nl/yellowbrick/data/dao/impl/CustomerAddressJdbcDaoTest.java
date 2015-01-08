@@ -102,6 +102,28 @@ public class CustomerAddressJdbcDaoTest extends BaseSpringTestCase {
         assertStoredProcedureCall(calls.get(1), address, AddressType.BILLING);
     }
 
+    @Test
+    public void delegates_deleting_address_to_stored_procedure() throws Exception {
+        CountDownLatch lock = new CountDownLatch(1);
+        LinkedList<Functions.FunctionCall> calls = new LinkedList<>();
+
+        CALL_RECORDERS.add((functionCall) -> {
+            calls.add(functionCall);
+            lock.countDown();
+        });
+
+        CustomerAddress address = addressDao.findByCustomerId(2364, AddressType.MAIN).get();
+        addressDao.deleteAddress(address);
+
+        lock.await(2, TimeUnit.SECONDS);
+
+        FunctionCall call = calls.get(0);
+
+        assertThat(call.functionName, equalTo("CustomerDeleteAddress"));
+        assertThat(call.getNumericArg(0).longValue(), IsEqual.equalTo(address.getCustomerAddressId()));
+        assertThat(call.arguments[1], is("TEST MUTATOR"));
+    }
+
     private void assertStoredProcedureCall(FunctionCall call, CustomerAddress address, AddressType addressType) {
         Object[] args = call.arguments;
 
