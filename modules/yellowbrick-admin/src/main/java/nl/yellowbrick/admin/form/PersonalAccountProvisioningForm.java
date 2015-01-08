@@ -48,7 +48,7 @@ public class PersonalAccountProvisioningForm implements FormData {
         setFirstName(customer.getFirstName());
         setInfix(customer.getInfix());
         setLastName(customer.getLastName());
-        setDateOfBirth(new Date());
+        setDateOfBirth(customer.getDateOfBirth());
         setEmail(customer.getEmail());
         setPhoneNr(customer.getPhoneNr());
 

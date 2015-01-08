@@ -11,6 +11,8 @@ import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
 import org.hamcrest.Matcher;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
@@ -23,6 +25,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.sql.Date;
 
+import static nl.yellowbrick.admin.matchers.HtmlMatchers.isField;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.argThat;
@@ -130,6 +133,62 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
         MvcResult res = mockMvc.perform(get("/provisioning/" + BUSINESS_CUSTOMER_ID)).andReturn();
 
         assertThat(res.getModelAndView().getViewName(), is("provisioning/validate_business"));
+    }
+
+    @Test
+    public void loads_private_customer_data() throws Exception {
+        MvcResult res = mockMvc.perform(get("/provisioning/" + PRIVATE_CUSTOMER_ID)).andReturn();
+
+        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+
+        assertThat(html.select(".field input"), hasItems(
+                isField("initials", "W.J."),
+                isField("firstName", "Wietse"),
+                isField("lastName", "Scheltinga"),
+                isField("dateOfBirth", "31-12-1981"),
+                isField("email", "bestaatniet@taxameter.nl"),
+                isField("phoneNr", "0616545500"),
+                isField("street", "Davisstraat"),
+                isField("houseNr", "42"),
+                isField("supplement", "I"),
+                isField("postalCode", "1057 TL"),
+                isField("city", "Amsterdam"),
+                isField("country", "NL")
+        ));
+    }
+
+    @Test
+    public void loads_business_customer_data() throws Exception {
+        MvcResult res = mockMvc.perform(get("/provisioning/" + BUSINESS_CUSTOMER_ID)).andReturn();
+
+        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+
+        assertThat(html.select(".field input"), hasItems(
+                isField("businessName", "kabisa"),
+                isField("businessIdentifiers[0].label", "businessRegistrationNumber"),
+                isField("businessIdentifiers[0].value", "14090089"),
+                isField("businessIdentifiers[1].label", "vatNumber"),
+                isField("businessIdentifiers[1].value", ""),
+                isField("initials", "M.R."),
+                isField("firstName", "Rui"),
+                isField("lastName", "Salgado"),
+                isField("dateOfBirth", "07-09-1985"),
+                isField("email", "rui.salgado@kabisa.nl"),
+                isField("phoneNr", "+31495430798"),
+                isField("street", "Marconilaan"),
+                isField("houseNr", "8"),
+                isField("supplement", ""),
+                isField("postalCode", "6003 DD"),
+                isField("city", "Weert"),
+                isField("country", "NL"),
+                isField("billingAddressPoBox", ""),
+                isField("billingAddressStreet", "Kleine Gartmanplantsoen"),
+                isField("billingAddressHouseNr", "10"),
+                isField("billingAddressSupplement", ""),
+                isField("billingAddressPostalCode", "1017 RR"),
+                isField("billingAddressCity", "Amsterdam"),
+                isField("billingAddressCountry", "NL")
+        ));
     }
 
     @Test
