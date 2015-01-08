@@ -66,12 +66,12 @@ public class AccountProvisioningController {
     @RequestMapping(method = RequestMethod.GET, value = "{id}")
     public String validate(Model model, @PathVariable("id") int id, Locale locale) {
         Customer customer = customerById(id);
-        CustomerAddress address = addressForCustomer(id, AddressType.MAIN);
+        CustomerAddress address = addressForCustomer(id);
         PriceModel priceModel = priceModelForCustomer(id, customer.getActionCode());
         FormData form;
 
         if(customer.isBusinessCustomer()) {
-            CustomerAddress billingAddress = addressForCustomer(id, AddressType.BILLING);
+            Optional<CustomerAddress> billingAddress = billingAddressForCustomer(id);
             List<BusinessIdentifier> businessIdentifiers = customerDao.getBusinessIdentifiers(id);
             form = new BusinessAccountProvisioningForm(customer, address, priceModel,
                     billingAddress, businessIdentifiers);
@@ -123,7 +123,7 @@ public class AccountProvisioningController {
             ModelMap model) {
 
         Customer customer = customerById(id);
-        CustomerAddress address = addressForCustomer(id, AddressType.MAIN);
+        CustomerAddress address = addressForCustomer(id);
         PriceModel priceModel = priceModelForCustomer(id, customer.getActionCode());
 
         updateCustomer(customer, form);
@@ -148,29 +148,34 @@ public class AccountProvisioningController {
             ModelMap model) {
 
         Customer customer = customerById(id);
-        CustomerAddress businessAddress = addressForCustomer(id, AddressType.MAIN);
-        CustomerAddress billingAddress = addressForCustomer(id, AddressType.BILLING);
+        CustomerAddress businessAddress = addressForCustomer(id);
+        Optional<CustomerAddress> maybeBillingAddress = billingAddressForCustomer(id);
 
         PriceModel priceModel = priceModelForCustomer(id, customer.getActionCode());
 
         updateBusinessCustomer(customer, form);
         updateAddress(businessAddress, form);
 
-        if(form.isBillingAddressSameAsMailingAddress())
-            updateAddress(billingAddress, form);
-        else
-            updateBillingAddress(billingAddress, form);
-
-        model.clear();
-
         // save changes
         customerDao.saveBusinessCustomer(customer);
         addressDao.saveBusinessCustomerAddress(id, businessAddress, AddressType.MAIN);
-        addressDao.saveBusinessCustomerAddress(id, billingAddress, AddressType.BILLING);
+
+        // save changes to or remove billing address
+        if(form.isBillingAddressSameAsMailingAddress()) {
+            maybeBillingAddress.ifPresent(addressDao::deleteAddress);
+        } else {
+            CustomerAddress billingAddress = maybeBillingAddress.orElse(new CustomerAddress());
+            updateBillingAddress(billingAddress, form);
+            addressDao.saveBusinessCustomerAddress(id, billingAddress, AddressType.BILLING);
+        }
+
+        // update business identifiers
         form.getBusinessIdentifiers().forEach(customerDao::updateBusinessIdentifier);
 
         // and activate customer
         accountActivationService.activateCustomerAccount(customer, priceModel);
+
+        model.clear();
 
         return "redirect:/provisioning";
     }
@@ -188,18 +193,20 @@ public class AccountProvisioningController {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
-    private CustomerAddress addressForCustomer(int customerId, AddressType addressType) {
-        Optional<CustomerAddress> address = addressDao.findByCustomerId(customerId, addressType);
+    private CustomerAddress addressForCustomer(int customerId) {
+        Optional<CustomerAddress> address = addressDao.findByCustomerId(customerId, AddressType.MAIN);
 
         if(address.isPresent())
             return address.get();
 
-        String error = String.format("couldn't find %s address for customer id: %s",
-                addressType.name().toLowerCase(),
-                customerId);
+        String error = String.format("couldn't find address for customer id: %s", customerId);
 
         log.error(error);
         throw new InconsistentDataException(error);
+    }
+
+    private Optional<CustomerAddress> billingAddressForCustomer(int customerId) {
+        return addressDao.findByCustomerId(customerId, AddressType.BILLING);
     }
 
     private PriceModel priceModelForCustomer(int customerId, String actionCode) {

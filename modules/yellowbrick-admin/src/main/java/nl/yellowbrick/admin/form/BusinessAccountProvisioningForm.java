@@ -7,6 +7,7 @@ import nl.yellowbrick.data.domain.CustomerAddress;
 import nl.yellowbrick.data.domain.PriceModel;
 
 import java.util.List;
+import java.util.Optional;
 
 public class BusinessAccountProvisioningForm extends PersonalAccountProvisioningForm {
 
@@ -29,19 +30,24 @@ public class BusinessAccountProvisioningForm extends PersonalAccountProvisioning
     public BusinessAccountProvisioningForm(Customer customer,
                                            CustomerAddress address,
                                            PriceModel priceModel,
-                                           CustomerAddress billingAddress,
+                                           Optional<CustomerAddress> billingAddress,
                                            List<BusinessIdentifier> businessIdentifiers) {
         super(customer, address, priceModel);
         setBusinessName(customer.getBusinessName());
         setBusinessIdentifiers(businessIdentifiers);
-        setBillingAddressIsPoBox(!Strings.isNullOrEmpty(billingAddress.getPoBox()));
-        setBillingAddressPoBox(billingAddress.getPoBox());
-        setBillingAddressStreet(billingAddress.getAddress());
-        setBillingAddressHouseNr(billingAddress.getHouseNr());
-        setBillingAddressSupplement(billingAddress.getSupplement());
-        setBillingAddressPostalCode(billingAddress.getZipCode());
-        setBillingAddressCity(billingAddress.getCity());
-        setBillingAddressCountry(billingAddress.getCountryCode());
+
+        billingAddress.ifPresent((ba) -> {
+            setBillingAddressIsPoBox(!Strings.isNullOrEmpty(ba.getPoBox()));
+            setBillingAddressPoBox(ba.getPoBox());
+            setBillingAddressStreet(ba.getAddress());
+            setBillingAddressHouseNr(ba.getHouseNr());
+            setBillingAddressSupplement(ba.getSupplement());
+            setBillingAddressPostalCode(ba.getZipCode());
+            setBillingAddressCity(ba.getCity());
+            setBillingAddressCountry(ba.getCountryCode());
+        });
+
+        setBillingAddressSameAsMailingAddress(!billingAddress.isPresent());
     }
 
     public String getBusinessName() {
