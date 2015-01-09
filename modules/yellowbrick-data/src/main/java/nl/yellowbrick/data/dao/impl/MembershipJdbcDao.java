@@ -44,20 +44,23 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
         RandomPinCode pinCode = new RandomPinCode();
         RandomPassword password = new RandomPassword();
 
+        Customer cust = membership.getCustomer();
+        PriceModel pm = membership.getPriceModel();
+
         Map<String, Object> results = jdbcCall.execute(new MapSqlParameterSource(new HashMap<String, Object>() {{
-            put("CustomerId_in", membership.getCustomer().getCustomerId());
-            put("CustomerNr_in", membership.getCustomer().getCustomerNr());
-            put("ParkadammerTotal_in", membership.getCustomer().getParkadammerTotal());
-            put("NumberOfTCards_in", membership.getCustomer().getNumberOfTCards());
-            put("NumberOfQCards_in", membership.getCustomer().getNumberOfQCards());
-            put("CreditLimit_in", membership.getCustomer().getCreditLimit());
-            put("SubscriptionFee_in", membership.getPriceModel().getSubscriptionCostEuroCents());
-            put("RegistrationFee_in", membership.getPriceModel().getRegistratiekosten());
-            put("IssuePhysicalCard_in", membership.getPriceModel().isDefaultIssuePhysicalCard());
-            put("InitialTCardFee_in", initialCardCost(membership.getPriceModel()));
-            put("AdditionalTCardFee_in", additionalCardCost(membership.getPriceModel()));
-            put("InitialRTPCardFee_in", membership.getPriceModel().getInitRtpCardCost());
-            put("AdditionalRTPCardFee_in", membership.getPriceModel().getRtpCardCost());
+            put("CustomerId_in", cust.getCustomerId());
+            put("CustomerNr_in", cust.getCustomerNr());
+            put("ParkadammerTotal_in", cust.getParkadammerTotal());
+            put("NumberOfTCards_in", cust.getNumberOfTCards());
+            put("NumberOfQCards_in", cust.getNumberOfQCards());
+            put("CreditLimit_in", cust.getCreditLimit());
+            put("SubscriptionFee_in", pm.getSubscriptionCostEuroCents());
+            put("RegistrationFee_in", pm.getRegistratiekosten());
+            put("IssuePhysicalCard_in", pm.isDefaultIssuePhysicalCard());
+            put("InitialTCardFee_in", initialCardCost(pm));
+            put("AdditionalTCardFee_in", additionalCardCost(pm));
+            put("InitialRTPCardFee_in", pm.getInitRtpCardCost());
+            put("AdditionalRTPCardFee_in", pm.getRtpCardCost());
             put("PinCode_in", pinCode.get());
             put("Password_in", password.get());
             put("Mutator_in", mutator.get());
