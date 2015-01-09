@@ -29,8 +29,8 @@ public class CardAssignmentService {
         List<CardOrder> transponderCardOrders = ordersForCustomer(customer, CardType.TRANSPONDER_CARD);
         List<CardOrder> vehicleProfileOrders = ordersForCustomer(customer, CardType.VECHILE_PROFILE);
 
-        log.info("Assigning %d transponder cards", transponderCardOrders.size());
-        log.info("Assigning %d vehicle profiles", vehicleProfileOrders.size());
+        log.info("Assigning {} transponder cards", transponderCardOrders.size());
+        log.info("Assigning {} vehicle profiles", vehicleProfileOrders.size());
 
         // keep track of last number used from pool
         String lastUsedNumber = null;
