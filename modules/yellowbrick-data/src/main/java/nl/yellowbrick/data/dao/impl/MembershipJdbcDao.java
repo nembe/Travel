@@ -2,9 +2,7 @@ package nl.yellowbrick.data.dao.impl;
 
 import nl.yellowbrick.data.audit.Mutator;
 import nl.yellowbrick.data.dao.MembershipDao;
-import nl.yellowbrick.data.domain.Membership;
-import nl.yellowbrick.data.domain.RandomPassword;
-import nl.yellowbrick.data.domain.RandomPinCode;
+import nl.yellowbrick.data.domain.*;
 import nl.yellowbrick.data.errors.ActivationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,8 +53,9 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
             put("CreditLimit_in", membership.getCustomer().getCreditLimit());
             put("SubscriptionFee_in", membership.getPriceModel().getSubscriptionCostEuroCents());
             put("RegistrationFee_in", membership.getPriceModel().getRegistratiekosten());
-            put("InitialTCardFee_in", membership.getPriceModel().getInitTranspCardCost());
-            put("AdditionalTCardFee_in", membership.getPriceModel().getTranspCardCost());
+            put("IssuePhysicalCard_in", membership.getPriceModel().isDefaultIssuePhysicalCard());
+            put("InitialTCardFee_in", initialCardCost(membership.getPriceModel()));
+            put("AdditionalTCardFee_in", additionalCardCost(membership.getPriceModel()));
             put("InitialRTPCardFee_in", membership.getPriceModel().getInitRtpCardCost());
             put("AdditionalRTPCardFee_in", membership.getPriceModel().getRtpCardCost());
             put("PinCode_in", pinCode.get());
@@ -75,6 +74,14 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
         }
     }
 
+    private int initialCardCost(PriceModel pm) {
+        return pm.isDefaultIssuePhysicalCard() ? pm.getInitTranspCardCost() : pm.getInitVehicleProfileCost();
+    }
+
+    private int additionalCardCost(PriceModel pm) {
+        return pm.isDefaultIssuePhysicalCard() ? pm.getTranspCardCost() : pm.getVehicleProfileCost();
+    }
+
     private void compileJdbcCall() {
         jdbcCall = new SimpleJdbcCall(template)
                 .withCatalogName(PACKAGE)
@@ -88,6 +95,7 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
                         new SqlParameter("CreditLimit_in", Types.NUMERIC),
                         new SqlParameter("SubscriptionFee_in", Types.NUMERIC),
                         new SqlParameter("RegistrationFee_in", Types.NUMERIC),
+                        new SqlParameter("IssuePhysicalCard_in", Types.BOOLEAN),
                         new SqlParameter("InitialTCardFee_in", Types.NUMERIC),
                         new SqlParameter("AdditionalTCardFee_in", Types.NUMERIC),
                         new SqlParameter("InitialRTPCardFee_in", Types.NUMERIC),

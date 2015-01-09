@@ -18,15 +18,15 @@ public class Functions {
 
     public static void customerValidateMembership(int customerId, String customerNr, int parkadammerTotal,
                                                   int numberOfTCards, int numberOfQCards, int creditLimit,
-                                                  int subscriptionFee, int registrationFee, int initialTCardFee,
-                                                  int additionalTCardFee, int initialRtpCardFee, int additionalRtpCardFee,
-                                                  String pinCode, String password, String mutator,
+                                                  int subscriptionFee, int registrationFee, boolean defaultIssuePhysicalCard,
+                                                  int initialTCardFee, int additionalTCardFee, int initialRtpCardFee,
+                                                  int additionalRtpCardFee, String pinCode, String password, String mutator,
                                                   Integer[] returnOut) {
 
         CALL_RECORDERS.forEach((recorder) -> {
             Object[] args = { customerId, customerNr, parkadammerTotal, numberOfTCards, numberOfQCards,
-                    creditLimit, subscriptionFee, registrationFee, initialTCardFee, additionalTCardFee,
-                    initialRtpCardFee, additionalRtpCardFee, pinCode, password, mutator };
+                    creditLimit, subscriptionFee, registrationFee, defaultIssuePhysicalCard, initialTCardFee,
+                    additionalTCardFee, initialRtpCardFee, additionalRtpCardFee, pinCode, password, mutator };
 
             recorder.accept(new FunctionCall("customerValidateMembership", args));
         });
