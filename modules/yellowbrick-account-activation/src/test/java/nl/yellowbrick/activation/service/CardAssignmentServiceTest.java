@@ -15,6 +15,7 @@ import java.util.Arrays;
 
 import static nl.yellowbrick.data.domain.CardOrderStatus.ACCEPTED;
 import static nl.yellowbrick.data.domain.CardType.TRANSPONDER_CARD;
+import static nl.yellowbrick.data.domain.CardType.VECHILE_PROFILE;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
@@ -29,8 +30,9 @@ public class CardAssignmentServiceTest {
 
     Customer customer;
 
-    CardOrder orderA;
-    CardOrder orderB;
+    CardOrder tCardOrderA;
+    CardOrder tCardOrderB;
+    CardOrder vehicleProfileOrder;
 
     @Before
     public void setUp() {
@@ -40,13 +42,17 @@ public class CardAssignmentServiceTest {
         customer.setCustomerId(12345);
         customer.setProductGroupId(1);
 
-        orderA = new CardOrder();
-        orderA.setAmount(1);
+        tCardOrderA = new CardOrder();
+        tCardOrderA.setAmount(1);
 
-        orderB = new CardOrder();
-        orderB.setAmount(1);
+        tCardOrderB = new CardOrder();
+        tCardOrderB.setAmount(1);
 
-        when(cardOrderDao.findForCustomer(customer, ACCEPTED, TRANSPONDER_CARD)).thenReturn(Arrays.asList(orderA, orderB));
+        vehicleProfileOrder = new CardOrder();
+        vehicleProfileOrder.setAmount(1);
+
+        when(cardOrderDao.findForCustomer(customer, ACCEPTED, TRANSPONDER_CARD)).thenReturn(Arrays.asList(tCardOrderA, tCardOrderB));
+        when(cardOrderDao.findForCustomer(customer, ACCEPTED, VECHILE_PROFILE)).thenReturn(Arrays.asList(vehicleProfileOrder));
     }
 
     @Test(expected = ActivationException.class)
@@ -54,15 +60,16 @@ public class CardAssignmentServiceTest {
         when(cardOrderDao.nextTransponderCardNumbers(eq(customer.getProductGroupId()), eq(5), any()))
                 .thenReturn(Arrays.asList("1", "2"));
 
-        orderA.setAmount(5);
+        tCardOrderA.setAmount(5);
 
         cardAssignmentService.assignToCustomer(customer);
     }
 
     @Test
     public void assigns_card_numbers_in_order_and_updates_mobile_only_for_first() {
+        //noinspection unchecked
         when(cardOrderDao.nextTransponderCardNumbers(eq(customer.getProductGroupId()), anyInt(), any()))
-                .thenReturn(Arrays.asList("1", "2"));
+                .thenReturn(Arrays.asList("1"), Arrays.asList("2"), Arrays.asList("3"));
 
         cardAssignmentService.assignToCustomer(customer);
 
@@ -70,5 +77,6 @@ public class CardAssignmentServiceTest {
 
         inOrder.verify(cardOrderDao).processTransponderCard("1", customer, true);
         inOrder.verify(cardOrderDao).processTransponderCard("2", customer, false);
+        inOrder.verify(cardOrderDao).processTransponderCard("3", customer, false);
     }
 }

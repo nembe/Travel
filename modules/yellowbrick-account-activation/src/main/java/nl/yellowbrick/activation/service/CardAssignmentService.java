@@ -1,5 +1,6 @@
 package nl.yellowbrick.activation.service;
 
+import com.google.common.collect.Iterables;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.CardOrderStatus;
@@ -23,17 +24,18 @@ public class CardAssignmentService {
     private CardOrderDao cardOrderDao;
 
     public void assignToCustomer(Customer customer) {
-        log.info("Assigning transpoder cards to customer ID " + customer.getCustomerId());
+        log.info("Assigning cards to customer ID " + customer.getCustomerId());
 
-        List<CardOrder> transponderCardOrders = cardOrderDao.findForCustomer(
-                customer,
-                CardOrderStatus.ACCEPTED,
-                CardType.TRANSPONDER_CARD);
+        List<CardOrder> transponderCardOrders = ordersForCustomer(customer, CardType.TRANSPONDER_CARD);
+        List<CardOrder> vehicleProfileOrders = ordersForCustomer(customer, CardType.VECHILE_PROFILE);
+
+        log.info("Assigning %d transponder cards", transponderCardOrders.size());
+        log.info("Assigning %d vehicle profiles", vehicleProfileOrders.size());
 
         // keep track of last number used from pool
         String lastUsedNumber = null;
 
-        for(CardOrder cardOrder: transponderCardOrders) {
+        for(CardOrder cardOrder: Iterables.concat(transponderCardOrders, vehicleProfileOrders)) {
             List<String> cardNumbers = cardOrderDao.nextTransponderCardNumbers(
                     customer.getProductGroupId(),
                     cardOrder.getAmount(),
@@ -53,5 +55,9 @@ public class CardAssignmentService {
                 cardOrderDao.processTransponderCard(lastUsedNumber, customer, updateMobileWithCard);
             }
         }
+    }
+
+    private List<CardOrder> ordersForCustomer(Customer customer, CardType cardType) {
+        return cardOrderDao.findForCustomer(customer, CardOrderStatus.ACCEPTED, cardType);
     }
 }
