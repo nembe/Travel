@@ -16,7 +16,8 @@ INSERT INTO PRODUCT_SUBGROUP VALUES (
              'Particulier',
              'N',
              'SYSTEM',
-             null);
+             null,
+             'N');
 
 INSERT INTO PRODUCT_SUBGROUP VALUES (
              1,
@@ -24,7 +25,8 @@ INSERT INTO PRODUCT_SUBGROUP VALUES (
              'Zakelijk',
              'Y',
              'SYSTEM',
-             TO_DATE ('06/01/2012 00:46:39', 'MM/DD/YYYY HH24:MI:SS'));
+             TO_DATE ('06/01/2012 00:46:39', 'MM/DD/YYYY HH24:MI:SS'),
+             'N');
 
 INSERT INTO PRICEMODEL VALUES (
              81,
@@ -43,7 +45,9 @@ INSERT INTO PRICEMODEL VALUES (
              500,
              0,
              500,
-             500);
+             500,
+             0,
+             0);
 
 INSERT INTO PRICEMODEL VALUES (
              91.00,
@@ -62,7 +66,9 @@ INSERT INTO PRICEMODEL VALUES (
              605,
              0,
              605,
-             605);
+             605,
+             0,
+             0);
 
 INSERT INTO PRODUCT_SUBGROUP_PRICEMODEL VALUES (
              82,
@@ -354,7 +360,7 @@ INSERT INTO CARDORDER VALUES (
              1,
              0);
 
-INSERT INTO CUSTOMER_REGISTRATION VALUES (4776, 'nl_NL', 'YBAANMELDEN:Struijk', NULL);
+INSERT INTO CUSTOMER_REGISTRATION VALUES (4776, 'nl_NL', 'YBAANMELDEN:Struijk', NULL, NULL);
 
 INSERT INTO MESSAGE VALUES (
                   1917,
