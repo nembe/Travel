@@ -104,6 +104,14 @@ public class Functions {
         });
     }
 
+    public static void customerDeleteAddress(int addressId, String mutator) {
+        CALL_RECORDERS.forEach((recorder) -> {
+            Object[] args = { addressId, mutator };
+
+            recorder.accept(new FunctionCall("CustomerDeleteAddress", args));
+        });
+    }
+
     public static class FunctionCall {
 
         public final String functionName;

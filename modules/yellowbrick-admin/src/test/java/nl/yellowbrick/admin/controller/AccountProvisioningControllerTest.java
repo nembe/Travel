@@ -257,6 +257,27 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
         )));
     }
 
+    @Test
+    public void deletes_billing_address_when_set_to_same_as_business_address() throws Exception {
+        CustomerAddress billingAddress = addressDao.findByCustomerId(BUSINESS_CUSTOMER_ID, AddressType.BILLING).get();
+
+        mockMvc.perform(post("/provisioning/" + BUSINESS_CUSTOMER_ID)
+                .param("billingAddressSameAsMailingAddress", "true") // set billing addr = main addr
+                .param("businessName", "ACME inc")
+                .param("email", "ceo@business.com")
+                .param("street", "North Orange")
+                .param("houseNr", "1209")
+                .param("city", "Delaware")
+                .param("numberOfPPlusCards", "1")
+                .param("dateOfBirth", "07-09-1985")
+                .param("businessIdentifiers[0].id", "123")
+                .param("businessIdentifiers[0].value", "12345678")
+                .param("validateBusinessAccount", "Submit")
+        ).andReturn();
+
+        verify(addressDao).deleteAddress(eq(billingAddress));
+    }
+
     private MvcResult postPersonalAccountProvisioningForm() throws Exception {
         return mockMvc.perform(post("/provisioning/" + PRIVATE_CUSTOMER_ID)
                 .param("email", "some.other.email@test.com")
