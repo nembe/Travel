@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class PriceModelJdbcDaoTest extends BaseSpringTestCase {
@@ -52,6 +53,9 @@ public class PriceModelJdbcDaoTest extends BaseSpringTestCase {
         assertThat(model.getInitTranspCardCost(), equalTo(0));
         assertThat(model.getTranspCardCost(), equalTo(500));
         assertThat(model.getQparkPassCost(), equalTo(500));
+        assertThat(model.getInitVehicleProfileCost(), equalTo(0));
+        assertThat(model.getVehicleProfileCost(), equalTo(250));
+        assertThat(model.isDefaultIssuePhysicalCard(), is(true));
     }
 
 }

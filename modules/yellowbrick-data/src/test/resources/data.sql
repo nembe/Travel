@@ -17,7 +17,7 @@ INSERT INTO PRODUCT_SUBGROUP VALUES (
              'N',
              'SYSTEM',
              null,
-             'N');
+             'Y');
 
 INSERT INTO PRODUCT_SUBGROUP VALUES (
              1,
@@ -47,7 +47,7 @@ INSERT INTO PRICEMODEL VALUES (
              500,
              500,
              0,
-             0);
+             250);
 
 INSERT INTO PRICEMODEL VALUES (
              91.00,
