@@ -72,7 +72,7 @@ public class MembershipJdbcDaoTest extends BaseSpringTestCase {
         assertThat(args[5], equalTo((int)customer.getCreditLimit()));
         assertThat(args[6], equalTo(800)); // membership fee
         assertThat(args[7], equalTo(1000)); // registration fee
-        assertThat(args[8], equalTo(priceModel.isDefaultIssuePhysicalCard()));
+        assertThat(args[8], equalTo(1));
         assertThat(args[9], equalTo(priceModel.getInitTranspCardCost()));
         assertThat(args[10], equalTo(priceModel.getTranspCardCost()));
         assertThat(args[11], equalTo(priceModel.getInitRtpCardCost()));
@@ -92,7 +92,7 @@ public class MembershipJdbcDaoTest extends BaseSpringTestCase {
 
         FunctionCall call = latestFunctionCall();
 
-        assertThat(call.arguments[8], equalTo(priceModel.isDefaultIssuePhysicalCard()));
+        assertThat(call.arguments[8], equalTo(0));
         assertThat(call.arguments[9], equalTo(priceModel.getInitVehicleProfileCost()));
         assertThat(call.arguments[10], equalTo(priceModel.getVehicleProfileCost()));
     }

@@ -56,7 +56,7 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
             put("CreditLimit_in", cust.getCreditLimit());
             put("SubscriptionFee_in", pm.getSubscriptionCostEuroCents());
             put("RegistrationFee_in", pm.getRegistratiekosten());
-            put("IssuePhysicalCard_in", pm.isDefaultIssuePhysicalCard());
+            put("IssuePhysicalCard_in", pm.isDefaultIssuePhysicalCard() ? 1 : 0);
             put("InitialTCardFee_in", initialCardCost(pm));
             put("AdditionalTCardFee_in", additionalCardCost(pm));
             put("InitialRTPCardFee_in", pm.getInitRtpCardCost());
@@ -98,7 +98,7 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
                         new SqlParameter("CreditLimit_in", Types.NUMERIC),
                         new SqlParameter("SubscriptionFee_in", Types.NUMERIC),
                         new SqlParameter("RegistrationFee_in", Types.NUMERIC),
-                        new SqlParameter("IssuePhysicalCard_in", Types.BOOLEAN),
+                        new SqlParameter("IssuePhysicalCard_in", Types.NUMERIC),
                         new SqlParameter("InitialTCardFee_in", Types.NUMERIC),
                         new SqlParameter("AdditionalTCardFee_in", Types.NUMERIC),
                         new SqlParameter("InitialRTPCardFee_in", Types.NUMERIC),

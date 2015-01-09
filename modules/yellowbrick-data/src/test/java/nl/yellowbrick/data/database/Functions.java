@@ -18,7 +18,7 @@ public class Functions {
 
     public static void customerValidateMembership(int customerId, String customerNr, int parkadammerTotal,
                                                   int numberOfTCards, int numberOfQCards, int creditLimit,
-                                                  int subscriptionFee, int registrationFee, boolean defaultIssuePhysicalCard,
+                                                  int subscriptionFee, int registrationFee, int defaultIssuePhysicalCard,
                                                   int initialTCardFee, int additionalTCardFee, int initialRtpCardFee,
                                                   int additionalRtpCardFee, String pinCode, String password, String mutator,
                                                   Integer[] returnOut) {
