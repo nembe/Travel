@@ -4,6 +4,8 @@ import nl.yellowbrick.data.audit.Mutator;
 import nl.yellowbrick.data.dao.CustomerAddressDao;
 import nl.yellowbrick.data.domain.AddressType;
 import nl.yellowbrick.data.domain.CustomerAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -20,7 +22,8 @@ import java.util.Optional;
 public class CustomerAddressJdbcDao implements CustomerAddressDao, InitializingBean {
 
     private static final String PACKAGE = "WEBAPP";
-    private static final String PROCEDURE = "CustomerSaveAddress";
+    private static final String SAVE_ADDRESS = "CustomerSaveAddress";
+    private static final String DELETE_ADDRESS = "CustomerDeleteAddress";
 
     @Autowired
     private JdbcTemplate template;
@@ -29,10 +32,13 @@ public class CustomerAddressJdbcDao implements CustomerAddressDao, InitializingB
     private Mutator mutator;
 
     private SimpleJdbcCall saveAddressCall;
+    private SimpleJdbcCall deleteAddressCall;
+
+    private Logger log = LoggerFactory.getLogger(CustomerAddressJdbcDao.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        compileJdbcCall();
+        compileJdbcCalls();
     }
 
     @Override
@@ -72,10 +78,15 @@ public class CustomerAddressJdbcDao implements CustomerAddressDao, InitializingB
         );
     }
 
-    private void compileJdbcCall() {
+    @Override
+    public void deleteAddress(CustomerAddress address) {
+        deleteAddressCall.execute(address.getCustomerAddressId(), mutator.get());
+    }
+
+    private void compileJdbcCalls() {
         saveAddressCall = new SimpleJdbcCall(template)
                 .withCatalogName(PACKAGE)
-                .withProcedureName(PROCEDURE)
+                .withProcedureName(SAVE_ADDRESS)
                 .declareParameters(
                         new SqlParameter("AddressId_in", Types.NUMERIC),
                         new SqlParameter("CustomerId_in", Types.NUMERIC),
@@ -91,7 +102,16 @@ public class CustomerAddressJdbcDao implements CustomerAddressDao, InitializingB
                         new SqlParameter("Mutator_in", Types.VARCHAR)
                 );
 
+        deleteAddressCall = new SimpleJdbcCall(template)
+                .withCatalogName(PACKAGE)
+                .withProcedureName(DELETE_ADDRESS)
+                .declareParameters(
+                        new SqlParameter("AddressId_in", Types.NUMERIC),
+                        new SqlParameter("Mutator_in", Types.VARCHAR)
+                );
+
         saveAddressCall.compile();
+        deleteAddressCall.compile();
     }
 
     private RowMapper<CustomerAddress> rowMapper() {

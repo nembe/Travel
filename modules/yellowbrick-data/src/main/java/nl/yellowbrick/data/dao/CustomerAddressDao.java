@@ -12,4 +12,6 @@ public interface CustomerAddressDao {
     void savePrivateCustomerAddress(long customerId, CustomerAddress address);
 
     void saveBusinessCustomerAddress(long customerId, CustomerAddress address, AddressType addressType);
+
+    void deleteAddress(CustomerAddress address);
 }
