@@ -26,6 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.sql.Date;
 
+import static nl.yellowbrick.admin.matchers.HtmlMatchers.hasAttr;
 import static nl.yellowbrick.admin.matchers.HtmlMatchers.isField;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -268,6 +269,38 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
         ).andReturn();
 
         verify(addressDao).deleteAddress(eq(billingAddress));
+    }
+
+    @Test
+    public void validates_binding_errors_on_private_customer_form() throws Exception {
+        MvcResult res = mockMvc.perform(
+                postPersonalAccountProvisioningForm().param("numberOfTransponderCards", "totally not a number")
+        ).andReturn();
+
+        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+
+        assertThat(html.select("input[name=numberOfTransponderCards]").first(), allOf(
+                hasAttr("class", "field-error"),
+                hasAttr("value", "totally not a number")
+        ));
+
+        verifyZeroInteractions(accountActivationService);
+    }
+
+    @Test
+    public void validates_binding_errors_on_business_customer_form() throws Exception {
+        MvcResult res = mockMvc.perform(
+                postBusinessAccountProvisioningForm().param("numberOfTransponderCards", "totally not a number")
+        ).andReturn();
+
+        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+
+        assertThat(html.select("input[name=numberOfTransponderCards]").first(), allOf(
+                hasAttr("class", "field-error"),
+                hasAttr("value", "totally not a number")
+        ));
+
+        verifyZeroInteractions(accountActivationService);
     }
 
     private MockHttpServletRequestBuilder postPersonalAccountProvisioningForm() throws Exception {
