@@ -47,11 +47,9 @@ public class Functions {
         });
     }
 
-    public static void cardOrderValidate(int customerId, int cardFee, int numberOfTCards,
-                                         String typeOfCard, Integer[] returnOut) {
+    public static void cardOrderValidate(int cardOrderId, String typeOfCard, Integer[] returnOut) {
         CALL_RECORDERS.forEach((recorder) -> {
-            recorder.accept(new FunctionCall("cardOrderValidate",
-                    customerId, cardFee, numberOfTCards, typeOfCard));
+            recorder.accept(new FunctionCall("cardOrderValidate", cardOrderId, typeOfCard));
         });
 
         returnOut[0] = -1;

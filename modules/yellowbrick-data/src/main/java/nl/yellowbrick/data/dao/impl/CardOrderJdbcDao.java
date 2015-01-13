@@ -75,7 +75,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
             saveAndAcceptCardOrder(orderid, pricePerCard, amount);
 
             CardType cardType = CardType.fromDescription(rs.getString("CardType"));
-            validateCardOrder(customer.getCustomerId(), pricePerCard, amount, cardType.code());
+            validateCardOrder(orderid, cardType.code());
         };
 
         template.query(sql, processCardOrder,
@@ -135,6 +135,9 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                 co.setBriefCode(rs.getString("BRIEFCODE"));
                 co.setAmount(rs.getInt("AMOUNT"));
                 co.setPricePerCard(rs.getDouble("PRICEPERCARD"));
+                co.setSurcharge(rs.getDouble("SURCHARGE"));
+                co.setExport(rs.getString("EXPORT").equals("Y"));
+                co.setCardNumber(rs.getString("CARD_NUMBER"));
 
                 return co;
             }
@@ -145,8 +148,8 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         cardOrderUpdateCall.execute(orderId, CardOrderStatus.ACCEPTED.code(), pricePerCard, amount);
     }
 
-    private void validateCardOrder(long customerId, double pricePerCard, int amount, String typeOfCard) {
-        Map<String, Object> res = cardOrderValidateCall.execute(customerId, pricePerCard, amount, typeOfCard);
+    private void validateCardOrder(double orderId, String typeOfCard) {
+        Map<String, Object> res = cardOrderValidateCall.execute(orderId, typeOfCard);
         String returnStr = res.get("Return_out").toString();
 
         Runnable logUnmetExpectation = () -> {
@@ -181,9 +184,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                 .withCatalogName(PACKAGE)
                 .withProcedureName(CARD_ORDER_VALIDATE_PROC)
                 .declareParameters(
-                        new SqlParameter("CustomerId_in", Types.NUMERIC),
-                        new SqlParameter("CardFee_in", Types.NUMERIC),
-                        new SqlParameter("NumberOfTCards_in", Types.NUMERIC),
+                        new SqlParameter("CardOrderId_in", Types.NUMERIC),
                         new SqlParameter("TypeOfCard_in", Types.VARCHAR),
                         new SqlOutParameter("Return_out", Types.INTEGER)
                 );

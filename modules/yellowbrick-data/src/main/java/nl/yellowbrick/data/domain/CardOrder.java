@@ -12,6 +12,9 @@ public class CardOrder {
     private String briefCode;
     private int amount;
     private double pricePerCard;
+    private double surcharge;
+    private boolean export;
+    private String cardNumber;
 
     public long getId() {
         return id;
@@ -77,6 +80,30 @@ public class CardOrder {
         this.pricePerCard = pricePerCard;
     }
 
+    public double getSurcharge() {
+        return surcharge;
+    }
+
+    public void setSurcharge(double surcharge) {
+        this.surcharge = surcharge;
+    }
+
+    public boolean isExport() {
+        return export;
+    }
+
+    public void setExport(boolean export) {
+        this.export = export;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -86,9 +113,12 @@ public class CardOrder {
 
         if (amount != cardOrder.amount) return false;
         if (customerId != cardOrder.customerId) return false;
+        if (export != cardOrder.export) return false;
         if (id != cardOrder.id) return false;
         if (Double.compare(cardOrder.pricePerCard, pricePerCard) != 0) return false;
+        if (Double.compare(cardOrder.surcharge, surcharge) != 0) return false;
         if (briefCode != null ? !briefCode.equals(cardOrder.briefCode) : cardOrder.briefCode != null) return false;
+        if (cardNumber != null ? !cardNumber.equals(cardOrder.cardNumber) : cardOrder.cardNumber != null) return false;
         if (cardType != cardOrder.cardType) return false;
         if (date != null ? !date.equals(cardOrder.date) : cardOrder.date != null) return false;
         if (status != cardOrder.status) return false;
@@ -109,6 +139,10 @@ public class CardOrder {
         result = 31 * result + amount;
         temp = Double.doubleToLongBits(pricePerCard);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(surcharge);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (export ? 1 : 0);
+        result = 31 * result + (cardNumber != null ? cardNumber.hashCode() : 0);
         return result;
     }
 }
