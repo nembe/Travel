@@ -8,8 +8,7 @@ public enum CardType {
     TRANSPONDER_CARD(1, "Transponderkaart"),
     RTP_CARD(2, "RTP kaart"),
     QPARK_CARD(3, "QCARD"),
-    SLEEVE(4, "Hoesje"),
-    VECHILE_PROFILE(5, "VehicleProfile");
+    SLEEVE(4, "Hoesje");
 
     private final int code;
     private final String description;
