@@ -1,6 +1,6 @@
 package nl.yellowbrick.activation.service;
 
-import com.google.common.collect.Iterables;
+import com.google.common.base.Strings;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.CardOrderStatus;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class CardAssignmentService {
@@ -26,16 +27,14 @@ public class CardAssignmentService {
     public void assignToCustomer(Customer customer) {
         log.info("Assigning cards to customer ID " + customer.getCustomerId());
 
-        List<CardOrder> transponderCardOrders = ordersForCustomer(customer, CardType.TRANSPONDER_CARD);
-        List<CardOrder> vehicleProfileOrders = ordersForCustomer(customer, CardType.VECHILE_PROFILE);
+        List<CardOrder> cardOrders = ordersForCustomer(customer);
 
-        log.info("Assigning {} transponder cards", transponderCardOrders.size());
-        log.info("Assigning {} vehicle profiles", vehicleProfileOrders.size());
+        log.info("Assigning {} transponder cards", cardOrders.size());
 
         // keep track of last number used from pool
         String lastUsedNumber = null;
 
-        for(CardOrder cardOrder: Iterables.concat(transponderCardOrders, vehicleProfileOrders)) {
+        for(CardOrder cardOrder: cardOrders) {
             List<String> cardNumbers = cardOrderDao.nextTransponderCardNumbers(
                     customer.getProductGroupId(),
                     cardOrder.getAmount(),
@@ -57,7 +56,10 @@ public class CardAssignmentService {
         }
     }
 
-    private List<CardOrder> ordersForCustomer(Customer customer, CardType cardType) {
-        return cardOrderDao.findForCustomer(customer, CardOrderStatus.ACCEPTED, cardType);
+    private List<CardOrder> ordersForCustomer(Customer customer) {
+        return cardOrderDao.findForCustomer(customer, CardOrderStatus.ACCEPTED, CardType.TRANSPONDER_CARD)
+                .stream()
+                .filter((cardOrder) -> Strings.isNullOrEmpty(cardOrder.getCardNumber()))
+                .collect(Collectors.toList());
     }
 }
