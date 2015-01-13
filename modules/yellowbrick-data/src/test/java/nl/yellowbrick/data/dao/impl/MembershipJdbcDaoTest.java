@@ -32,19 +32,13 @@ public class MembershipJdbcDaoTest extends BaseSpringTestCase {
         customer = new Customer();
         customer.setCustomerId(123l);
         customer.setCustomerNr("ABC123");
-        customer.setParkadammerTotal(1);
         customer.setNumberOfTCards(2);
         customer.setNumberOfQCards(4);
         customer.setCreditLimit(0);
 
         priceModel = new PriceModel();
         priceModel.setDefaultIssuePhysicalCard(true);
-        priceModel.setInitRtpCardCost(50);
-        priceModel.setInitTranspCardCost(55);
-        priceModel.setTranspCardCost(60);
-        priceModel.setRtpCardCost(65);
         priceModel.setRegistratiekosten(10 * 100); // cents
-        priceModel.setSubscriptionCostEuroCents(8 * 100); // cents
 
         lock = new CountDownLatch(1);
         Functions.CALL_RECORDERS.add((functionCall) -> {
@@ -66,35 +60,24 @@ public class MembershipJdbcDaoTest extends BaseSpringTestCase {
 
         assertThat(call.getNumericArg(0).longValue(), equalTo(customer.getCustomerId()));
         assertThat(args[1], equalTo(customer.getCustomerNr()));
-        assertThat(args[2], equalTo(customer.getParkadammerTotal()));
-        assertThat(args[3], equalTo(customer.getNumberOfTCards()));
-        assertThat(args[4], equalTo(customer.getNumberOfQCards()));
-        assertThat(args[5], equalTo((int)customer.getCreditLimit()));
-        assertThat(args[6], equalTo(800)); // membership fee
-        assertThat(args[7], equalTo(1000)); // registration fee
-        assertThat(args[8], equalTo(1));
-        assertThat(args[9], equalTo(priceModel.getInitTranspCardCost()));
-        assertThat(args[10], equalTo(priceModel.getTranspCardCost()));
-        assertThat(args[11], equalTo(priceModel.getInitRtpCardCost()));
-        assertThat(args[12], equalTo(priceModel.getRtpCardCost()));
-        assertThat(args[13].toString().length(), equalTo(4)); // 4 char pincode
-        assertThat(args[14].toString().length(), equalTo(60)); // 60 char password
-        assertThat(args[15], equalTo("TEST MUTATOR"));
+        assertThat(args[2], equalTo(customer.getNumberOfTCards()));
+        assertThat(args[3], equalTo(customer.getNumberOfQCards()));
+        assertThat(args[4], equalTo("Y"));
+        assertThat(args[5], equalTo(1000)); // registration fee
+        assertThat(args[6].toString().length(), equalTo(4)); // 4 char pincode
+        assertThat(args[7].toString().length(), equalTo(60)); // 60 char password
+        assertThat(args[8], equalTo("TEST MUTATOR"));
     }
 
     @Test
     public void takes_issuing_of_physical_cards_into_account() throws Exception {
         priceModel.setDefaultIssuePhysicalCard(false); // dont issue physical cards!
-        priceModel.setInitVehicleProfileCost(123);
-        priceModel.setVehicleProfileCost(456);
 
         membershipDao.saveValidatedMembership(new Membership(customer, priceModel));
 
         FunctionCall call = latestFunctionCall();
 
-        assertThat(call.arguments[8], equalTo(0));
-        assertThat(call.arguments[9], equalTo(priceModel.getInitVehicleProfileCost()));
-        assertThat(call.arguments[10], equalTo(priceModel.getVehicleProfileCost()));
+        assertThat(call.arguments[4], equalTo("N"));
     }
 
     private FunctionCall latestFunctionCall() throws InterruptedException {

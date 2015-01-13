@@ -16,17 +16,13 @@ public class Functions {
 
     public static List<Consumer<FunctionCall>> CALL_RECORDERS = new ArrayList<>();
 
-    public static void customerValidateMembership(int customerId, String customerNr, int parkadammerTotal,
-                                                  int numberOfTCards, int numberOfQCards, int creditLimit,
-                                                  int subscriptionFee, int registrationFee, int defaultIssuePhysicalCard,
-                                                  int initialTCardFee, int additionalTCardFee, int initialRtpCardFee,
-                                                  int additionalRtpCardFee, String pinCode, String password, String mutator,
-                                                  Integer[] returnOut) {
+    public static void customerValidateMembership(int customerId, String customerNr, int numberOfTCards,
+                                                  int numberOfQCards, String issuePhysicalCard, int registrationFee,
+                                                  String pinCode, String password, String mutator, Integer[] returnOut) {
 
         CALL_RECORDERS.forEach((recorder) -> {
-            Object[] args = { customerId, customerNr, parkadammerTotal, numberOfTCards, numberOfQCards,
-                    creditLimit, subscriptionFee, registrationFee, defaultIssuePhysicalCard, initialTCardFee,
-                    additionalTCardFee, initialRtpCardFee, additionalRtpCardFee, pinCode, password, mutator };
+            Object[] args = { customerId, customerNr, numberOfTCards, numberOfQCards, issuePhysicalCard,
+                    registrationFee, pinCode, password, mutator };
 
             recorder.accept(new FunctionCall("customerValidateMembership", args));
         });

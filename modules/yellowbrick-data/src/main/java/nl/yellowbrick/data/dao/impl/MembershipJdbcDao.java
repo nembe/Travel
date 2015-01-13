@@ -50,17 +50,10 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
         Map<String, Object> results = jdbcCall.execute(new MapSqlParameterSource(new HashMap<String, Object>() {{
             put("CustomerId_in", cust.getCustomerId());
             put("CustomerNr_in", cust.getCustomerNr());
-            put("ParkadammerTotal_in", cust.getParkadammerTotal());
             put("NumberOfTCards_in", cust.getNumberOfTCards());
             put("NumberOfQCards_in", cust.getNumberOfQCards());
-            put("CreditLimit_in", cust.getCreditLimit());
-            put("SubscriptionFee_in", pm.getSubscriptionCostEuroCents());
+            put("IssuePhysicalCard_in", pm.isDefaultIssuePhysicalCard() ? 'Y' : 'N');
             put("RegistrationFee_in", pm.getRegistratiekosten());
-            put("IssuePhysicalCard_in", pm.isDefaultIssuePhysicalCard() ? 1 : 0);
-            put("InitialTCardFee_in", initialCardCost(pm));
-            put("AdditionalTCardFee_in", additionalCardCost(pm));
-            put("InitialRTPCardFee_in", pm.getInitRtpCardCost());
-            put("AdditionalRTPCardFee_in", pm.getRtpCardCost());
             put("PinCode_in", pinCode.get());
             put("Password_in", password.get());
             put("Mutator_in", mutator.get());
@@ -77,14 +70,6 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
         }
     }
 
-    private int initialCardCost(PriceModel pm) {
-        return pm.isDefaultIssuePhysicalCard() ? pm.getInitTranspCardCost() : pm.getInitVehicleProfileCost();
-    }
-
-    private int additionalCardCost(PriceModel pm) {
-        return pm.isDefaultIssuePhysicalCard() ? pm.getTranspCardCost() : pm.getVehicleProfileCost();
-    }
-
     private void compileJdbcCall() {
         jdbcCall = new SimpleJdbcCall(template)
                 .withCatalogName(PACKAGE)
@@ -92,17 +77,10 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
                 .declareParameters(
                         new SqlParameter("CustomerId_in", Types.NUMERIC),
                         new SqlParameter("CustomerNr_in", Types.VARCHAR),
-                        new SqlParameter("ParkadammerTotal_in", Types.NUMERIC),
                         new SqlParameter("NumberOfTCards_in", Types.NUMERIC),
                         new SqlParameter("NumberOfQCards_in", Types.NUMERIC),
-                        new SqlParameter("CreditLimit_in", Types.NUMERIC),
-                        new SqlParameter("SubscriptionFee_in", Types.NUMERIC),
+                        new SqlParameter("IssuePhysicalCard_in", Types.VARCHAR),
                         new SqlParameter("RegistrationFee_in", Types.NUMERIC),
-                        new SqlParameter("IssuePhysicalCard_in", Types.NUMERIC),
-                        new SqlParameter("InitialTCardFee_in", Types.NUMERIC),
-                        new SqlParameter("AdditionalTCardFee_in", Types.NUMERIC),
-                        new SqlParameter("InitialRTPCardFee_in", Types.NUMERIC),
-                        new SqlParameter("AdditionalRTPCardFee_in", Types.NUMERIC),
                         new SqlParameter("PinCode_in", Types.VARCHAR),
                         new SqlParameter("Password_in", Types.VARCHAR),
                         new SqlParameter("Mutator_in", Types.VARCHAR),
