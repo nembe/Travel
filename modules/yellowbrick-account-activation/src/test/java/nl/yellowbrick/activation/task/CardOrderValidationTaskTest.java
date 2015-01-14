@@ -46,4 +46,11 @@ public class CardOrderValidationTaskTest {
         verify(cardOrderDao).validateCardOrder(nonPhysicalOrder);
     }
 
+    @Test
+    public void validates_physical_card_orders() {
+        cardOrderValidationTask.validatePendingPhysicalCardOrders();
+
+        verify(cardOrderDao, times(1)).validateCardOrder(any());
+        verify(cardOrderDao).validateCardOrder(order);
+    }
 }

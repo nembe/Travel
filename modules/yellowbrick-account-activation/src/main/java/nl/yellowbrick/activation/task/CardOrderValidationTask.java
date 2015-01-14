@@ -38,6 +38,21 @@ public class CardOrderValidationTask {
         nonPhysicalOrders.forEach(cardOrderDao::validateCardOrder);
     }
 
+    @Scheduled(cron = "${tasks.transpondercard-validation-cron}")
+    public void validatePendingPhysicalCardOrders() {
+        log.debug("starting validatePendingNonPhysicalCardOrders");
+
+        List<CardOrder> orders = insertedOrders();
+        List<CardOrder> physicalOrders = orders.stream()
+                .filter(CardOrder::isExport)
+                .collect(Collectors.toList());
+
+        log.info("validating {} physical card orders out of a total of {} card orders",
+                physicalOrders.size(), orders.size());
+
+        physicalOrders.forEach(cardOrderDao::validateCardOrder);
+    }
+
     private List<CardOrder> insertedOrders() {
         return cardOrderDao.findByStatusAndType(CardOrderStatus.INSERTED, CardType.TRANSPONDER_CARD);
     }
