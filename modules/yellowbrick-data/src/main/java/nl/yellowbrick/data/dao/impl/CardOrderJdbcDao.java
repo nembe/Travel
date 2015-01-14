@@ -93,6 +93,24 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                 updateMobileWithCard ? 1 : 0);
     }
 
+    public void validateCardOrder(CardOrder cardOrder) {
+        acceptCardOrder(cardOrder.getId(), cardOrder.getPricePerCard(), cardOrder.getAmount());
+
+        Map<String, Object> res = cardOrderValidateCall.execute(cardOrder.getId(), cardOrder.getCardType().code());
+        String returnStr = res.get("Return_out").toString();
+
+        Runnable logUnmetExpectation = () -> {
+            log.error("Expected {}.{} to return -1 but instead got {}", PACKAGE, CARD_ORDER_UPDATE_PROC, returnStr);
+        };
+
+        try {
+            if(Integer.parseInt(returnStr) != -1)
+                logUnmetExpectation.run();
+        } catch(NumberFormatException e) {
+            logUnmetExpectation.run();
+        }
+    }
+
     private RowMapper<CardOrder> cardOrderRowMapper() {
         return new RowMapper<CardOrder>() {
             @Override
@@ -118,24 +136,6 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
 
     private void acceptCardOrder(double orderId, double pricePerCard, int amount) {
         cardOrderUpdateCall.execute(orderId, CardOrderStatus.ACCEPTED.code(), pricePerCard, amount);
-    }
-
-    public void validateCardOrder(CardOrder cardOrder) {
-        acceptCardOrder(cardOrder.getId(), cardOrder.getPricePerCard(), cardOrder.getAmount());
-
-        Map<String, Object> res = cardOrderValidateCall.execute(cardOrder.getId(), cardOrder.getCardType().code());
-        String returnStr = res.get("Return_out").toString();
-
-        Runnable logUnmetExpectation = () -> {
-            log.error("Expected {}.{} to return -1 but instead got {}", PACKAGE, CARD_ORDER_UPDATE_PROC, returnStr);
-        };
-
-        try {
-            if(Integer.parseInt(returnStr) != -1)
-                logUnmetExpectation.run();
-        } catch(NumberFormatException e) {
-            logUnmetExpectation.run();
-        }
     }
 
     @Override
