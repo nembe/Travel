@@ -12,7 +12,9 @@ public interface CardOrderDao {
 
     public void saveSpecialTarifIfApplicable(Customer customer);
 
-    public void validateCardOrders(Customer customer);
+    public void validateCardOrder(CardOrder cardOrder);
+
+    public void validateCardOrders(Customer customer, CardType... cardTypes);
 
     public List<String> nextTransponderCardNumbers(int productGroupId, int numberOfCards, Optional<String> lastUsedCardNumber);
 

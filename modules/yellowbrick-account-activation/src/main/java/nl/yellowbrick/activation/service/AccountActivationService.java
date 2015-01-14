@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static nl.yellowbrick.data.domain.CardType.QPARK_CARD;
+import static nl.yellowbrick.data.domain.CardType.TRANSPONDER_CARD;
+
 @Component
 public class AccountActivationService {
 
@@ -43,7 +46,7 @@ public class AccountActivationService {
 
             log.info("Saved validated membership for customer ID " + customer.getCustomerId());
 
-            cardOrderDao.validateCardOrders(customer);
+            cardOrderDao.validateCardOrders(customer, TRANSPONDER_CARD, QPARK_CARD);
             cardAssignmentService.assignToCustomer(customer);
             emailNotificationService.notifyAccountAccepted(customer);
 

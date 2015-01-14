@@ -3,8 +3,6 @@ package nl.yellowbrick.data.dao.impl;
 import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.database.DbHelper;
 import nl.yellowbrick.data.domain.CardOrder;
-import nl.yellowbrick.data.domain.CardOrderStatus;
-import nl.yellowbrick.data.domain.CardType;
 import nl.yellowbrick.data.domain.Customer;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,9 +17,10 @@ import java.util.concurrent.TimeUnit;
 
 import static nl.yellowbrick.data.database.Functions.CALL_RECORDERS;
 import static nl.yellowbrick.data.database.Functions.FunctionCall;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
+import static nl.yellowbrick.data.domain.CardOrderStatus.ACCEPTED;
+import static nl.yellowbrick.data.domain.CardOrderStatus.INSERTED;
+import static nl.yellowbrick.data.domain.CardType.*;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -72,7 +71,9 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
             lock.countDown();
         });
 
-        cardOrderDao.validateCardOrders(customer);
+        CardOrder someOrder = cardOrderDao.findForCustomer(customer, INSERTED, QPARK_CARD).get(0);
+
+        cardOrderDao.validateCardOrder(someOrder);
 
         lock.await(2, TimeUnit.SECONDS);
         assertThat("not all expected stored procedures have been called", lock.getCount(), equalTo(0l));
@@ -89,7 +90,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         FunctionCall secondCall = calls.get(1);
         assertThat(secondCall.functionName, equalTo("cardOrderValidate"));
         assertThat(secondCall.getNumericArg(0).longValue(), equalTo(72031l)); // card order id
-        assertThat(secondCall.arguments[1], equalTo("3")); // type of card
+        assertThat(secondCall.arguments[1], equalTo("3")); // type of card (qpark maps to "3")
     }
 
     @Test
@@ -104,7 +105,9 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
             lock.countDown();
         });
 
-        cardOrderDao.validateCardOrders(customer);
+        CardOrder order = cardOrderDao.findForCustomer(customer, INSERTED, TRANSPONDER_CARD).get(0);
+        cardOrderDao.validateCardOrder(order);
+
         lock.await(2, TimeUnit.SECONDS);
 
         assertThat(calls.getLast().arguments[1], equalTo("1"));
@@ -122,46 +125,12 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
             lock.countDown();
         });
 
-        cardOrderDao.validateCardOrders(customer);
+        CardOrder order = cardOrderDao.findForCustomer(customer, INSERTED, RTP_CARD).get(0);
+        cardOrderDao.validateCardOrder(order);
+
         lock.await(2, TimeUnit.SECONDS);
 
         assertThat(calls.getLast().arguments[1], equalTo("2"));
-    }
-
-    @Test
-    public void maps_q_card_description_to_type_3() throws Exception {
-        updateCardType("qcard");
-
-        CountDownLatch lock = new CountDownLatch(2);
-        LinkedList<FunctionCall> calls = new LinkedList<>();
-
-        CALL_RECORDERS.add((functionCall) -> {
-            calls.add(functionCall);
-            lock.countDown();
-        });
-
-        cardOrderDao.validateCardOrders(customer);
-        lock.await(2, TimeUnit.SECONDS);
-
-        assertThat(calls.getLast().arguments[1], equalTo("3"));
-    }
-
-    @Test
-    public void maps_other_descriptions_to_type_0() throws Exception {
-        updateCardType("BAZINGA?");
-
-        CountDownLatch lock = new CountDownLatch(2);
-        LinkedList<FunctionCall> calls = new LinkedList<>();
-
-        CALL_RECORDERS.add((functionCall) -> {
-            calls.add(functionCall);
-            lock.countDown();
-        });
-
-        cardOrderDao.validateCardOrders(customer);
-        lock.await(2, TimeUnit.SECONDS);
-
-        assertThat(calls.getLast().arguments[1], equalTo("0"));
     }
 
     @Test
@@ -188,9 +157,9 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         CardOrder orderA = new CardOrder();
         orderA.setId(72031);
         orderA.setDate(Date.valueOf("2010-12-23"));
-        orderA.setStatus(CardOrderStatus.INSERTED);
+        orderA.setStatus(INSERTED);
         orderA.setCustomerId(4776);
-        orderA.setCardType(CardType.QPARK_CARD);
+        orderA.setCardType(QPARK_CARD);
         orderA.setBriefCode("2");
         orderA.setAmount(1);
         orderA.setPricePerCard(0);
@@ -200,20 +169,20 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         CardOrder orderB = new CardOrder();
         orderB.setId(72032);
         orderB.setDate(Date.valueOf("2010-12-23"));
-        orderB.setStatus(CardOrderStatus.ACCEPTED);
+        orderB.setStatus(ACCEPTED);
         orderB.setCustomerId(4776);
-        orderB.setCardType(CardType.TRANSPONDER_CARD);
+        orderB.setCardType(TRANSPONDER_CARD);
         orderB.setBriefCode("1");
         orderB.setAmount(2);
         orderB.setPricePerCard(500);
-        orderB.setSurcharge(    200);
+        orderB.setSurcharge(200);
         orderB.setExport(true);
         orderB.setCardNumber("123456");
 
-        List<CardOrder> cardOrders = cardOrderDao.findForCustomer(customer, CardOrderStatus.INSERTED, CardType.QPARK_CARD);
+        List<CardOrder> cardOrders = cardOrderDao.findForCustomer(customer, INSERTED, QPARK_CARD);
         assertThat(cardOrders, contains(orderA));
 
-        cardOrders = cardOrderDao.findForCustomer(customer, CardOrderStatus.ACCEPTED, CardType.TRANSPONDER_CARD);
+        cardOrders = cardOrderDao.findForCustomer(customer, ACCEPTED, TRANSPONDER_CARD);
         assertThat(cardOrders, contains(orderB));
     }
 

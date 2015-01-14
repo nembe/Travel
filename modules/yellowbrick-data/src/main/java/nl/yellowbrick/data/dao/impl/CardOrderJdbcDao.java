@@ -1,7 +1,5 @@
 package nl.yellowbrick.data.dao.impl;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import nl.yellowbrick.data.audit.Mutator;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
@@ -19,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,33 +52,6 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     @Override
     public void saveSpecialTarifIfApplicable(Customer customer) {
         saveSpecialTarifCall.execute(customer.getCustomerId());
-    }
-
-    @Override
-    public void validateCardOrders(Customer customer) {
-        String sql = Joiner.on(' ').join(ImmutableList.of(
-                "SELECT co.ORDERID, co.ORDERDATE, c.BUSINESS, c.LASTNAME, co.CARDTYPE, co.AMOUNT, co.PRICEPERCARD",
-                "FROM CARDORDER co",
-                "INNER JOIN CUSTOMER c ON c.CUSTOMERID = co.CUSTOMERID",
-                "WHERE co.ORDERSTATUS = ?",
-                "AND co.CARDTYPE != ? ",
-                "AND co.CUSTOMERID = ? "
-        ));
-
-        RowCallbackHandler processCardOrder = (rs) -> {
-            double pricePerCard = rs.getDouble("PricePerCard");
-            double orderid = rs.getDouble("OrderId");
-
-            int amount = new Double(rs.getDouble("Amount")).intValue();
-
-            saveAndAcceptCardOrder(orderid, pricePerCard, amount);
-
-            CardType cardType = CardType.fromDescription(rs.getString("CardType"));
-            validateCardOrder(orderid, cardType.code());
-        };
-
-        template.query(sql, processCardOrder,
-                CardOrderStatus.INSERTED.code(), CardType.SLEEVE.description(), customer.getCustomerId());
     }
 
     @Override
@@ -144,12 +116,14 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         };
     }
 
-    private void saveAndAcceptCardOrder(double orderId, double pricePerCard, int amount) {
+    private void acceptCardOrder(double orderId, double pricePerCard, int amount) {
         cardOrderUpdateCall.execute(orderId, CardOrderStatus.ACCEPTED.code(), pricePerCard, amount);
     }
 
-    private void validateCardOrder(double orderId, String typeOfCard) {
-        Map<String, Object> res = cardOrderValidateCall.execute(orderId, typeOfCard);
+    public void validateCardOrder(CardOrder cardOrder) {
+        acceptCardOrder(cardOrder.getId(), cardOrder.getPricePerCard(), cardOrder.getAmount());
+
+        Map<String, Object> res = cardOrderValidateCall.execute(cardOrder.getId(), cardOrder.getCardType().code());
         String returnStr = res.get("Return_out").toString();
 
         Runnable logUnmetExpectation = () -> {
@@ -162,6 +136,13 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         } catch(NumberFormatException e) {
             logUnmetExpectation.run();
         }
+    }
+
+    @Override
+    public void validateCardOrders(Customer customer, CardType... cardTypes) {
+        Arrays.asList(cardTypes).forEach((cardType) -> {
+            findForCustomer(customer, CardOrderStatus.INSERTED, cardType).forEach(this::validateCardOrder);
+        });
     }
 
     private void compileJdbcCalls() {

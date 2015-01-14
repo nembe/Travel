@@ -3,6 +3,7 @@ package nl.yellowbrick.activation.service;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.dao.MembershipDao;
+import nl.yellowbrick.data.domain.CardType;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.Membership;
 import nl.yellowbrick.data.domain.PriceModel;
@@ -57,7 +58,7 @@ public class AccountActivationServiceTest {
         InOrder inOrder = Mockito.inOrder(cardOrderDao, cardAssignmentService);
 
         inOrder.verify(cardOrderDao).saveSpecialTarifIfApplicable(eq(customer));
-        inOrder.verify(cardOrderDao).validateCardOrders(eq(customer));
+        inOrder.verify(cardOrderDao).validateCardOrders(customer, CardType.TRANSPONDER_CARD, CardType.QPARK_CARD);
         inOrder.verify(cardAssignmentService).assignToCustomer(customer);
     }
 
