@@ -4,8 +4,8 @@ datasource:
   username: dev_nl_brickparking
   password: dev_nl_brickparking
 
-activation:
-  delay: 5000
+tasks:
+  customer-activation-delay: 5000
 
 mail:
   host: 127.0.0.1

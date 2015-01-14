@@ -1,4 +1,4 @@
-package nl.yellowbrick.activation.bootstrap;
+package nl.yellowbrick.activation.task;
 
 import com.google.common.collect.ImmutableList;
 import nl.yellowbrick.activation.service.AccountActivationService;

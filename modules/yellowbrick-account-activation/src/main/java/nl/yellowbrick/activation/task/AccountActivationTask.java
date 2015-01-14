@@ -1,4 +1,4 @@
-package nl.yellowbrick.activation.bootstrap;
+package nl.yellowbrick.activation.task;
 
 import com.google.common.base.Strings;
 import nl.yellowbrick.activation.service.AccountActivationService;
@@ -45,7 +45,7 @@ public class AccountActivationTask {
         this.accountRegistrationValidators = validators;
     }
 
-    @Scheduled(fixedDelayString = "${activation.delay}")
+    @Scheduled(fixedDelayString = "${tasks.customer-activation-delay}")
     public void validateAndActivateAccounts()  {
         log.debug("starting validateAndActivateAccounts");
 
