@@ -68,7 +68,6 @@ public class AccountProvisioningController {
     public String validate(ModelMap model, @PathVariable("id") int id, Locale locale) {
         Customer customer = customerById(id);
         CustomerAddress address = addressForCustomer(id);
-        PriceModel priceModel = priceModelForCustomer(id, customer.getActionCode());
 
         FormData form;
         if(model.containsAttribute("form")) {
@@ -76,10 +75,9 @@ public class AccountProvisioningController {
         } else if(customer.isBusinessCustomer()) {
             Optional<CustomerAddress> billingAddress = billingAddressForCustomer(id);
             List<BusinessIdentifier> businessIdentifiers = customerDao.getBusinessIdentifiers(id);
-            form = new BusinessAccountProvisioningForm(customer, address, priceModel,
-                    billingAddress, businessIdentifiers);
+            form = new BusinessAccountProvisioningForm(customer, address, billingAddress, businessIdentifiers);
         } else {
-            form = new PersonalAccountProvisioningForm(customer, address, priceModel);
+            form = new PersonalAccountProvisioningForm(customer, address);
         }
 
         BeanPropertyBindingResult errors = new BeanPropertyBindingResult(form, "form");
@@ -98,6 +96,7 @@ public class AccountProvisioningController {
         model.addAttribute(FORM_ERRORS, errors);
         model.addAttribute("customer", customer);
         model.addAttribute("specialRateDescription", rateTranslationService.describeRateForCustomer(customer, locale));
+        model.addAttribute("priceModel", priceModelForCustomer(id, customer.getActionCode()));
 
         addPaymentData(model, customer);
 

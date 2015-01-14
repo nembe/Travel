@@ -2,7 +2,6 @@ package nl.yellowbrick.admin.form;
 
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
-import nl.yellowbrick.data.domain.PriceModel;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -34,15 +33,11 @@ public class PersonalAccountProvisioningForm implements FormData {
     private int numberOfTransponderCards;
     private int numberOfPPlusCards;
 
-    // fees
-    private double subscriptionFee;
-    private double registrationFee;
-
     // 0-arg constructor for javabeans compliance
     public PersonalAccountProvisioningForm() {
     }
 
-    public PersonalAccountProvisioningForm(Customer customer, CustomerAddress address, PriceModel priceModel) {
+    public PersonalAccountProvisioningForm(Customer customer, CustomerAddress address) {
         setGender(customer.getGender());
         setInitials(customer.getInitials());
         setFirstName(customer.getFirstName());
@@ -61,9 +56,6 @@ public class PersonalAccountProvisioningForm implements FormData {
 
         setNumberOfTransponderCards(customer.getNumberOfTCards());
         setNumberOfPPlusCards(customer.getNumberOfQCards());
-
-        setSubscriptionFee(priceModel.getSubscriptionCostEuroCents() / 100);
-        setRegistrationFee(priceModel.getRegistratiekosten() / 100);
     }
 
     public String getGender() {
@@ -192,21 +184,5 @@ public class PersonalAccountProvisioningForm implements FormData {
 
     public void setNumberOfPPlusCards(int numberOfPPlusCards) {
         this.numberOfPPlusCards = numberOfPPlusCards;
-    }
-
-    public double getSubscriptionFee() {
-        return subscriptionFee;
-    }
-
-    public void setSubscriptionFee(double subscriptionFee) {
-        this.subscriptionFee = subscriptionFee;
-    }
-
-    public double getRegistrationFee() {
-        return registrationFee;
-    }
-
-    public void setRegistrationFee(double registrationFee) {
-        this.registrationFee = registrationFee;
     }
 }

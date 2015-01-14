@@ -125,16 +125,14 @@
         <span class="field-value" th:text="${ccname}"></span>
     </div>
 
-    <div th:fragment="subscriptionFee" class="field">
-        <label for="subscriptionFee" class="field-label">Subscription fee</label>
-        <input type="text" th:field="*{subscriptionFee}" th:errorclass="field-error" disabled="disabled" />
-        <span class="field-error" th:if="${#fields.hasErrors('subscriptionFee')}" th:errors="*{subscriptionFee}"></span>
+    <div th:fragment="subscriptionFee" class="field" th:if="${priceModel}">
+        <span class="field-label">Subscription fee</span>
+        <span class="field-value" th:text="${priceModel.subscriptionCostEuroCents / 100}"></span>
     </div>
 
-    <div th:fragment="registrationFee" class="field">
-        <label for="registrationFee" class="field-label">Registration fee</label>
-        <input type="text" th:field="*{registrationFee}" th:errorclass="field-error" disabled="disabled" />
-        <span class="field-error" th:if="${#fields.hasErrors('registrationFee')}" th:errors="*{registrationFee}"></span>
+    <div th:fragment="registrationFee" class="field" th:if="${priceModel}">
+        <span class="field-label">Registration fee</span>
+        <span class="field-value" th:text="${priceModel.registratiekosten / 100}"></span>
     </div>
 
     <div th:fragment="businessName" class="field">

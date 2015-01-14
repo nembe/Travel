@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
-import nl.yellowbrick.data.domain.PriceModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,10 +28,9 @@ public class BusinessAccountProvisioningForm extends PersonalAccountProvisioning
 
     public BusinessAccountProvisioningForm(Customer customer,
                                            CustomerAddress address,
-                                           PriceModel priceModel,
                                            Optional<CustomerAddress> billingAddress,
                                            List<BusinessIdentifier> businessIdentifiers) {
-        super(customer, address, priceModel);
+        super(customer, address);
         setBusinessName(customer.getBusinessName());
         setBusinessIdentifiers(businessIdentifiers);
 
