@@ -1,6 +1,7 @@
 package nl.yellowbrick.activation.bootstrap;
 
 import nl.yellowbrick.activation.task.AccountActivationTask;
+import nl.yellowbrick.activation.task.CardOrderValidationTask;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
@@ -15,7 +16,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableScheduling
 public class Application {
 
+    private static final Object[] CONTEXT_SOURCES = new Object[] {
+            Application.class,
+            AccountActivationTask.class,
+            CardOrderValidationTask.class
+    };
+
     public static void main(String[] args) {
-        SpringApplication.run(new Object[] { Application.class, AccountActivationTask.class }, args);
+        SpringApplication.run(CONTEXT_SOURCES, args);
     }
 }
