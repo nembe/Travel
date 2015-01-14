@@ -3,6 +3,7 @@ package nl.yellowbrick.data.dao.impl;
 import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.database.DbHelper;
 import nl.yellowbrick.data.domain.CardOrder;
+import nl.yellowbrick.data.domain.CardType;
 import nl.yellowbrick.data.domain.Customer;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import static nl.yellowbrick.data.database.Functions.CALL_RECORDERS;
 import static nl.yellowbrick.data.database.Functions.FunctionCall;
 import static nl.yellowbrick.data.domain.CardOrderStatus.ACCEPTED;
+import static nl.yellowbrick.data.domain.CardOrderStatus.EXPORTED;
 import static nl.yellowbrick.data.domain.CardOrderStatus.INSERTED;
 import static nl.yellowbrick.data.domain.CardType.*;
 import static org.hamcrest.Matchers.*;
@@ -207,6 +209,21 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         assertThat(call.arguments[1], equalTo("123456"));
         assertThat(call.arguments[2], equalTo("TEST MUTATOR"));
         assertThat(call.arguments[3], is(1));
+    }
+
+    @Test
+    public void fetches_orders_by_status_and_card_type() {
+        assertThat(cardOrderDao.findByStatusAndType(INSERTED, TRANSPONDER_CARD), empty());
+        assertThat(cardOrderDao.findByStatusAndType(ACCEPTED, TRANSPONDER_CARD), hasSize(1));
+
+        assertThat(cardOrderDao.findByStatusAndType(INSERTED, QPARK_CARD), hasSize(1));
+        assertThat(cardOrderDao.findByStatusAndType(ACCEPTED, QPARK_CARD), empty());
+
+        updateCardType(CardType.RTP_CARD.description());
+
+        assertThat(cardOrderDao.findByStatusAndType(INSERTED, RTP_CARD), hasSize(1));
+        assertThat(cardOrderDao.findByStatusAndType(ACCEPTED, RTP_CARD), hasSize(1));
+        assertThat(cardOrderDao.findByStatusAndType(EXPORTED, RTP_CARD), empty());
     }
 
     private void updateCardType(String cardType) {

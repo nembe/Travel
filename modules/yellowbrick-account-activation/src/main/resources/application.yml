@@ -6,6 +6,7 @@ datasource:
 
 tasks:
   customer-activation-delay: 5000
+  vehicle-profile-validation-delay: 300000
 
 mail:
   host: 127.0.0.1

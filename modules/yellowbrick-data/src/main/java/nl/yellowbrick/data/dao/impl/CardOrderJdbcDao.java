@@ -111,6 +111,15 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         }
     }
 
+    @Override
+    public List<CardOrder> findByStatusAndType(CardOrderStatus status, CardType type) {
+        String sql = "SELECT * FROM CARDORDER " +
+                "WHERE ORDERSTATUS = ? " +
+                "AND UPPER(CARDTYPE) = UPPER(?)";
+
+        return template.query(sql, cardOrderRowMapper(), status.code(), type.description());
+    }
+
     private RowMapper<CardOrder> cardOrderRowMapper() {
         return new RowMapper<CardOrder>() {
             @Override

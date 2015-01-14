@@ -21,4 +21,6 @@ public interface CardOrderDao {
     public List<CardOrder> findForCustomer(Customer customer, CardOrderStatus orderStatus, CardType cardType);
 
     public void processTransponderCard(String cardNumber, Customer customer, boolean updateMobileWithCard);
+
+    public List<CardOrder> findByStatusAndType(CardOrderStatus inserted, CardType transponderCard);
 }
