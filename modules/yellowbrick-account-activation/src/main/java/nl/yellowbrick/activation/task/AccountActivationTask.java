@@ -14,7 +14,6 @@ import nl.yellowbrick.data.errors.ActivationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.DataBinder;
 
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@EnableScheduling
 public class AccountActivationTask {
 
     private static final Logger log = LoggerFactory.getLogger(AccountActivationTask.class);
