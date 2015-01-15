@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/provisioning")
+@RequestMapping("/provisioning/accounts")
 public class AccountProvisioningController {
 
     private static final Logger log = LoggerFactory.getLogger(AccountProvisioningController.class);
@@ -60,7 +60,7 @@ public class AccountProvisioningController {
     public String pendingValidation(Model model) {
         model.addAttribute("customers", customersPendingManualValidation());
 
-        return "provisioning/index";
+        return "provisioning/accounts/index";
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "{id}")
@@ -98,8 +98,8 @@ public class AccountProvisioningController {
         });
 
         if(customer.isBusinessCustomer())
-            return "provisioning/validate_business";
-        return "provisioning/validate_personal";
+            return "provisioning/accounts/validate_business";
+        return "provisioning/accounts/validate_personal";
     }
 
     private void addPaymentData(Model model, Customer customer) {
@@ -138,7 +138,7 @@ public class AccountProvisioningController {
         // and activate customer
         accountActivationService.activateCustomerAccount(customer, priceModel);
 
-        return "redirect:/provisioning";
+        return "redirect:/provisioning/accounts";
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"validateBusinessAccount"})
@@ -177,7 +177,7 @@ public class AccountProvisioningController {
 
         model.clear();
 
-        return "redirect:/provisioning";
+        return "redirect:/provisioning/accounts";
     }
 
     private List<Customer> customersPendingManualValidation() {

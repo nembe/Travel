@@ -31,7 +31,7 @@
                         <td th:text="${cust.accountCity}"></td>
                         <td th:text="${cust.productGroup}"></td>
                         <td>
-                            <a th:href="@{'/provisioning/' + ${cust.customerId}}">validate</a>
+                            <a th:href="@{'/provisioning/accounts' + ${cust.customerId}}">validate</a>
                         </td>
                     </tr>
                 </tbody>
