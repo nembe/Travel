@@ -3,6 +3,7 @@ package nl.yellowbrick.data.dao.impl;
 import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.database.DbHelper;
 import nl.yellowbrick.data.domain.CardOrder;
+import nl.yellowbrick.data.domain.CardOrderStatus;
 import nl.yellowbrick.data.domain.CardType;
 import nl.yellowbrick.data.domain.Customer;
 import org.junit.Before;
@@ -18,10 +19,9 @@ import java.util.concurrent.TimeUnit;
 
 import static nl.yellowbrick.data.database.Functions.CALL_RECORDERS;
 import static nl.yellowbrick.data.database.Functions.FunctionCall;
-import static nl.yellowbrick.data.domain.CardOrderStatus.ACCEPTED;
-import static nl.yellowbrick.data.domain.CardOrderStatus.EXPORTED;
-import static nl.yellowbrick.data.domain.CardOrderStatus.INSERTED;
+import static nl.yellowbrick.data.domain.CardOrderStatus.*;
 import static nl.yellowbrick.data.domain.CardType.*;
+import static nl.yellowbrick.data.matchers.DateMatchers.after;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -226,7 +226,23 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         assertThat(cardOrderDao.findByStatusAndType(EXPORTED, RTP_CARD), empty());
     }
 
+    @Test
+    public void fetches_orders_by_status() {
+        assertThat(cardOrderDao.findByStatus(EXPORTED), empty());
+
+        updateCardStatus(CardOrderStatus.EXPORTED.code());
+
+        List<CardOrder> orders = cardOrderDao.findByStatus(EXPORTED);
+
+        assertThat(orders, hasSize(2));
+        assertThat(orders.get(0).getDate(), after(orders.get(1).getDate()));
+    }
+
     private void updateCardType(String cardType) {
         db.accept((template) -> template.update("UPDATE CARDORDER SET cardtype = ?", cardType));
+    }
+
+    private void updateCardStatus(int status) {
+        db.accept((template) -> template.update("UPDATE CARDORDER SET orderstatus = ?", status));
     }
 }
