@@ -5,7 +5,7 @@ Welcome to the Yellowbrick Brickwall repository.
 ## Prerequisites
 
 * JDK 8
-* Access to Kabisa's [Nexus](http://nexus.kabisa.nl/index.html#welcome)
+* Access to Kabisa's [Nexus](http://nexus.kabisa.nl/index.html#welcome) or Yellowbrick's Artifactory
 * Oracle 10g for running the app locally
 
 ## Modules
