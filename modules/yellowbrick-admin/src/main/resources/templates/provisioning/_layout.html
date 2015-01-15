@@ -8,7 +8,10 @@
         <div id="main-menu">
             <ul>
                 <li>
-                    <a th:href="@{/provisioning/accounts}">ACCOUNT VALIDATION</a>
+                    <a th:href="@{/provisioning/cards}" bw:activeforctx="/provisioning/cards">CARD ORDER VALIDATION</a>
+                </li>
+                <li>
+                    <a th:href="@{/provisioning/accounts}" bw:activeforctx="/provisioning/accounts">ACCOUNT VALIDATION</a>
                 </li>
             </ul>
         </div>

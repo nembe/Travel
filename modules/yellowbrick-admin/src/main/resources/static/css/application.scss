@@ -57,8 +57,9 @@ a, a:active, a:hover, a:visited {
       &:hover, &.active {
         background-color: $color;
 
-        a {
+        a, a:active, a:hover, a:visited {
           color: #FFF;
+          text-decoration: none;
         }
       }
     }
@@ -104,7 +105,12 @@ a, a:active, a:hover, a:visited {
   line-height: 60px;
   text-align: right;
 
-  a {
+  a, a:active, a:hover, a:visited {
+    color: #198376;
+    text-decoration: none;
+  }
+
+  a.active, a:hover {
     color: #FFF;
   }
 
@@ -116,6 +122,7 @@ a, a:active, a:hover, a:visited {
   li {
     list-style-type: none;
     display: inline;
+    margin-left: 26px;
   }
 }
 

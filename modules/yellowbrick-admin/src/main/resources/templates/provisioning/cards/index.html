@@ -1,0 +1,13 @@
+<!DOCTYPE HTML>
+<html layout:decorator="provisioning/_layout">
+<head>
+    <title>Card Order Validation</title>
+</head>
+<body>
+    <div layout:fragment="content-inner">
+        <div class="section" th:if="${#lists.isEmpty(orders)}">
+            <h3>No card orders pending validation.</h3>
+        </div>
+    </div>
+</body>
+</html>
