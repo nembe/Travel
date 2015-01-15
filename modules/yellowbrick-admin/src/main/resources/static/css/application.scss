@@ -51,15 +51,18 @@ a, a:active, a:hover, a:visited {
       margin-top: 2px;
     }
 
+    a, a:active, a:hover, a:visited {
+      text-decoration: none;
+    }
+
     @mixin active-highlight($color) {
       border-left-color: $color;
 
       &:hover, &.active {
         background-color: $color;
 
-        a, a:active, a:hover, a:visited {
+        a {
           color: #FFF;
-          text-decoration: none;
         }
       }
     }
