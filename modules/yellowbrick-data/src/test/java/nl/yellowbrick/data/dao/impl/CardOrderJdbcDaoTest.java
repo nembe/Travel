@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -158,7 +158,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
     public void returns_card_orders_per_customer() {
         CardOrder orderA = new CardOrder();
         orderA.setId(72031);
-        orderA.setDate(Date.valueOf("2010-12-23"));
+        orderA.setDate(Timestamp.valueOf("2010-12-23 16:26:39"));
         orderA.setStatus(INSERTED);
         orderA.setCustomerId(4776);
         orderA.setCardType(QPARK_CARD);
@@ -170,7 +170,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         
         CardOrder orderB = new CardOrder();
         orderB.setId(72032);
-        orderB.setDate(Date.valueOf("2010-12-23"));
+        orderB.setDate(Timestamp.valueOf("2010-12-23 16:00:00"));
         orderB.setStatus(ACCEPTED);
         orderB.setCustomerId(4776);
         orderB.setCardType(TRANSPONDER_CARD);
