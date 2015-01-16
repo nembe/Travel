@@ -127,6 +127,13 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         return template.query(sql, cardOrderRowMapper(), status.code());
     }
 
+    @Override
+    public Optional<CardOrder> findById(long id) {
+        String sql = "SELECT * FROM CARDORDER WHERE ORDERID = ?";
+
+        return template.query(sql, cardOrderRowMapper(), id).stream().findFirst();
+    }
+
     private RowMapper<CardOrder> cardOrderRowMapper() {
         return new RowMapper<CardOrder>() {
             @Override

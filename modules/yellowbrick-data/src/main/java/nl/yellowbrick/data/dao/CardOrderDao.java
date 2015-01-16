@@ -25,4 +25,6 @@ public interface CardOrderDao {
     List<CardOrder> findByStatusAndType(CardOrderStatus status, CardType cardType);
 
     List<CardOrder> findByStatus(CardOrderStatus status);
+
+    Optional<CardOrder> findById(long id);
 }

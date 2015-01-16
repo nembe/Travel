@@ -357,9 +357,9 @@ INSERT INTO CARDORDER VALUES (
              4776,
              'Qcard',
              '2',
-             1,
-             0,
-             0,
+             2,
+             600,
+             300,
              'N',
              NULL);
 

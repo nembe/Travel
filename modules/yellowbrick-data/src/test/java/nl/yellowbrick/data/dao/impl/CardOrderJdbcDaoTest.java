@@ -85,8 +85,8 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         assertThat(firstCall.functionName, equalTo("cardOrderUpdate"));
         assertThat(firstCall.getNumericArg(0).longValue(), equalTo(72031l)); // card order id
         assertThat(firstCall.arguments[1], equalTo("2")); // STATUS_ACCEPTED
-        assertThat(firstCall.getNumericArg(2).longValue(), equalTo(0l));
-        assertThat(firstCall.getNumericArg(3).intValue(), equalTo(1));
+        assertThat(firstCall.getNumericArg(2).longValue(), equalTo(600l));
+        assertThat(firstCall.getNumericArg(3).intValue(), equalTo(2));
 
         // then calls WEBAPP.CardOrderValidate
         FunctionCall secondCall = calls.get(1);
@@ -163,9 +163,9 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         orderA.setCustomerId(4776);
         orderA.setCardType(QPARK_CARD);
         orderA.setBriefCode("2");
-        orderA.setAmount(1);
-        orderA.setPricePerCard(0);
-        orderA.setSurcharge(0);
+        orderA.setAmount(2);
+        orderA.setPricePerCard(600);
+        orderA.setSurcharge(300);
         orderA.setExport(false);
         
         CardOrder orderB = new CardOrder();

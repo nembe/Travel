@@ -31,6 +31,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class CardProvisioningControllerTest extends BaseSpringTestCase {
 
     private static final String BASE = "/provisioning/cards/";
+    private static final String ORDER_ID = "72031";
+
 
     @Autowired WebApplicationContext wac;
     @Autowired @InjectMocks CardProvisioningController controller;
@@ -75,7 +77,24 @@ public class CardProvisioningControllerTest extends BaseSpringTestCase {
         assertThat(row.select("td:nth-child(5)").text(), is("Mathijn Slomp")); // customer name
         assertThat(row.select("td:nth-child(6)").text(), is("QPARK_CARD")); // card type
         assertThat(row.select("td:nth-child(7)").text(), is("false")); // export
-        assertThat(row.select("td:nth-child(8)").text(), is("1")); // order amount
-        assertThat(row.select("td:last-child a").attr("href"), is("/provisioning/cards/72031")); // link to validation
+        assertThat(row.select("td:nth-child(8)").text(), is("2")); // order amount
+        assertThat(row.select("td:last-child a").attr("href"), is(BASE + ORDER_ID)); // link to validation
+    }
+
+    @Test
+    public void loads_card_order_data() throws Exception {
+        MvcResult res = mockMvc.perform(get(BASE + ORDER_ID)).andReturn();
+
+        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+        Elements fields = html.select(".field");
+
+        assertThat(fields.select("[name=cardType]").text(), is("QPARK_CARD"));
+        assertThat(fields.select("[name=orderDate]").text(), is("2010-12-23 16:26:39.0"));
+        assertThat(fields.select("[name=businessCustomer]").text(), is("false"));
+        assertThat(fields.select("[name=customerName]").text(), is("Mathijn Slomp"));
+        assertThat(fields.select("[name=export][checked]").val(), is("false"));
+        assertThat(fields.select("[name=amount] option[selected]").val(), is("2"));
+        assertThat(fields.select("[name=pricepercard]").val(), is("6.0"));
+        assertThat(fields.select("[name=surcharge]").val(), is("3.0"));
     }
 }
