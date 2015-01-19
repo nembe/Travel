@@ -134,6 +134,13 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         return template.query(sql, cardOrderRowMapper(), id).stream().findFirst();
     }
 
+    @Override
+    public void delete(long id) {
+        log.info("Deleting order id {}", id);
+
+        template.update("DELETE FROM CARDORDER WHERE ORDERID = ?", id);
+    }
+
     private RowMapper<CardOrder> cardOrderRowMapper() {
         return new RowMapper<CardOrder>() {
             @Override

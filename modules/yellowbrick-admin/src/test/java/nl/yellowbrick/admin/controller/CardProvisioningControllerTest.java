@@ -128,4 +128,14 @@ public class CardProvisioningControllerTest extends BaseMvcTestCase {
                 hasProperty("surcharge", is(4.56 * 100))
         )));
     }
+
+    @Test
+    public void deletes_card_orders() throws Exception {
+        MvcResult result = mockMvc.perform(post(BASE + ORDER_ID).param("deleteCardOrder", "Submit")).andReturn();
+
+        verify(cardOrderDao).delete(Long.parseLong(ORDER_ID));
+
+        assertThat(result.getResponse().getHeader("Location"), is("/provisioning/cards"));
+    }
+
 }

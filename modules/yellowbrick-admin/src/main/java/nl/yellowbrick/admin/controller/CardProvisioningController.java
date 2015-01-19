@@ -79,7 +79,14 @@ public class CardProvisioningController {
         cardOrderDao.validateCardOrder(order);
 
         model.clear();
-        return "/provisioning/cards/index";
+        return "redirect:/provisioning/cards";
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"deleteCardOrder"})
+    public String deleteCardOrder(@PathVariable("id") int id) {
+        cardOrderDao.delete(id);
+
+        return "redirect:/provisioning/cards";
     }
 
     private Customer customerForOrder(CardOrder order) {

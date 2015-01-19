@@ -238,6 +238,15 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         assertThat(orders.get(0).getDate(), after(orders.get(1).getDate()));
     }
 
+    @Test
+    public void deletes_orders_by_id() {
+        CardOrder cardOrder = cardOrderDao.findById(72031).get();
+
+        cardOrderDao.delete(cardOrder.getId());
+
+        assertThat(cardOrderDao.findById(72031).isPresent(), is(false));
+    }
+
     private void updateCardType(String cardType) {
         db.accept((template) -> template.update("UPDATE CARDORDER SET cardtype = ?", cardType));
     }

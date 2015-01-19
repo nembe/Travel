@@ -31,3 +31,7 @@ span.field-error {
 .global-errors {
   color: #f00;
 }
+
+input[type='submit'] + input[type='submit'] {
+  margin-left: 10px;
+}

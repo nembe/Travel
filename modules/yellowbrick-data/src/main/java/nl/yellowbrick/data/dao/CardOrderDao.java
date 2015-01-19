@@ -27,4 +27,6 @@ public interface CardOrderDao {
     List<CardOrder> findByStatus(CardOrderStatus status);
 
     Optional<CardOrder> findById(long id);
+
+    void delete(long id);
 }

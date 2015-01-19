@@ -2,6 +2,7 @@
 <html layout:decorator="provisioning/_layout">
 <head>
     <title>Validate Card Order</title>
+    <script type="text/javascript" charset="utf-8" th:src="@{/javascript/provisioning/cards.js}"></script>
 </head>
 <body>
     <div layout:fragment="content-inner">
@@ -65,7 +66,8 @@
             </div>
 
             <div class="section">
-                <input type="submit" name="validateCardOrder" value="Submit" />
+                <input type="submit" name="validateCardOrder" value="Validate" />
+                <input type="submit" name="deleteCardOrder" value="Delete"/>
             </div>
         </form>
     </div>
