@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+</head>
+<body>
+
+    <div id="flash" th:if="${message}" th:fragment="flash">
+        <div class="flash-inner">
+            <span th:text="${message}">Flash message goes here</span>
+            <button type="button" class="close" data-target="#flash">&times;</button>
+        </div>
+    </div>
+
+</body>
+</html>

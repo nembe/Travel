@@ -8,6 +8,7 @@ import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static nl.yellowbrick.data.domain.CardOrderStatus.INSERTED;
@@ -31,6 +34,9 @@ public class CardProvisioningController {
 
     @Autowired
     private CustomerDao customerDao;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @RequestMapping(method = RequestMethod.GET)
     public String pendingValidation(Model model) {
@@ -83,8 +89,10 @@ public class CardProvisioningController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"deleteCardOrder"})
-    public String deleteCardOrder(@PathVariable("id") int id) {
+    public String deleteCardOrder(@PathVariable("id") int id, RedirectAttributes redirectAttributes, Locale locale) {
         cardOrderDao.delete(id);
+
+        redirectAttributes.addFlashAttribute("message", messageSource.getMessage("cardorder.deleted", null, locale));
 
         return "redirect:/provisioning/cards";
     }
