@@ -10,6 +10,9 @@ import nl.yellowbrick.data.domain.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,8 +45,8 @@ public class CardProvisioningController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "{id}")
-    public String validate(Model model, @PathVariable("id") int id) {
-        CardOrder cardOrder = cardOrderDao.findById(id).orElseThrow(ResourceNotFoundException::new);
+    public String showValidationForm(ModelMap model, @PathVariable("id") int id) {
+        CardOrder cardOrder = order(id);
 
         if(!cardOrder.getStatus().equals(INSERTED))
             throw new InconsistentDataException(String.format(
@@ -51,13 +54,28 @@ public class CardProvisioningController {
                     cardOrder.getId(), INSERTED, cardOrder.getStatus().name()
             ));
 
-        CardOrderValidationForm form = new CardOrderValidationForm(cardOrder);
-
         model.addAttribute("order", cardOrder);
         model.addAttribute("customer", customerForOrder(cardOrder));
-        model.addAttribute("form", form);
+
+        if(!model.containsAttribute("form"))
+            model.addAttribute("form", new CardOrderValidationForm(cardOrder));
 
         return "provisioning/cards/validate_order";
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"validateCardOrder"})
+    public String validateCardOrder(@PathVariable("id") int id,
+                                    @ModelAttribute("form") CardOrderValidationForm form,
+                                    BindingResult bindingResult,
+                                    ModelMap model) {
+
+        if(bindingResult.hasErrors())
+            return showValidationForm(model, id);
+
+        model.clear();
+        cardOrderDao.validateCardOrder(order(id));
+
+        return "/provisioning/cards";
     }
 
     private Customer customerForOrder(CardOrder order) {
@@ -66,6 +84,10 @@ public class CardProvisioningController {
                     "Couldn't find customer id %s for card %s", order.getCustomerId(), order.getId()
             ));
         });
+    }
+
+    private CardOrder order(long orderId) {
+        return cardOrderDao.findById(orderId).orElseThrow(ResourceNotFoundException::new);
     }
 
     private CardOrderListItem toListItem(CardOrder cardOrder) {

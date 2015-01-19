@@ -1,6 +1,6 @@
 package nl.yellowbrick.admin.controller;
 
-import nl.yellowbrick.data.BaseSpringTestCase;
+import nl.yellowbrick.admin.BaseMvcTestCase;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.CardOrderStatus;
@@ -22,13 +22,16 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
 
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebAppConfiguration
-public class CardProvisioningControllerTest extends BaseSpringTestCase {
+public class CardProvisioningControllerTest extends BaseMvcTestCase {
 
     private static final String BASE = "/provisioning/cards/";
     private static final String ORDER_ID = "72031";
@@ -96,5 +99,18 @@ public class CardProvisioningControllerTest extends BaseSpringTestCase {
         assertThat(fields.select("[name=amount] option[selected]").val(), is("2"));
         assertThat(fields.select("[name=pricepercard]").val(), is("6.0"));
         assertThat(fields.select("[name=surcharge]").val(), is("3.0"));
+    }
+
+    @Test
+    public void shows_form_binding_errors() throws Exception {
+        MvcResult res = mockMvc.perform(post(BASE + ORDER_ID)
+                        .param("pricePerCard", "5.0") // correct entry
+                        .param("surcharge", "not an integer") // wrong type. should have binding error
+                        .param("validateCardOrder", "Submit")
+        ).andReturn();
+
+        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+
+        assertThat(html.select("[name=surcharge] + .field-error").text(), not(isEmptyOrNullString()));
     }
 }
