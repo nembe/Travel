@@ -72,10 +72,14 @@ public class CardProvisioningController {
         if(bindingResult.hasErrors())
             return showValidationForm(model, id);
 
-        model.clear();
-        cardOrderDao.validateCardOrder(order(id));
+        CardOrder order = order(id);
+        order.setPricePerCard(form.getPricePerCardCents());
+        order.setSurcharge(form.getSurchargeCents());
 
-        return "/provisioning/cards";
+        cardOrderDao.validateCardOrder(order);
+
+        model.clear();
+        return "/provisioning/cards/index";
     }
 
     private Customer customerForOrder(CardOrder order) {

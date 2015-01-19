@@ -31,6 +31,9 @@ public class CardOrderValidationForm {
     public double getPricePerCard() {
         return pricePerCard;
     }
+    public double getPricePerCardCents() {
+        return pricePerCard * 100;
+    }
 
     public void setPricePerCard(double pricePerCard) {
         this.pricePerCard = pricePerCard;
@@ -38,6 +41,9 @@ public class CardOrderValidationForm {
 
     public double getSurcharge() {
         return surcharge;
+    }
+    public double getSurchargeCents() {
+        return surcharge * 100;
     }
 
     public void setSurcharge(double surcharge) {

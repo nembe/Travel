@@ -4,7 +4,6 @@ import nl.yellowbrick.admin.BaseMvcTestCase;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.CardOrderStatus;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -23,9 +22,10 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -57,7 +57,7 @@ public class CardProvisioningControllerTest extends BaseMvcTestCase {
 
         MvcResult res = mockMvc.perform(get(BASE)).andReturn();
 
-        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+        Document html = parseHtml(res);
 
         assertThat(html.select(".section").size(), is(1));
         assertThat(html.select(".section").get(0).text(), is("No card orders pending validation."));
@@ -67,7 +67,7 @@ public class CardProvisioningControllerTest extends BaseMvcTestCase {
     public void lists_card_orders() throws Exception {
         MvcResult res = mockMvc.perform(get(BASE)).andReturn();
 
-        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+        Document html = parseHtml(res);
 
         Elements tableRows = html.select(".section table tbody tr");
         Element row = tableRows.get(0);
@@ -88,7 +88,7 @@ public class CardProvisioningControllerTest extends BaseMvcTestCase {
     public void loads_card_order_data() throws Exception {
         MvcResult res = mockMvc.perform(get(BASE + ORDER_ID)).andReturn();
 
-        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+        Document html = parseHtml(res);
         Elements fields = html.select(".field");
 
         assertThat(fields.select("[name=cardType]").text(), is("QPARK_CARD"));
@@ -109,8 +109,23 @@ public class CardProvisioningControllerTest extends BaseMvcTestCase {
                         .param("validateCardOrder", "Submit")
         ).andReturn();
 
-        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+        Document html = parseHtml(res);
 
         assertThat(html.select("[name=surcharge] + .field-error").text(), not(isEmptyOrNullString()));
+    }
+
+    @Test
+    public void validates_card_order_converting_charges_to_cents() throws Exception {
+        mockMvc.perform(post(BASE + ORDER_ID)
+                        .param("pricePerCard", "1.23")
+                        .param("surcharge", "4.56")
+                        .param("validateCardOrder", "Submit")
+        ).andReturn();
+
+        verify(cardOrderDao).validateCardOrder(argThat(allOf(
+                hasProperty("id", is(Long.parseLong(ORDER_ID))),
+                hasProperty("pricePerCard", is(1.23 * 100)),
+                hasProperty("surcharge", is(4.56 * 100))
+        )));
     }
 }
