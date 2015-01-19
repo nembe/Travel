@@ -20,11 +20,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.sql.Date;
 
+import static nl.yellowbrick.admin.matchers.HtmlMatchers.hasAttr;
 import static nl.yellowbrick.admin.matchers.HtmlMatchers.isField;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -117,7 +119,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
     @Test
     public void saves_changes_to_customer_and_address() throws Exception {
-        postPersonalAccountProvisioningForm();
+        mockMvc.perform(postPersonalAccountProvisioningForm()).andReturn();
 
         verify(customerDao).savePrivateCustomer(argThat(isUpdatedPrivateCustomer()));
         verify(addressDao).savePrivateCustomerAddress(eq(PRIVATE_CUSTOMER_ID), argThat(isUpdatedAddress()));
@@ -125,7 +127,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
     @Test
     public void activates_private_customer_account() throws Exception {
-        postPersonalAccountProvisioningForm();
+        mockMvc.perform(postPersonalAccountProvisioningForm()).andReturn();
 
         verify(accountActivationService).activateCustomerAccount(argThat(isUpdatedPrivateCustomer()), any());
     }
@@ -195,7 +197,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
     @Test
     public void saves_business_customer_data() throws Exception {
-        postBusinessAccountProvisioningForm();
+        mockMvc.perform(postBusinessAccountProvisioningForm()).andReturn();
 
         Matcher<CustomerAddress> isMainAddress = new ArgumentMatcher<CustomerAddress>() {
             @Override
@@ -243,7 +245,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
     @Test
     public void activates_business_customer_account() throws Exception {
-        postBusinessAccountProvisioningForm();
+        mockMvc.perform(postBusinessAccountProvisioningForm()).andReturn();
 
         verify(accountActivationService).activateCustomerAccount(argThat(isUpdatedBusinessCustomer()), any());
     }
@@ -263,35 +265,57 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
     public void deletes_billing_address_when_set_to_same_as_business_address() throws Exception {
         CustomerAddress billingAddress = addressDao.findByCustomerId(BUSINESS_CUSTOMER_ID, AddressType.BILLING).get();
 
-        mockMvc.perform(post(BASE + BUSINESS_CUSTOMER_ID)
-                .param("billingAddressSameAsMailingAddress", "true") // set billing addr = main addr
-                .param("businessName", "ACME inc")
-                .param("email", "ceo@business.com")
-                .param("street", "North Orange")
-                .param("houseNr", "1209")
-                .param("city", "Delaware")
-                .param("numberOfPPlusCards", "1")
-                .param("dateOfBirth", "07-09-1985")
-                .param("businessIdentifiers[0].id", "123")
-                .param("businessIdentifiers[0].value", "12345678")
-                .param("validateBusinessAccount", "Submit")
+        mockMvc.perform(
+                // set billing addr = main addr
+                postBusinessAccountProvisioningForm().param("billingAddressSameAsMailingAddress", "true")
         ).andReturn();
 
         verify(addressDao).deleteAddress(eq(billingAddress));
     }
 
-    private MvcResult postPersonalAccountProvisioningForm() throws Exception {
-        return mockMvc.perform(post(BASE + PRIVATE_CUSTOMER_ID)
+    @Test
+    public void validates_binding_errors_on_private_customer_form() throws Exception {
+        MvcResult res = mockMvc.perform(
+                postPersonalAccountProvisioningForm().param("numberOfTransponderCards", "totally not a number")
+        ).andReturn();
+
+        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+
+        assertThat(html.select("input[name=numberOfTransponderCards]").first(), allOf(
+                hasAttr("class", "field-error"),
+                hasAttr("value", "totally not a number")
+        ));
+
+        verifyZeroInteractions(accountActivationService);
+    }
+
+    @Test
+    public void validates_binding_errors_on_business_customer_form() throws Exception {
+        MvcResult res = mockMvc.perform(
+                postBusinessAccountProvisioningForm().param("numberOfTransponderCards", "totally not a number")
+        ).andReturn();
+
+        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+
+        assertThat(html.select("input[name=numberOfTransponderCards]").first(), allOf(
+                hasAttr("class", "field-error"),
+                hasAttr("value", "totally not a number")
+        ));
+
+        verifyZeroInteractions(accountActivationService);
+    }
+
+    private MockHttpServletRequestBuilder postPersonalAccountProvisioningForm() throws Exception {
+        return post("/provisioning/accounts/" + PRIVATE_CUSTOMER_ID)
                 .param("email", "some.other.email@test.com")
                 .param("street", "middle of nowhere")
                 .param("numberOfPPlusCards", "2")
                 .param("dateOfBirth", "07-09-1985")
-                .param("validatePersonalAccount", "Submit")
-        ).andReturn();
+                .param("validatePersonalAccount", "Submit");
     }
 
-    private MvcResult postBusinessAccountProvisioningForm() throws Exception  {
-        return mockMvc.perform(post(BASE + BUSINESS_CUSTOMER_ID)
+    private MockHttpServletRequestBuilder postBusinessAccountProvisioningForm() throws Exception  {
+        return post("/provisioning/accounts/" + BUSINESS_CUSTOMER_ID)
                 .param("businessName", "ACME inc")
                 .param("email", "ceo@business.com")
                 .param("street", "North Orange")
@@ -304,8 +328,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
                 .param("dateOfBirth", "07-09-1985")
                 .param("businessIdentifiers[0].id", "123")
                 .param("businessIdentifiers[0].value", "12345678")
-                .param("validateBusinessAccount", "Submit")
-        ).andReturn();
+                .param("validateBusinessAccount", "Submit");
     }
 
     private Matcher<Customer> isUpdatedPrivateCustomer() {
