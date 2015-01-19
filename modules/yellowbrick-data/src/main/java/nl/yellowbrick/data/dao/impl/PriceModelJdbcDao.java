@@ -36,8 +36,9 @@ public class PriceModelJdbcDao implements PriceModelDao {
 
     private PriceModel getPriceModelForSubGroup(long subGroupId) throws SQLException {
         String sql = Joiner.on(' ').join(ImmutableList.of(
-                "SELECT p.* FROM PRICEMODEL p",
+                "SELECT p.*, ps.default_issue_physical_card FROM PRICEMODEL p",
                 "INNER JOIN PRODUCT_SUBGROUP_PRICEMODEL sm ON sm.pricemodel_id = p.id",
+                "INNER JOIN PRODUCT_SUBGROUP ps ON ps.id = sm.product_subgroup_id",
                 "WHERE sm.product_subgroup_id = ?",
                 "AND sm.APPLY_DATE = (",
                 "SELECT MAX(APPLY_DATE) FROM PRODUCT_SUBGROUP_PRICEMODEL",
@@ -84,6 +85,9 @@ public class PriceModelJdbcDao implements PriceModelDao {
         model.setInitTranspCardCost(rs.getInt("INIT_TCARD_COSTS"));
         model.setTranspCardCost(rs.getInt("TRANSPCARD_COSTS"));
         model.setQparkPassCost(rs.getInt("QPARK_PASS_COSTS"));
+        model.setInitVehicleProfileCost(rs.getInt("INIT_VEHICLE_PROFILE_COST"));
+        model.setVehicleProfileCost(rs.getInt("VEHICLE_PROFILE_COST"));
+        model.setDefaultIssuePhysicalCard(rs.getString("DEFAULT_ISSUE_PHYSICAL_CARD").equals("Y"));
 
         return model;
     }

@@ -80,7 +80,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         // starts by calling WEBAPP.cardorderupdate
         FunctionCall firstCall = calls.getFirst();
         assertThat(firstCall.functionName, equalTo("cardOrderUpdate"));
-        assertThat(firstCall.getNumericArg(0).longValue(), equalTo(72031l));
+        assertThat(firstCall.getNumericArg(0).longValue(), equalTo(72031l)); // card order id
         assertThat(firstCall.arguments[1], equalTo("2")); // STATUS_ACCEPTED
         assertThat(firstCall.getNumericArg(2).longValue(), equalTo(0l));
         assertThat(firstCall.getNumericArg(3).intValue(), equalTo(1));
@@ -88,10 +88,8 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         // then calls WEBAPP.CardOrderValidate
         FunctionCall secondCall = calls.get(1);
         assertThat(secondCall.functionName, equalTo("cardOrderValidate"));
-        assertThat(secondCall.getNumericArg(0).longValue(), equalTo(customer.getCustomerId()));
-        assertThat(secondCall.getNumericArg(1).longValue(), equalTo(0l)); // price per card
-        assertThat(secondCall.getNumericArg(2).intValue(), equalTo(1)); // amount
-        assertThat(secondCall.arguments[3], equalTo("3")); // type of card
+        assertThat(secondCall.getNumericArg(0).longValue(), equalTo(72031l)); // card order id
+        assertThat(secondCall.arguments[1], equalTo("3")); // type of card
     }
 
     @Test
@@ -109,7 +107,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         cardOrderDao.validateCardOrders(customer);
         lock.await(2, TimeUnit.SECONDS);
 
-        assertThat(calls.getLast().arguments[3], equalTo("1"));
+        assertThat(calls.getLast().arguments[1], equalTo("1"));
     }
 
     @Test
@@ -127,7 +125,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         cardOrderDao.validateCardOrders(customer);
         lock.await(2, TimeUnit.SECONDS);
 
-        assertThat(calls.getLast().arguments[3], equalTo("2"));
+        assertThat(calls.getLast().arguments[1], equalTo("2"));
     }
 
     @Test
@@ -145,7 +143,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         cardOrderDao.validateCardOrders(customer);
         lock.await(2, TimeUnit.SECONDS);
 
-        assertThat(calls.getLast().arguments[3], equalTo("3"));
+        assertThat(calls.getLast().arguments[1], equalTo("3"));
     }
 
     @Test
@@ -163,7 +161,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         cardOrderDao.validateCardOrders(customer);
         lock.await(2, TimeUnit.SECONDS);
 
-        assertThat(calls.getLast().arguments[3], equalTo("0"));
+        assertThat(calls.getLast().arguments[1], equalTo("0"));
     }
 
     @Test
@@ -187,18 +185,36 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void returns_card_orders_per_customer() {
-        CardOrder expectedCardOrder = new CardOrder();
-        expectedCardOrder.setId(72031);
-        expectedCardOrder.setDate(Date.valueOf("2010-12-23"));
-        expectedCardOrder.setStatus(CardOrderStatus.INSERTED);
-        expectedCardOrder.setCustomerId(4776);
-        expectedCardOrder.setCardType(CardType.QPARK_CARD);
-        expectedCardOrder.setBriefCode("2");
-        expectedCardOrder.setAmount(1);
-        expectedCardOrder.setPricePerCard(0);
+        CardOrder orderA = new CardOrder();
+        orderA.setId(72031);
+        orderA.setDate(Date.valueOf("2010-12-23"));
+        orderA.setStatus(CardOrderStatus.INSERTED);
+        orderA.setCustomerId(4776);
+        orderA.setCardType(CardType.QPARK_CARD);
+        orderA.setBriefCode("2");
+        orderA.setAmount(1);
+        orderA.setPricePerCard(0);
+        orderA.setSurcharge(0);
+        orderA.setExport(false);
+        
+        CardOrder orderB = new CardOrder();
+        orderB.setId(72032);
+        orderB.setDate(Date.valueOf("2010-12-23"));
+        orderB.setStatus(CardOrderStatus.ACCEPTED);
+        orderB.setCustomerId(4776);
+        orderB.setCardType(CardType.TRANSPONDER_CARD);
+        orderB.setBriefCode("1");
+        orderB.setAmount(2);
+        orderB.setPricePerCard(500);
+        orderB.setSurcharge(    200);
+        orderB.setExport(true);
+        orderB.setCardNumber("123456");
 
         List<CardOrder> cardOrders = cardOrderDao.findForCustomer(customer, CardOrderStatus.INSERTED, CardType.QPARK_CARD);
-        assertThat(cardOrders, contains(expectedCardOrder));
+        assertThat(cardOrders, contains(orderA));
+
+        cardOrders = cardOrderDao.findForCustomer(customer, CardOrderStatus.ACCEPTED, CardType.TRANSPONDER_CARD);
+        assertThat(cardOrders, contains(orderB));
     }
 
     @Test

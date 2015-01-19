@@ -2,9 +2,7 @@ package nl.yellowbrick.data.dao.impl;
 
 import nl.yellowbrick.data.audit.Mutator;
 import nl.yellowbrick.data.dao.MembershipDao;
-import nl.yellowbrick.data.domain.Membership;
-import nl.yellowbrick.data.domain.RandomPassword;
-import nl.yellowbrick.data.domain.RandomPinCode;
+import nl.yellowbrick.data.domain.*;
 import nl.yellowbrick.data.errors.ActivationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,19 +44,16 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
         RandomPinCode pinCode = new RandomPinCode();
         RandomPassword password = new RandomPassword();
 
+        Customer cust = membership.getCustomer();
+        PriceModel pm = membership.getPriceModel();
+
         Map<String, Object> results = jdbcCall.execute(new MapSqlParameterSource(new HashMap<String, Object>() {{
-            put("CustomerId_in", membership.getCustomer().getCustomerId());
-            put("CustomerNr_in", membership.getCustomer().getCustomerNr());
-            put("ParkadammerTotal_in", membership.getCustomer().getParkadammerTotal());
-            put("NumberOfTCards_in", membership.getCustomer().getNumberOfTCards());
-            put("NumberOfQCards_in", membership.getCustomer().getNumberOfQCards());
-            put("CreditLimit_in", membership.getCustomer().getCreditLimit());
-            put("SubscriptionFee_in", membership.getPriceModel().getSubscriptionCostEuroCents());
-            put("RegistrationFee_in", membership.getPriceModel().getRegistratiekosten());
-            put("InitialTCardFee_in", membership.getPriceModel().getInitTranspCardCost());
-            put("AdditionalTCardFee_in", membership.getPriceModel().getTranspCardCost());
-            put("InitialRTPCardFee_in", membership.getPriceModel().getInitRtpCardCost());
-            put("AdditionalRTPCardFee_in", membership.getPriceModel().getRtpCardCost());
+            put("CustomerId_in", cust.getCustomerId());
+            put("CustomerNr_in", cust.getCustomerNr());
+            put("NumberOfTCards_in", cust.getNumberOfTCards());
+            put("NumberOfQCards_in", cust.getNumberOfQCards());
+            put("IssuePhysicalCard_in", pm.isDefaultIssuePhysicalCard() ? 'Y' : 'N');
+            put("RegistrationFee_in", pm.getRegistratiekosten());
             put("PinCode_in", pinCode.get());
             put("Password_in", password.get());
             put("Mutator_in", mutator.get());
@@ -82,16 +77,10 @@ public class MembershipJdbcDao implements MembershipDao, InitializingBean {
                 .declareParameters(
                         new SqlParameter("CustomerId_in", Types.NUMERIC),
                         new SqlParameter("CustomerNr_in", Types.VARCHAR),
-                        new SqlParameter("ParkadammerTotal_in", Types.NUMERIC),
                         new SqlParameter("NumberOfTCards_in", Types.NUMERIC),
                         new SqlParameter("NumberOfQCards_in", Types.NUMERIC),
-                        new SqlParameter("CreditLimit_in", Types.NUMERIC),
-                        new SqlParameter("SubscriptionFee_in", Types.NUMERIC),
+                        new SqlParameter("IssuePhysicalCard_in", Types.VARCHAR),
                         new SqlParameter("RegistrationFee_in", Types.NUMERIC),
-                        new SqlParameter("InitialTCardFee_in", Types.NUMERIC),
-                        new SqlParameter("AdditionalTCardFee_in", Types.NUMERIC),
-                        new SqlParameter("InitialRTPCardFee_in", Types.NUMERIC),
-                        new SqlParameter("AdditionalRTPCardFee_in", Types.NUMERIC),
                         new SqlParameter("PinCode_in", Types.VARCHAR),
                         new SqlParameter("Password_in", Types.VARCHAR),
                         new SqlParameter("Mutator_in", Types.VARCHAR),

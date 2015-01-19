@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.LinkedList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -25,58 +24,65 @@ public class MembershipJdbcDaoTest extends BaseSpringTestCase {
     Customer customer;
     PriceModel priceModel;
 
+    FunctionCall latestCall;
+    CountDownLatch lock;
+
     @Before
     public void setUp() {
         customer = new Customer();
         customer.setCustomerId(123l);
         customer.setCustomerNr("ABC123");
-        customer.setParkadammerTotal(1);
         customer.setNumberOfTCards(2);
         customer.setNumberOfQCards(4);
         customer.setCreditLimit(0);
 
         priceModel = new PriceModel();
-        priceModel.setInitRtpCardCost(50);
-        priceModel.setInitTranspCardCost(55);
-        priceModel.setTranspCardCost(60);
-        priceModel.setRtpCardCost(65);
+        priceModel.setDefaultIssuePhysicalCard(true);
         priceModel.setRegistratiekosten(10 * 100); // cents
-        priceModel.setSubscriptionCostEuroCents(8 * 100); // cents
+
+        lock = new CountDownLatch(1);
+        Functions.CALL_RECORDERS.add((functionCall) -> {
+            latestCall = (functionCall);
+            lock.countDown();
+        });
     }
 
     @Test
     public void delegates_to_stored_procedure() throws Exception {
-        CountDownLatch lock = new CountDownLatch(1);
-        LinkedList<FunctionCall> calls = new LinkedList<>();
-
-        Functions.CALL_RECORDERS.add((functionCall) -> {
-            calls.add(functionCall);
-            lock.countDown();
-        });
-
         membershipDao.saveValidatedMembership(new Membership(customer, priceModel));
 
-        lock.await(2, TimeUnit.SECONDS);
+        FunctionCall call = latestFunctionCall();
+
         assertThat("customerValidateMembership was never called", lock.getCount(), equalTo(0l));
-        FunctionCall call = calls.getFirst();
         assertThat(call.functionName, equalTo("customerValidateMembership"));
 
         Object[] args = call.arguments;
 
         assertThat(call.getNumericArg(0).longValue(), equalTo(customer.getCustomerId()));
         assertThat(args[1], equalTo(customer.getCustomerNr()));
-        assertThat(args[2], equalTo(customer.getParkadammerTotal()));
-        assertThat(args[3], equalTo(customer.getNumberOfTCards()));
-        assertThat(args[4], equalTo(customer.getNumberOfQCards()));
-        assertThat(args[5], equalTo((int)customer.getCreditLimit()));
-        assertThat(args[6], equalTo(800)); // membership fee
-        assertThat(args[7], equalTo(1000)); // registration fee
-        assertThat(args[8], equalTo(priceModel.getInitTranspCardCost()));
-        assertThat(args[9], equalTo(priceModel.getTranspCardCost()));
-        assertThat(args[10], equalTo(priceModel.getInitRtpCardCost()));
-        assertThat(args[11], equalTo(priceModel.getRtpCardCost()));
-        assertThat(args[12].toString().length(), equalTo(4)); // 4 char pincode
-        assertThat(args[13].toString().length(), equalTo(60)); // 60 char password
-        assertThat(args[14], equalTo("TEST MUTATOR"));
+        assertThat(args[2], equalTo(customer.getNumberOfTCards()));
+        assertThat(args[3], equalTo(customer.getNumberOfQCards()));
+        assertThat(args[4], equalTo("Y"));
+        assertThat(args[5], equalTo(1000)); // registration fee
+        assertThat(args[6].toString().length(), equalTo(4)); // 4 char pincode
+        assertThat(args[7].toString().length(), equalTo(60)); // 60 char password
+        assertThat(args[8], equalTo("TEST MUTATOR"));
+    }
+
+    @Test
+    public void takes_issuing_of_physical_cards_into_account() throws Exception {
+        priceModel.setDefaultIssuePhysicalCard(false); // dont issue physical cards!
+
+        membershipDao.saveValidatedMembership(new Membership(customer, priceModel));
+
+        FunctionCall call = latestFunctionCall();
+
+        assertThat(call.arguments[4], equalTo("N"));
+    }
+
+    private FunctionCall latestFunctionCall() throws InterruptedException {
+        lock.await(2, TimeUnit.SECONDS);
+
+        return latestCall;
     }
 }

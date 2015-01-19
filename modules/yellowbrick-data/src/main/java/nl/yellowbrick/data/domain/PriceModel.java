@@ -20,6 +20,9 @@ public class PriceModel {
     private int transpCardCost;
     private int qparkPassCost;
     private Date applyDate;
+    private int initVehicleProfileCost;
+    private int vehicleProfileCost;
+    private boolean defaultIssuePhysicalCard;
 
     public long getId() {
         return id;
@@ -147,5 +150,29 @@ public class PriceModel {
 
     public void setApplyDate(Date applyDate) {
         this.applyDate = applyDate;
+    }
+
+    public int getInitVehicleProfileCost() {
+        return initVehicleProfileCost;
+    }
+
+    public void setInitVehicleProfileCost(int initVehicleProfileCost) {
+        this.initVehicleProfileCost = initVehicleProfileCost;
+    }
+
+    public int getVehicleProfileCost() {
+        return vehicleProfileCost;
+    }
+
+    public void setVehicleProfileCost(int vehicleProfileCost) {
+        this.vehicleProfileCost = vehicleProfileCost;
+    }
+
+    public boolean isDefaultIssuePhysicalCard() {
+        return defaultIssuePhysicalCard;
+    }
+
+    public void setDefaultIssuePhysicalCard(boolean defaultIssuePhysicalCard) {
+        this.defaultIssuePhysicalCard = defaultIssuePhysicalCard;
     }
 }

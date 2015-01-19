@@ -24,7 +24,7 @@ public class SubscriptionJdbcDao implements SubscriptionDao {
                 "AND s.subscription_type_id = t.id " +
                 "AND ROWNUM <= 1";
 
-        RowMapper<Subscription> rowMapper = new BeanPropertyRowMapper(Subscription.class);
+        RowMapper<Subscription> rowMapper = new BeanPropertyRowMapper<>(Subscription.class);
 
         return template.query(sql, rowMapper, customerId).stream().findFirst();
     }
