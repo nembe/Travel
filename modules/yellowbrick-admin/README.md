@@ -16,5 +16,6 @@ Welcome to the Yellowbrick Admin module.
 ## Running in development
 
 * Run `mvn spring-boot:run`
+* If you want to attach a debugger: `mvn spring-boot:run -Drun.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"`
 * Sass is compiled with gulp, which is bound to maven. Use `gulp watch` to have stylesheets hot reload
 * Your IDE may use a different target directory than maven, specially when running on a container. You can overwrite the default target for gulp actions: `gulp watch --target target/yellowbrick-admin-0.0.1-SNAPSHOT/WEB-INF/classes/static/`
