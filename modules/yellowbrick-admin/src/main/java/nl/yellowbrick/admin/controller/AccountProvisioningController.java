@@ -8,6 +8,7 @@ import nl.yellowbrick.admin.form.BusinessAccountProvisioningForm;
 import nl.yellowbrick.admin.form.FormData;
 import nl.yellowbrick.admin.form.PersonalAccountProvisioningForm;
 import nl.yellowbrick.admin.service.RateTranslationService;
+import nl.yellowbrick.admin.util.MessageHelper;
 import nl.yellowbrick.data.dao.*;
 import nl.yellowbrick.data.domain.*;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -120,7 +122,8 @@ public class AccountProvisioningController {
     public String saveValidatedPersonalAccount(
             @ModelAttribute("form") PersonalAccountProvisioningForm form,
             @PathVariable("id") int id,
-            ModelMap model) {
+            ModelMap model,
+            RedirectAttributes ra) {
 
         Customer customer = customerById(id);
         CustomerAddress address = addressForCustomer(id);
@@ -138,6 +141,7 @@ public class AccountProvisioningController {
         // and activate customer
         accountActivationService.activateCustomerAccount(customer, priceModel);
 
+        MessageHelper.flash(ra, "account.validated");
         return "redirect:/provisioning/accounts";
     }
 
@@ -145,7 +149,8 @@ public class AccountProvisioningController {
     public String saveValidatedBusinessAccount(
             @ModelAttribute("form") BusinessAccountProvisioningForm form,
             @PathVariable("id") int id,
-            ModelMap model) {
+            ModelMap model,
+            RedirectAttributes ra) {
 
         Customer customer = customerById(id);
         CustomerAddress businessAddress = addressForCustomer(id);
@@ -177,6 +182,7 @@ public class AccountProvisioningController {
 
         model.clear();
 
+        MessageHelper.flash(ra, "account.validated");
         return "redirect:/provisioning/accounts";
     }
 

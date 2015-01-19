@@ -3,6 +3,7 @@ package nl.yellowbrick.admin.controller;
 import nl.yellowbrick.admin.exceptions.InconsistentDataException;
 import nl.yellowbrick.admin.exceptions.ResourceNotFoundException;
 import nl.yellowbrick.admin.form.CardOrderValidationForm;
+import nl.yellowbrick.admin.util.MessageHelper;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.CardOrder;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static nl.yellowbrick.data.domain.CardOrderStatus.INSERTED;
@@ -73,7 +73,8 @@ public class CardProvisioningController {
     public String validateCardOrder(@PathVariable("id") int id,
                                     @ModelAttribute("form") CardOrderValidationForm form,
                                     BindingResult bindingResult,
-                                    ModelMap model) {
+                                    ModelMap model,
+                                    RedirectAttributes ra) {
 
         if(bindingResult.hasErrors())
             return showValidationForm(model, id);
@@ -85,15 +86,15 @@ public class CardProvisioningController {
         cardOrderDao.validateCardOrder(order);
 
         model.clear();
+        MessageHelper.flash(ra, "cardorder.validated");
         return "redirect:/provisioning/cards";
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"deleteCardOrder"})
-    public String deleteCardOrder(@PathVariable("id") int id, RedirectAttributes redirectAttributes, Locale locale) {
+    public String deleteCardOrder(@PathVariable("id") int id, RedirectAttributes ra) {
         cardOrderDao.delete(id);
 
-        redirectAttributes.addFlashAttribute("message", messageSource.getMessage("cardorder.deleted", null, locale));
-
+        MessageHelper.flash(ra, "cardorder.deleted");
         return "redirect:/provisioning/cards";
     }
 
