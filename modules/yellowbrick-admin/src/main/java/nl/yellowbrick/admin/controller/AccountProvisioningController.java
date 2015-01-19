@@ -38,7 +38,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/provisioning")
 public class AccountProvisioningController {
 
-    private static final Logger log = LoggerFactory.getLogger(AccountProvisioningController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AccountProvisioningController.class);
+    private static final String FORM_ERRORS = BindingResult.MODEL_KEY_PREFIX + "form";
 
     // collaborators
     @Autowired private CustomerDao customerDao;
@@ -64,32 +65,38 @@ public class AccountProvisioningController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "{id}")
-    public String validate(Model model, @PathVariable("id") int id, Locale locale) {
+    public String validate(ModelMap model, @PathVariable("id") int id, Locale locale) {
         Customer customer = customerById(id);
         CustomerAddress address = addressForCustomer(id);
-        PriceModel priceModel = priceModelForCustomer(id, customer.getActionCode());
-        FormData form;
 
-        if(customer.isBusinessCustomer()) {
+        FormData form;
+        if(model.containsAttribute("form")) {
+            form = (FormData) model.get("form");
+        } else if(customer.isBusinessCustomer()) {
             Optional<CustomerAddress> billingAddress = billingAddressForCustomer(id);
             List<BusinessIdentifier> businessIdentifiers = customerDao.getBusinessIdentifiers(id);
-            form = new BusinessAccountProvisioningForm(customer, address, priceModel,
-                    billingAddress, businessIdentifiers);
+            form = new BusinessAccountProvisioningForm(customer, address, billingAddress, businessIdentifiers);
         } else {
-            form = new PersonalAccountProvisioningForm(customer, address, priceModel);
+            form = new PersonalAccountProvisioningForm(customer, address);
         }
 
         BeanPropertyBindingResult errors = new BeanPropertyBindingResult(form, "form");
         errors.initConversion(conversionService);
+
+        if(model.containsAttribute(FORM_ERRORS)) {
+            BindingResult previousErrors = (BindingResult) model.get(FORM_ERRORS);
+            errors.addAllErrors(previousErrors);
+        }
 
         for(Validator validator: accountRegistrationValidators) {
             ValidationUtils.invokeValidator(validator, customer, errors);
         }
 
         model.addAttribute("form", form);
-        model.addAttribute(BindingResult.MODEL_KEY_PREFIX + "form", errors);
+        model.addAttribute(FORM_ERRORS, errors);
         model.addAttribute("customer", customer);
         model.addAttribute("specialRateDescription", rateTranslationService.describeRateForCustomer(customer, locale));
+        model.addAttribute("priceModel", priceModelForCustomer(id, customer.getActionCode()));
 
         addPaymentData(model, customer);
 
@@ -102,7 +109,7 @@ public class AccountProvisioningController {
         return "provisioning/validate_personal";
     }
 
-    private void addPaymentData(Model model, Customer customer) {
+    private void addPaymentData(ModelMap model, Customer customer) {
         PaymentMethod payMethod = customer.getPaymentMethodType();
 
         if(payMethod.equals(PaymentMethod.DIRECT_DEBIT)) {
@@ -118,9 +125,16 @@ public class AccountProvisioningController {
 
     @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"validatePersonalAccount"})
     public String saveValidatedPersonalAccount(
-            @ModelAttribute("form") PersonalAccountProvisioningForm form,
             @PathVariable("id") int id,
-            ModelMap model) {
+            @ModelAttribute("form") PersonalAccountProvisioningForm form,
+            BindingResult bindingResult,
+            ModelMap model,
+            Locale locale) {
+
+        if(bindingResult.hasErrors())
+            return validate(model, id, locale);
+        else
+            model.clear();
 
         Customer customer = customerById(id);
         CustomerAddress address = addressForCustomer(id);
@@ -143,9 +157,16 @@ public class AccountProvisioningController {
 
     @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"validateBusinessAccount"})
     public String saveValidatedBusinessAccount(
-            @ModelAttribute("form") BusinessAccountProvisioningForm form,
             @PathVariable("id") int id,
-            ModelMap model) {
+            @ModelAttribute("form") BusinessAccountProvisioningForm form,
+            BindingResult bindingResult,
+            ModelMap model,
+            Locale locale) {
+
+        if(bindingResult.hasErrors())
+            return validate(model, id, locale);
+        else
+            model.clear();
 
         Customer customer = customerById(id);
         CustomerAddress businessAddress = addressForCustomer(id);
@@ -175,8 +196,6 @@ public class AccountProvisioningController {
         // and activate customer
         accountActivationService.activateCustomerAccount(customer, priceModel);
 
-        model.clear();
-
         return "redirect:/provisioning";
     }
 
@@ -201,7 +220,7 @@ public class AccountProvisioningController {
 
         String error = String.format("couldn't find address for customer id: %s", customerId);
 
-        log.error(error);
+        LOG.error(error);
         throw new InconsistentDataException(error);
     }
 
@@ -215,7 +234,7 @@ public class AccountProvisioningController {
 
         Supplier<InconsistentDataException> inconsistentDataError = () -> {
             String error = "couldn't find price model for customer id: " + customerId;
-            log.error(error);
+            LOG.error(error);
 
             return new InconsistentDataException(error);
         };
