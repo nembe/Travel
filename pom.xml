@@ -20,6 +20,7 @@
     <modules>
         <module>modules/yellowbrick-data</module>
         <module>modules/yellowbrick-account-activation</module>
+        <module>modules/travelcard-account-import</module>
         <module>modules/yellowbrick-admin</module>
     </modules>
 
