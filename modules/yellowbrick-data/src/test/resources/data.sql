@@ -529,3 +529,11 @@ INSERT INTO TBLADMINISTRATOR VALUES (
              NULL,
              99,
              NULL);
+
+INSERT INTO TRAVELCARD_WHITELIST_IMPORT VALUES (
+             'tc111111111',
+             'AA-BB-CC',
+             1,
+             TO_DATE ('02/25/2015 11:26:26', 'MM/DD/YYYY HH24:MI:SS'),
+             'N');
+
