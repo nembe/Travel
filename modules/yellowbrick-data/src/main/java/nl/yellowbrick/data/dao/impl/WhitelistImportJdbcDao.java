@@ -4,15 +4,19 @@ import nl.yellowbrick.data.dao.WhitelistImportDao;
 import nl.yellowbrick.data.domain.WhitelistEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static nl.yellowbrick.data.dao.impl.ResultSetUtil.getLongOrNull;
 
 @Component
 public class WhitelistImportJdbcDao implements WhitelistImportDao {
+
+    private static final Object[] NO_ARGS = {};
 
     @Autowired
     private JdbcTemplate template;
@@ -58,6 +62,22 @@ public class WhitelistImportJdbcDao implements WhitelistImportDao {
                 entry.getLicensePlate(),
                 entry.getTransponderCardId(),
                 entry.isObsolete() ? "Y" : "N");
+    }
+
+    @Override
+    public void scanObsolete(Consumer<WhitelistEntry> callback) {
+        String sql = "select * from travelcard_whitelist_import where obsolete = 'Y'";
+
+        template.query(sql, NO_ARGS, mapForConsumer(callback));
+    }
+
+    private RowCallbackHandler mapForConsumer(Consumer<WhitelistEntry> callback) {
+        RowMapper<WhitelistEntry> rowMapper = rowMapper();
+
+        return rs -> {
+            final WhitelistEntry obsoleteEntry = rowMapper.mapRow(rs, rs.getRow());
+            callback.accept(obsoleteEntry);
+        };
     }
 
     private RowMapper<WhitelistEntry> rowMapper() {

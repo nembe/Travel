@@ -10,6 +10,7 @@ tc:
     doneDir: '/tmp/inbound/done'
     delay: 5000
     csvDelimiter: ','
+    mainAccountId: 20210
 
 mutator: TCIMPORT
 
