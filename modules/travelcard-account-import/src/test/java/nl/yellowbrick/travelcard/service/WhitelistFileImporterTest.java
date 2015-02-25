@@ -71,7 +71,10 @@ public class WhitelistFileImporterTest {
     @Test
     public void updates_license_plate_for_existing_entries_removing_others() throws Exception {
         WhitelistEntry entry = new WhitelistEntry("tc111111111", "DD-EE-FF");
+        entry.setObsolete(false);
+
         WhitelistEntry existing = new WhitelistEntry("tc111111111", "AA-BB-CC");
+        existing.setObsolete(true);
 
         when(parser.parseFile(testFile)).thenReturn(Lists.newArrayList(entry));
         when(importDao.findByTravelcardNumber(entry.getTravelcardNumber())).thenReturn(Optional.of(existing));

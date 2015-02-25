@@ -66,6 +66,7 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
         if(maybeExistingEntry.isPresent()) {
             WhitelistEntry existingEntry = maybeExistingEntry.get();
             existingEntry.setLicensePlate(entry.getLicensePlate());
+            existingEntry.setObsolete(false);
 
             importDao.updateEntry(existingEntry);
         } else {
