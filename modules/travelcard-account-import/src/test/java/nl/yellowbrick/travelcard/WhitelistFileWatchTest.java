@@ -1,8 +1,6 @@
-package nl.yellowbrick.travelcard.bootstrap;
+package nl.yellowbrick.travelcard;
 
 import com.google.common.io.Files;
-import nl.yellowbrick.travelcard.WhitelistFileWatch;
-import nl.yellowbrick.travelcard.WhitelistFileWatchListener;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +14,7 @@ import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 public class WhitelistFileWatchTest {
@@ -46,8 +45,7 @@ public class WhitelistFileWatchTest {
 
     @Test
     public void notifies_listeners_of_created_files() throws IOException, InterruptedException {
-        File newFile = new File(importDir, "new.csv");
-        Files.append("something", newFile, Charset.forName("UTF-8"));
+        addFileToImportDir("new.csv");
 
         // this is only required for the Mac because the JVM there doesnt natively support watches
         // so instead relies internally on some really slow polling
@@ -58,7 +56,7 @@ public class WhitelistFileWatchTest {
             @Override
             public boolean matches(Object o) {
                 Path path = (Path) o;
-                return path.toString().equals("new.csv");
+                return path.equals(importDir.toPath().resolve("new.csv"));
             }
         };
 
@@ -75,5 +73,23 @@ public class WhitelistFileWatchTest {
         Thread.sleep(10000);
 
         verifyZeroInteractions(listener);
+    }
+
+    @Test
+    public void is_resilient_to_errors() throws Exception {
+        doThrow(RuntimeException.class).when(listener).fileCreated(any());
+
+        addFileToImportDir("test1.csv");
+        addFileToImportDir("test2.csv");
+
+        // TODO find a reliable alternative to this sleep
+        Thread.sleep(10000);
+
+        verify(listener, times(2)).fileCreated(any());
+    }
+
+    private void addFileToImportDir(String filename) throws IOException {
+        File newFile = new File(importDir, filename);
+        Files.append("something", newFile, Charset.forName("UTF-8"));
     }
 }

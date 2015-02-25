@@ -1,5 +1,6 @@
 package nl.yellowbrick.travelcard;
 
+import com.google.common.collect.Queues;
 import com.sun.nio.file.SensitivityWatchEventModifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +37,7 @@ public class WhitelistFileWatch {
     @Autowired
     public WhitelistFileWatch(@Value("${tc.import.dir}") String importDir,
                               @Value("${tc.import.delay}") int importDelay) throws IOException {
-        this.importDirPath = Paths.get(importDir);
+        this.importDirPath = Paths.get(importDir).toAbsolutePath();
         this.importDelay = importDelay;
         this.listeners = new ArrayList<>();
         this.executorService = Executors.newSingleThreadExecutor();
@@ -54,19 +56,33 @@ public class WhitelistFileWatch {
         importDirPath.register(watchService, new WatchEvent.Kind[] { ENTRY_CREATE }, SensitivityWatchEventModifier.HIGH);
 
         executorService.execute(() -> {
+            final Queue<Path> fileQueue = Queues.newArrayDeque();
+
             while(running) {
+                WatchKey watchKey = null;
+
                 try {
-                    WatchKey watchKey = watchService.poll(importDelay, TimeUnit.MILLISECONDS);
+                    while(fileQueue.peek() != null) {
+                        notifyListeners(fileQueue.poll());
+                    }
+
+                    watchKey = watchService.poll(importDelay, TimeUnit.MILLISECONDS);
 
                     if(watchKey != null) {
-                        List<WatchEvent<?>> watchEvents = watchKey.pollEvents();
-                        watchEvents.forEach((event) -> notifyListeners((WatchEvent<Path>) event));
-                        watchKey.reset();
+                        watchKey.pollEvents().forEach(event -> {
+                            Path fileName = ((WatchEvent<Path>) event).context();
+                            fileQueue.add(importDirPath.resolve(fileName));
+                        });
                     }
                 } catch (InterruptedException e) {
                     LOGGER.warn("failed to gracefully shutdown", e);
                 } catch (ClosedWatchServiceException e) {
                     LOGGER.debug("tried to access a closed WatchService", e);
+                } catch (Exception e) {
+                    LOGGER.error("got unhandled exception", e);
+                } finally {
+                    if(watchKey != null)
+                        watchKey.reset();
                 }
             }
         });
@@ -83,9 +99,8 @@ public class WhitelistFileWatch {
         }
     }
 
-    private void notifyListeners(WatchEvent<Path> watchEvent) {
-        final Path pathToCreatedFile = watchEvent.context();
 
-        listeners.forEach((listener) -> listener.fileCreated(pathToCreatedFile));
+    private void notifyListeners(Path path) {
+        listeners.forEach((listener) -> listener.fileCreated(path));
     }
 }
