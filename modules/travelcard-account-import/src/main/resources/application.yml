@@ -1,5 +1,6 @@
 tc:
   import:
-    dir: '.'
+    dir: .
+    doneDir: '.done'
     delay: 5000
     csvDelimiter: ,
