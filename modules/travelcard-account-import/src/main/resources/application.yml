@@ -2,3 +2,4 @@ tc:
   import:
     dir: '.'
     delay: 5000
+    csvDelimiter: ,
