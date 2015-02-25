@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import nl.yellowbrick.data.domain.WhitelistEntry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ public class WhitelistCsvParser {
 
     private final char delimiter;
 
+    @Autowired
     public WhitelistCsvParser(@Value("${tc.import.csvDelimiter}") char delimiter) {
         this.delimiter = delimiter;
     }

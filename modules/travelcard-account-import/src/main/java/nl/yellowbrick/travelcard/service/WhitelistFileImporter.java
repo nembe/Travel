@@ -32,10 +32,10 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
     @Autowired
     public WhitelistFileImporter(WhitelistImportDao importDao,
                                  WhitelistCsvParser parser,
-                                 @Value("${tc.import.dir}") String doneDir) throws IOException {
+                                 @Value("${tc.import.doneDir}") String doneDir) throws IOException {
         this.importDao = importDao;
         this.parser = parser;
-        this.doneDir = Paths.get(doneDir);
+        this.doneDir = Paths.get(doneDir).toAbsolutePath();
 
         checkDoneDirectory();
     }
@@ -45,6 +45,7 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
     public void fileCreated(Path path) {
         try {
             List<WhitelistEntry> csvEntries = parser.parseFile(path);
+            LOGGER.info("processing {} entries from file {}", csvEntries.size(), path.getFileName());
 
             importDao.markAllAsObsolete();
 
