@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
@@ -134,6 +135,23 @@ public class WhitelistFileImporterTest {
         inOrder.verify(transponderCardDao).createCard(expectedCard);
         inOrder.verify(importDao).createEntry(expectedEntry);
         inOrder.verify(importDao).deleteAllObsolete();
+    }
+
+    @Test
+    public void cancels_cards_for_obsolete_accounts() throws Exception {
+        WhitelistEntry entry = new WhitelistEntry(TC_NUMBER, "AA-BB-CC");
+        entry.setObsolete(true);
+        entry.setTransponderCardId(CARD_ID);
+
+        when(parser.parseFile(testFile)).thenReturn(Lists.newArrayList());
+        doAnswer(invocationOnMock -> {
+            ((Consumer<WhitelistEntry>) invocationOnMock.getArguments()[0]).accept(entry);
+            return null;
+        }).when(importDao).scanObsolete(any());
+
+        fileImporter.fileCreated(testFile);
+
+        verify(transponderCardDao).cancelCard(CARD_ID);
     }
 
     private Path placeTestFile() throws Exception {
