@@ -20,7 +20,7 @@ public class WhitelistImportJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void retrieves_entries_by_travelcard_number() {
-        WhitelistEntry expectedEntry = new WhitelistEntry(TC_NUMBER, "AA-BB-CC", 1);
+        WhitelistEntry expectedEntry = new WhitelistEntry(TC_NUMBER, "AA-BB-CC", 1l);
         WhitelistEntry actualEntry = dao.findByTravelcardNumber(TC_NUMBER).get();
 
         assertThat(actualEntry, is(expectedEntry));
@@ -41,7 +41,7 @@ public class WhitelistImportJdbcDaoTest extends BaseSpringTestCase {
         WhitelistEntry entry = dao.findByTravelcardNumber(TC_NUMBER).get();
 
         entry.setLicensePlate("test");
-        entry.setTransponderCardId(123);
+        entry.setTransponderCardId(123l);
         entry.setObsolete(true);
         dao.updateEntry(entry);
 

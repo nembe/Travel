@@ -4,7 +4,7 @@ public class WhitelistEntry {
 
     private String travelcardNumber;
     private String licensePlate;
-    private long transponderCardId;
+    private Long transponderCardId;
     private boolean obsolete;
 
     public WhitelistEntry(String travelcardNumber, String licensePlate) {
@@ -12,7 +12,7 @@ public class WhitelistEntry {
         this.licensePlate = licensePlate;
     }
 
-    public WhitelistEntry(String travelcardNumber, String licensePlate, long transponderCardId) {
+    public WhitelistEntry(String travelcardNumber, String licensePlate, Long transponderCardId) {
         this(travelcardNumber, licensePlate);
         this.transponderCardId = transponderCardId;
     }
@@ -33,11 +33,11 @@ public class WhitelistEntry {
         this.licensePlate = licensePlate;
     }
 
-    public long getTransponderCardId() {
+    public Long getTransponderCardId() {
         return transponderCardId;
     }
 
-    public void setTransponderCardId(long transponderCardId) {
+    public void setTransponderCardId(Long transponderCardId) {
         this.transponderCardId = transponderCardId;
     }
 
@@ -57,8 +57,9 @@ public class WhitelistEntry {
         WhitelistEntry that = (WhitelistEntry) o;
 
         if (obsolete != that.obsolete) return false;
-        if (transponderCardId != that.transponderCardId) return false;
         if (licensePlate != null ? !licensePlate.equals(that.licensePlate) : that.licensePlate != null) return false;
+        if (transponderCardId != null ? !transponderCardId.equals(that.transponderCardId) : that.transponderCardId != null)
+            return false;
         if (travelcardNumber != null ? !travelcardNumber.equals(that.travelcardNumber) : that.travelcardNumber != null)
             return false;
 
@@ -69,7 +70,7 @@ public class WhitelistEntry {
     public int hashCode() {
         int result = travelcardNumber != null ? travelcardNumber.hashCode() : 0;
         result = 31 * result + (licensePlate != null ? licensePlate.hashCode() : 0);
-        result = 31 * result + (int) (transponderCardId ^ (transponderCardId >>> 32));
+        result = 31 * result + (transponderCardId != null ? transponderCardId.hashCode() : 0);
         result = 31 * result + (obsolete ? 1 : 0);
         return result;
     }

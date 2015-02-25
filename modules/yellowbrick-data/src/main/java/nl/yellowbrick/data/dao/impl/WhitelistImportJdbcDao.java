@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static nl.yellowbrick.data.dao.impl.ResultSetUtil.getLongOrNull;
+
 @Component
 public class WhitelistImportJdbcDao implements WhitelistImportDao {
 
@@ -41,7 +43,7 @@ public class WhitelistImportJdbcDao implements WhitelistImportDao {
         template.update(sql,
                 entry.getLicensePlate(),
                 entry.getTransponderCardId(),
-                entry.isObsolete() ? 'Y' : 'N',
+                entry.isObsolete() ? "Y" : "N",
                 entry.getTravelcardNumber());
     }
 
@@ -55,14 +57,14 @@ public class WhitelistImportJdbcDao implements WhitelistImportDao {
                 entry.getTravelcardNumber(),
                 entry.getLicensePlate(),
                 entry.getTransponderCardId(),
-                entry.isObsolete() ? 'Y' : 'N');
+                entry.isObsolete() ? "Y" : "N");
     }
 
     private RowMapper<WhitelistEntry> rowMapper() {
         return (rs, rowNum) -> {
             String tcNumber = rs.getString("tc_number");
             String licensePlate = rs.getString("license_plate");
-            Long cardId = rs.getLong("transpondercardidfk");
+            Long cardId = getLongOrNull(rs, "transpondercardidfk");
             boolean isObsolete = rs.getString("obsolete").equals("Y");
 
             WhitelistEntry entry = new WhitelistEntry(tcNumber, licensePlate, cardId);
