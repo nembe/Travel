@@ -37,6 +37,9 @@ mail:
 
 adminEmail: development@brickparking.com
 
+logging:
+  file: importer.log
+
 ---
 
 spring:
