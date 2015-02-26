@@ -71,7 +71,7 @@ public class TransponderCardJdbcDao implements TransponderCardDao {
             card.setLicenseplate(rs.getString("licenseplate"));
             card.setCountry(rs.getString("licenseplatecountry"));
             card.setMutator(rs.getString("mutator"));
-            card.setMutationDate(rs.getDate("mutation_date"));
+            card.setMutationDate(rs.getTimestamp("mutation_date"));
 
             return card;
         };

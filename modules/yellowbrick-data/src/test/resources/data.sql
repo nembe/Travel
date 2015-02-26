@@ -539,3 +539,14 @@ INSERT INTO TRAVELCARD_WHITELIST_IMPORT VALUES (
              TO_DATE ('02/25/2015 11:26:26', 'MM/DD/YYYY HH24:MI:SS'),
              'N');
 
+INSERT INTO TRANSPONDERCARD VALUES (
+             222005,
+             '278577',
+             398744,
+             1,
+             NULL,
+             '39-LB-40',
+             'NL',
+             NULL,
+             'ADMIN:ron',
+             TO_DATE ('12/14/2014 19:04:22', 'MM/DD/YYYY HH24:MI:SS'));
