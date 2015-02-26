@@ -436,6 +436,8 @@ INSERT INTO SYSTEMUSER VALUES (
              0,
              NULL,
              NULL,
+             NULL,
+             NULL,
              NULL);
 
 INSERT INTO MARKETINGACTION VALUES (
