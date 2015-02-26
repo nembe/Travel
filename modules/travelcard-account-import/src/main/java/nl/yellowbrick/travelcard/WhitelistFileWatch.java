@@ -18,6 +18,7 @@ import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 
@@ -52,12 +53,13 @@ public class WhitelistFileWatch {
     public void startWatching() throws IOException {
         running = true;
 
+        final Queue<Path> fileQueue = Queues.newArrayDeque();
+        filesInImportDir().forEach(fileQueue::add);
+
         watchService = FileSystems.getDefault().newWatchService();
         importDirPath.register(watchService, new WatchEvent.Kind[] { ENTRY_CREATE }, SensitivityWatchEventModifier.HIGH);
 
         executorService.execute(() -> {
-            final Queue<Path> fileQueue = Queues.newArrayDeque();
-
             while(running) {
                 WatchKey watchKey = null;
 
@@ -99,6 +101,13 @@ public class WhitelistFileWatch {
         }
     }
 
+    private Stream<Path> filesInImportDir() {
+        try {
+            return Files.list(importDirPath);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read import dir " + importDirPath.toString(), e);
+        }
+    }
 
     private void notifyListeners(Path path) {
         listeners.forEach((listener) -> listener.fileCreated(path));
