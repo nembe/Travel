@@ -1,6 +1,7 @@
 package nl.yellowbrick.travelcard.service;
 
 import com.google.common.collect.Lists;
+import nl.yellowbrick.data.dao.SystemUserDao;
 import nl.yellowbrick.data.dao.TransponderCardDao;
 import nl.yellowbrick.data.dao.WhitelistImportDao;
 import nl.yellowbrick.data.domain.CardStatus;
@@ -20,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static nl.yellowbrick.data.domain.UserAccountType.RESTRICTED_SUBACCOUNT;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -27,7 +29,7 @@ import static org.mockito.Mockito.*;
 
 public class WhitelistFileImporterTest {
 
-    private static final String TC_NUMBER = "tc111111111";
+    private static final String TC_NUMBER = "111111111";
     private static final long CARD_ID = 123456l;
 
     WhitelistFileImporter fileImporter;
@@ -35,6 +37,7 @@ public class WhitelistFileImporterTest {
     WhitelistImportDao importDao;
     WhitelistCsvParser parser;
     TransponderCardDao transponderCardDao;
+    SystemUserDao systemUserDao;
     Path doneDir;
     Long mainAccountId = 1l;
 
@@ -46,10 +49,11 @@ public class WhitelistFileImporterTest {
         importDao = mock(WhitelistImportDao.class);
         parser = mock(WhitelistCsvParser.class);
         transponderCardDao = mock(TransponderCardDao.class);
+        systemUserDao = mock(SystemUserDao.class);
         doneDir = Files.createTempDirectory("done");
 
         String doneDirStr = doneDir.toAbsolutePath().toString();
-        fileImporter = new WhitelistFileImporter(importDao, parser, transponderCardDao, doneDirStr, mainAccountId);
+        fileImporter = new WhitelistFileImporter(importDao, parser, transponderCardDao, systemUserDao, doneDirStr, mainAccountId);
 
         inboundDir = Files.createTempDirectory("inbound");
         testFile = placeTestFile();
@@ -64,7 +68,7 @@ public class WhitelistFileImporterTest {
 
     @Test(expected = IOException.class)
     public void throws_early_exception_if_cant_create_done_dir() throws Exception {
-        new WhitelistFileImporter(importDao, parser, transponderCardDao, "/dev/null/something", mainAccountId);
+        new WhitelistFileImporter(importDao, parser, transponderCardDao, systemUserDao, "/dev/null/something", mainAccountId);
     }
 
     @Test
@@ -130,15 +134,19 @@ public class WhitelistFileImporterTest {
         expectedCard.setCountry("NL");
         expectedCard.setStatus(CardStatus.ACTIVE);
 
-        InOrder inOrder = inOrder(importDao, transponderCardDao);
+        String expectedUsername = "tc" + TC_NUMBER;
+        String expectedPassword = expectedEntry.getLicensePlate().toLowerCase();
+
+        InOrder inOrder = inOrder(importDao, transponderCardDao, systemUserDao);
         inOrder.verify(importDao).markAllAsObsolete();
         inOrder.verify(transponderCardDao).createCard(expectedCard);
         inOrder.verify(importDao).createEntry(expectedEntry);
+        inOrder.verify(systemUserDao).createAppUser(expectedCard, expectedUsername, expectedPassword, RESTRICTED_SUBACCOUNT);
         inOrder.verify(importDao).deleteAllObsolete();
     }
 
     @Test
-    public void cancels_cards_for_obsolete_accounts() throws Exception {
+    public void cancels_cards_and_removes_users_of_obsolete_accounts() throws Exception {
         WhitelistEntry entry = new WhitelistEntry(TC_NUMBER, "AA-BB-CC");
         entry.setObsolete(true);
         entry.setTransponderCardId(CARD_ID);
@@ -152,6 +160,7 @@ public class WhitelistFileImporterTest {
         fileImporter.fileCreated(testFile);
 
         verify(transponderCardDao).cancelCard(CARD_ID);
+        verify(systemUserDao).deleteAppUserByCardId(CARD_ID);
     }
 
     private Path placeTestFile() throws Exception {
@@ -159,12 +168,5 @@ public class WhitelistFileImporterTest {
         File destination = new File(inboundDir.toFile(), file.getName());
 
         return Files.copy(file.toPath(), destination.toPath());
-    }
-
-    private TransponderCard testCard() {
-        TransponderCard card = new TransponderCard();
-        card.setId(123456l);
-
-        return card;
     }
 }

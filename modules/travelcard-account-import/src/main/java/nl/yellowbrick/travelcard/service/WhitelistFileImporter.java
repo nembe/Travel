@@ -1,9 +1,11 @@
 package nl.yellowbrick.travelcard.service;
 
+import nl.yellowbrick.data.dao.SystemUserDao;
 import nl.yellowbrick.data.dao.TransponderCardDao;
 import nl.yellowbrick.data.dao.WhitelistImportDao;
 import nl.yellowbrick.data.domain.CardStatus;
 import nl.yellowbrick.data.domain.TransponderCard;
+import nl.yellowbrick.data.domain.UserAccountType;
 import nl.yellowbrick.data.domain.WhitelistEntry;
 import nl.yellowbrick.travelcard.WhitelistFileWatchListener;
 import org.slf4j.Logger;
@@ -28,10 +30,12 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WhitelistFileImporter.class);
     private static final String CARD_COUNTRY = "NL";
+    private static final String USERNAME_PREFIX = "tc";
 
     private final WhitelistImportDao importDao;
     private final WhitelistCsvParser parser;
     private final TransponderCardDao transponderCardDao;
+    private final SystemUserDao systemUserDao;
     private final Path doneDir;
     private final Long mainAccountId;
 
@@ -39,11 +43,13 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
     public WhitelistFileImporter(WhitelistImportDao importDao,
                                  WhitelistCsvParser parser,
                                  TransponderCardDao transponderCardDao,
+                                 SystemUserDao systemUserDao,
                                  @Value("${tc.import.doneDir}") String doneDir,
                                  @Value("${tc.import.mainAccountId}") Long mainAccountId) throws IOException {
         this.importDao = importDao;
         this.parser = parser;
         this.transponderCardDao = transponderCardDao;
+        this.systemUserDao = systemUserDao;
         this.doneDir = Paths.get(doneDir).toAbsolutePath();
         this.mainAccountId = mainAccountId;
 
@@ -63,7 +69,7 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
 
             importDao.scanObsolete((entry) -> {
                 transponderCardDao.cancelCard(entry.getTransponderCardId());
-                // TODO delete system user
+                systemUserDao.deleteAppUserByCardId(entry.getTransponderCardId());
             });
 
             importDao.deleteAllObsolete();
@@ -86,13 +92,15 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
             importDao.updateEntry(existingEntry);
             transponderCardDao.updateLicensePlate(existingEntry.getTransponderCardId(), entry.getLicensePlate());
         } else {
-            addTransponderCard(entry);
-            // TODO add system user
+            TransponderCard card = createTransponderCard(entry);
+            entry.setTransponderCardId(card.getId());
+
             importDao.createEntry(entry);
+            systemUserDao.createAppUser(card, username(entry), password(entry), UserAccountType.RESTRICTED_SUBACCOUNT);
         }
     }
 
-    private void addTransponderCard(WhitelistEntry entry) {
+    private TransponderCard createTransponderCard(WhitelistEntry entry) {
         TransponderCard card = new TransponderCard();
 
         card.setCustomerId(mainAccountId);
@@ -101,14 +109,12 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
         card.setCountry(CARD_COUNTRY);
         card.setStatus(CardStatus.ACTIVE);
 
-        card = transponderCardDao.createCard(card);
-
-        entry.setTransponderCardId(card.getId());
+        return transponderCardDao.createCard(card);
     }
 
     private void checkDoneDirectory() throws IOException {
         if(!Files.exists(doneDir))
-            Files.createDirectory(doneDir);
+            Files.createDirectories(doneDir);
     }
 
     private void moveToDoneDirectory(Path path) {
@@ -124,5 +130,13 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
         return path.getFileName().toString() + "." + formatter.format(LocalDateTime.now());
+    }
+
+    private String username(WhitelistEntry entry) {
+        return (USERNAME_PREFIX + entry.getTravelcardNumber()).toLowerCase();
+    }
+
+    private String password(WhitelistEntry entry) {
+        return entry.getLicensePlate().toLowerCase();
     }
 }

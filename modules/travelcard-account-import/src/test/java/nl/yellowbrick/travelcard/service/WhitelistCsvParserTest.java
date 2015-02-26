@@ -18,8 +18,8 @@ public class WhitelistCsvParserTest {
     public void readsCsvEntriesFromFile() throws Exception {
         List<WhitelistEntry> entries = parser.parseFile(testFile());
 
-        assertEquals(new WhitelistEntry("tc111111111", "AA-BB-CC"), entries.get(0));
-        assertEquals(new WhitelistEntry("tc222222222", "DD-EE-FF"), entries.get(1));
+        assertEquals(new WhitelistEntry("111111111", "AA-BB-CC"), entries.get(0));
+        assertEquals(new WhitelistEntry("222222222", "DD-EE-FF"), entries.get(1));
     }
 
     private Path testFile() throws Exception {
