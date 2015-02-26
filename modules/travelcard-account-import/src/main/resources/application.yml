@@ -32,13 +32,21 @@ datasource:
   username: telepay
   password: telepay
 
+tc:
+  import:
+    dir: 'inbound'
+    doneDir: 'done'
+    delay: 5000
+    csvDelimiter: ','
+    mainAccountId: 20210
+
 mail:
   host: ybmail
 
 adminEmail: development@brickparking.com
 
 logging:
-  file: importer.log
+  file: log/importer.log
 
 ---
 
