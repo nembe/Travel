@@ -103,7 +103,7 @@ public class WhitelistFileWatch {
 
     private Stream<Path> filesInImportDir() {
         try {
-            return Files.list(importDirPath);
+            return Files.list(importDirPath).filter(path -> !Files.isDirectory(path));
         } catch (IOException e) {
             throw new RuntimeException("Failed to read import dir " + importDirPath.toString(), e);
         }

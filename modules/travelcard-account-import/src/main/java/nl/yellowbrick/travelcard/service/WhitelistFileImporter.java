@@ -36,6 +36,7 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
     private final WhitelistCsvParser parser;
     private final TransponderCardDao transponderCardDao;
     private final SystemUserDao systemUserDao;
+    private final EmailNotificationService emailNotificationService;
     private final Path doneDir;
     private final Long mainAccountId;
 
@@ -44,12 +45,14 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
                                  WhitelistCsvParser parser,
                                  TransponderCardDao transponderCardDao,
                                  SystemUserDao systemUserDao,
+                                 EmailNotificationService emailNotificationService,
                                  @Value("${tc.import.doneDir}") String doneDir,
                                  @Value("${tc.import.mainAccountId}") Long mainAccountId) throws IOException {
         this.importDao = importDao;
         this.parser = parser;
         this.transponderCardDao = transponderCardDao;
         this.systemUserDao = systemUserDao;
+        this.emailNotificationService = emailNotificationService;
         this.doneDir = Paths.get(doneDir).toAbsolutePath();
         this.mainAccountId = mainAccountId;
 
@@ -59,6 +62,8 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
     @Override
     @Transactional
     public void fileCreated(Path path) {
+        Exception failure = null;
+
         try {
             List<WhitelistEntry> csvEntries = parser.parseFile(path);
             LOGGER.info("processing {} entries from file {}", csvEntries.size(), path.getFileName());
@@ -73,11 +78,20 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
             });
 
             importDao.deleteAllObsolete();
+        } catch (Exception e) {
+            failure = e;
+        }
 
-        } catch (IOException e) {
-            LOGGER.error("Failed to parse file " + path.toString(), e);
-        } finally {
-            moveToDoneDirectory(path);
+        Path doneFile = moveToDoneDirectory(path);
+
+        if(failure == null) {
+            emailNotificationService.notifyFileImported(doneFile);
+        } else if(failure instanceof IOException) {
+            LOGGER.error("Failed to parse file " + doneFile.toString(), failure);
+            emailNotificationService.notifyImportFailed(doneFile, "Parse error");
+        } else {
+            LOGGER.error("Error importing file " + doneFile.toString(), failure);
+            emailNotificationService.notifyImportFailed(doneFile, "Import error");
         }
     }
 
@@ -117,13 +131,18 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
             Files.createDirectories(doneDir);
     }
 
-    private void moveToDoneDirectory(Path path) {
+    private Path moveToDoneDirectory(Path path) {
+        LOGGER.info("moving processed file {} to directory {}", path, doneDir);
+
         try {
-            LOGGER.info("moving processed file {} to directory {}", path, doneDir);
-            Files.move(path, doneDir.resolve(doneFileName(path)), StandardCopyOption.REPLACE_EXISTING);
+            Path doneFile = doneDir.resolve(doneFileName(path));
+            Files.move(path, doneFile, StandardCopyOption.REPLACE_EXISTING);
+
+            return doneFile;
         } catch (IOException e) {
             LOGGER.error(String.format("could not move %s to done directory %s", path, doneDir), e);
         }
+        return path;
     }
 
     private String doneFileName(Path path) {

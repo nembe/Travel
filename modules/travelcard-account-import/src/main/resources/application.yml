@@ -12,7 +12,11 @@ tc:
     csvDelimiter: ','
     mainAccountId: 20210
 
+mail:
+  host: 127.0.0.1
+
 mutator: TCIMPORT
+adminEmail: rui.salgado@kabisa.nl
 
 ---
 
@@ -27,3 +31,15 @@ datasource:
         (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = telepay)(FAILOVER_MODE=(TYPE=select)(METHOD=basic))))
   username: telepay
   password: telepay
+
+mail:
+  host: ybmail
+
+adminEmail: development@brickparking.com
+
+---
+
+spring:
+  profiles: production
+
+adminEmail: beheer@brickparking.com

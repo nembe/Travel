@@ -38,6 +38,7 @@ public class WhitelistFileImporterTest {
     WhitelistCsvParser parser;
     TransponderCardDao transponderCardDao;
     SystemUserDao systemUserDao;
+    EmailNotificationService emailNotificationService;
     Path doneDir;
     Long mainAccountId = 1l;
 
@@ -50,10 +51,10 @@ public class WhitelistFileImporterTest {
         parser = mock(WhitelistCsvParser.class);
         transponderCardDao = mock(TransponderCardDao.class);
         systemUserDao = mock(SystemUserDao.class);
-        doneDir = Files.createTempDirectory("done");
+        emailNotificationService = mock(EmailNotificationService.class);
 
-        String doneDirStr = doneDir.toAbsolutePath().toString();
-        fileImporter = new WhitelistFileImporter(importDao, parser, transponderCardDao, systemUserDao, doneDirStr, mainAccountId);
+        doneDir = Files.createTempDirectory("done");
+        fileImporter = newFileImporter(doneDir.toAbsolutePath().toString());
 
         inboundDir = Files.createTempDirectory("inbound");
         testFile = placeTestFile();
@@ -68,7 +69,7 @@ public class WhitelistFileImporterTest {
 
     @Test(expected = IOException.class)
     public void throws_early_exception_if_cant_create_done_dir() throws Exception {
-        new WhitelistFileImporter(importDao, parser, transponderCardDao, systemUserDao, "/dev/null/something", mainAccountId);
+        newFileImporter("/dev/null/something");
     }
 
     @Test
@@ -163,10 +164,35 @@ public class WhitelistFileImporterTest {
         verify(systemUserDao).deleteAppUserByCardId(CARD_ID);
     }
 
+    @Test
+    public void notifies_of_successes() throws Exception {
+        fileImporter.fileCreated(testFile);
+
+        Path doneFile = Files.list(doneDir).findFirst().get();
+
+        verify(emailNotificationService).notifyFileImported(doneFile);
+    }
+
+    @Test
+    public void notifies_of_failures() throws Exception {
+        when(parser.parseFile(any())).thenThrow(Exception.class);
+
+        fileImporter.fileCreated(testFile);
+
+        Path doneFile = Files.list(doneDir).findFirst().get();
+
+        verify(emailNotificationService).notifyImportFailed(eq(doneFile), anyString());
+    }
+
     private Path placeTestFile() throws Exception {
         File file = new File(getClass().getClassLoader().getResource("whitelist.csv").toURI());
         File destination = new File(inboundDir.toFile(), file.getName());
 
         return Files.copy(file.toPath(), destination.toPath());
+    }
+
+    private WhitelistFileImporter newFileImporter(String doneDir) throws Exception {
+        return new WhitelistFileImporter(importDao, parser, transponderCardDao, systemUserDao,
+                emailNotificationService, doneDir, mainAccountId);
     }
 }
