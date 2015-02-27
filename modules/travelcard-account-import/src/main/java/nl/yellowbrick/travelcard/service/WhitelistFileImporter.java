@@ -1,9 +1,7 @@
 package nl.yellowbrick.travelcard.service;
 
 import nl.yellowbrick.data.dao.SystemUserDao;
-import nl.yellowbrick.data.dao.TransponderCardDao;
 import nl.yellowbrick.data.dao.WhitelistImportDao;
-import nl.yellowbrick.data.domain.CardStatus;
 import nl.yellowbrick.data.domain.TransponderCard;
 import nl.yellowbrick.data.domain.UserAccountType;
 import nl.yellowbrick.data.domain.WhitelistEntry;
@@ -29,32 +27,28 @@ import java.util.Optional;
 public class WhitelistFileImporter implements WhitelistFileWatchListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WhitelistFileImporter.class);
-    private static final String CARD_COUNTRY = "NL";
     private static final String USERNAME_PREFIX = "tc";
 
     private final WhitelistImportDao importDao;
     private final WhitelistCsvParser parser;
-    private final TransponderCardDao transponderCardDao;
     private final SystemUserDao systemUserDao;
+    private final CardBindingService cardBindingService;
     private final EmailNotificationService emailNotificationService;
     private final Path doneDir;
-    private final Long mainAccountId;
 
     @Autowired
     public WhitelistFileImporter(WhitelistImportDao importDao,
                                  WhitelistCsvParser parser,
-                                 TransponderCardDao transponderCardDao,
                                  SystemUserDao systemUserDao,
+                                 CardBindingService cardBindingService,
                                  EmailNotificationService emailNotificationService,
-                                 @Value("${tc.import.doneDir}") String doneDir,
-                                 @Value("${tc.import.mainAccountId}") Long mainAccountId) throws IOException {
+                                 @Value("${tc.import.doneDir}") String doneDir) throws IOException {
         this.importDao = importDao;
         this.parser = parser;
-        this.transponderCardDao = transponderCardDao;
         this.systemUserDao = systemUserDao;
+        this.cardBindingService = cardBindingService;
         this.emailNotificationService = emailNotificationService;
         this.doneDir = Paths.get(doneDir).toAbsolutePath();
-        this.mainAccountId = mainAccountId;
 
         checkDoneDirectory();
     }
@@ -73,7 +67,7 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
             csvEntries.forEach(this::createOrUpdateEntry);
 
             importDao.scanObsolete((entry) -> {
-                transponderCardDao.cancelCard(entry.getTransponderCardId());
+                cardBindingService.cancelTransponderCard(entry);
                 systemUserDao.deleteAppUserByCardId(entry.getTransponderCardId());
             });
 
@@ -104,26 +98,14 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
             existingEntry.setObsolete(false);
 
             importDao.updateEntry(existingEntry);
-            transponderCardDao.updateLicensePlate(existingEntry.getTransponderCardId(), entry.getLicensePlate());
+            cardBindingService.updateLicensePlate(existingEntry);
         } else {
-            TransponderCard card = createTransponderCard(entry);
+            TransponderCard card = cardBindingService.createTransponderCard(entry);
             entry.setTransponderCardId(card.getId());
 
             importDao.createEntry(entry);
             systemUserDao.createAppUser(card, username(entry), password(entry), UserAccountType.RESTRICTED_SUBACCOUNT);
         }
-    }
-
-    private TransponderCard createTransponderCard(WhitelistEntry entry) {
-        TransponderCard card = new TransponderCard();
-
-        card.setCustomerId(mainAccountId);
-        card.setCardNumber(entry.getTravelcardNumber());
-        card.setLicenseplate(entry.getLicensePlate());
-        card.setCountry(CARD_COUNTRY);
-        card.setStatus(CardStatus.ACTIVE);
-
-        return transponderCardDao.createCard(card);
     }
 
     private void checkDoneDirectory() throws IOException {

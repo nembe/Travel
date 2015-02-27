@@ -2,15 +2,12 @@ package nl.yellowbrick.travelcard.service;
 
 import com.google.common.collect.Lists;
 import nl.yellowbrick.data.dao.SystemUserDao;
-import nl.yellowbrick.data.dao.TransponderCardDao;
 import nl.yellowbrick.data.dao.WhitelistImportDao;
-import nl.yellowbrick.data.domain.CardStatus;
 import nl.yellowbrick.data.domain.TransponderCard;
 import nl.yellowbrick.data.domain.WhitelistEntry;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
-import org.mockito.Matchers;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,22 +22,28 @@ import static nl.yellowbrick.data.domain.UserAccountType.RESTRICTED_SUBACCOUNT;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 public class WhitelistFileImporterTest {
 
     private static final String TC_NUMBER = "111111111";
-    private static final long CARD_ID = 123456l;
+    private static final TransponderCard EXAMPLE_CARD = new TransponderCard();
+
+    static {
+        EXAMPLE_CARD.setId(123l);
+    }
 
     WhitelistFileImporter fileImporter;
 
     WhitelistImportDao importDao;
     WhitelistCsvParser parser;
-    TransponderCardDao transponderCardDao;
+    CardBindingService cardBindingService;
     SystemUserDao systemUserDao;
     EmailNotificationService emailNotificationService;
     Path doneDir;
-    Long mainAccountId = 1l;
 
     Path inboundDir;
     Path testFile;
@@ -49,7 +52,7 @@ public class WhitelistFileImporterTest {
     public void setUp() throws Exception {
         importDao = mock(WhitelistImportDao.class);
         parser = mock(WhitelistCsvParser.class);
-        transponderCardDao = mock(TransponderCardDao.class);
+        cardBindingService = mock(CardBindingService.class);
         systemUserDao = mock(SystemUserDao.class);
         emailNotificationService = mock(EmailNotificationService.class);
 
@@ -60,11 +63,7 @@ public class WhitelistFileImporterTest {
         testFile = placeTestFile();
 
         // just set some ID when creating a card
-        doAnswer(invocationOnMock -> {
-            TransponderCard card = (TransponderCard) invocationOnMock.getArguments()[0];
-            card.setId(CARD_ID);
-            return card;
-        }).when(transponderCardDao).createCard(Matchers.any());
+        when(cardBindingService.createTransponderCard(any())).thenReturn(EXAMPLE_CARD);
     }
 
     @Test(expected = IOException.class)
@@ -108,10 +107,10 @@ public class WhitelistFileImporterTest {
         WhitelistEntry expected = new WhitelistEntry(TC_NUMBER, newEntry.getLicensePlate(), existing.getTransponderCardId());
         expected.setObsolete(false);
 
-        InOrder inOrder = inOrder(importDao, transponderCardDao);
+        InOrder inOrder = inOrder(importDao, cardBindingService);
         inOrder.verify(importDao).markAllAsObsolete();
         inOrder.verify(importDao).updateEntry(expected);
-        inOrder.verify(transponderCardDao).updateLicensePlate(expected.getTransponderCardId(), expected.getLicensePlate());
+        inOrder.verify(cardBindingService).updateLicensePlate(expected);
         inOrder.verify(importDao).deleteAllObsolete();
     }
 
@@ -124,25 +123,17 @@ public class WhitelistFileImporterTest {
 
         fileImporter.fileCreated(testFile);
 
-        WhitelistEntry expectedEntry = new WhitelistEntry(TC_NUMBER, newEntry.getLicensePlate(), CARD_ID);
+        WhitelistEntry expectedEntry = new WhitelistEntry(TC_NUMBER, newEntry.getLicensePlate(), EXAMPLE_CARD.getId());
         expectedEntry.setObsolete(false);
-
-        TransponderCard expectedCard = new TransponderCard();
-        expectedCard.setId(CARD_ID);
-        expectedCard.setCustomerId(mainAccountId);
-        expectedCard.setCardNumber(TC_NUMBER);
-        expectedCard.setLicenseplate(newEntry.getLicensePlate());
-        expectedCard.setCountry("NL");
-        expectedCard.setStatus(CardStatus.ACTIVE);
 
         String expectedUsername = "tc" + TC_NUMBER;
         String expectedPassword = expectedEntry.getLicensePlate().toLowerCase();
 
-        InOrder inOrder = inOrder(importDao, transponderCardDao, systemUserDao);
+        InOrder inOrder = inOrder(importDao, cardBindingService, systemUserDao);
         inOrder.verify(importDao).markAllAsObsolete();
-        inOrder.verify(transponderCardDao).createCard(expectedCard);
+        inOrder.verify(cardBindingService).createTransponderCard(expectedEntry);
         inOrder.verify(importDao).createEntry(expectedEntry);
-        inOrder.verify(systemUserDao).createAppUser(expectedCard, expectedUsername, expectedPassword, RESTRICTED_SUBACCOUNT);
+        inOrder.verify(systemUserDao).createAppUser(EXAMPLE_CARD, expectedUsername, expectedPassword, RESTRICTED_SUBACCOUNT);
         inOrder.verify(importDao).deleteAllObsolete();
     }
 
@@ -150,7 +141,7 @@ public class WhitelistFileImporterTest {
     public void cancels_cards_and_removes_users_of_obsolete_accounts() throws Exception {
         WhitelistEntry entry = new WhitelistEntry(TC_NUMBER, "AA-BB-CC");
         entry.setObsolete(true);
-        entry.setTransponderCardId(CARD_ID);
+        entry.setTransponderCardId(EXAMPLE_CARD.getId());
 
         when(parser.parseFile(testFile)).thenReturn(Lists.newArrayList());
         doAnswer(invocationOnMock -> {
@@ -160,8 +151,8 @@ public class WhitelistFileImporterTest {
 
         fileImporter.fileCreated(testFile);
 
-        verify(transponderCardDao).cancelCard(CARD_ID);
-        verify(systemUserDao).deleteAppUserByCardId(CARD_ID);
+        verify(cardBindingService).cancelTransponderCard(entry);
+        verify(systemUserDao).deleteAppUserByCardId(EXAMPLE_CARD.getId());
     }
 
     @Test
@@ -192,7 +183,7 @@ public class WhitelistFileImporterTest {
     }
 
     private WhitelistFileImporter newFileImporter(String doneDir) throws Exception {
-        return new WhitelistFileImporter(importDao, parser, transponderCardDao, systemUserDao,
-                emailNotificationService, doneDir, mainAccountId);
+        return new WhitelistFileImporter(importDao, parser, systemUserDao, cardBindingService,
+                emailNotificationService, doneDir);
     }
 }
