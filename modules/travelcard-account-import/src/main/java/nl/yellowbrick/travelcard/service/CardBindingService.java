@@ -56,7 +56,7 @@ public class CardBindingService {
         annotation.setValue(tcNumber);
         annotation.setName(ANNOTATION_NAME);
         annotation.setDefaultAnnotation(true);
-        annotation.setFreeInput(false);
+        annotation.setFreeInput(true);
 
         annotationDao.createAnnotation(annotation);
     }

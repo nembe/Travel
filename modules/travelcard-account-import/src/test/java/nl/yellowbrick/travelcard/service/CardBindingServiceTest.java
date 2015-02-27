@@ -61,7 +61,7 @@ public class CardBindingServiceTest {
         annotation.setValue("1111");
         annotation.setName("Travelcard nummer");
         annotation.setDefaultAnnotation(true);
-        annotation.setFreeInput(false);
+        annotation.setFreeInput(true);
 
         verify(annotationDao).createAnnotation(annotation);
     }
