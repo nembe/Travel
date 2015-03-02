@@ -116,7 +116,7 @@ public class WhitelistFileImporterTest {
 
     @Test
     public void creates_new_entries_removing_others() throws Exception {
-        WhitelistEntry newEntry = new WhitelistEntry(TC_NUMBER, "AA-BB-CC");
+        WhitelistEntry newEntry = new WhitelistEntry(TC_NUMBER, "AA-BB-CC ");
 
         when(parser.parseFile(testFile)).thenReturn(Lists.newArrayList(newEntry));
         when(importDao.findByTravelcardNumber(TC_NUMBER)).thenReturn(Optional.empty());
@@ -127,7 +127,7 @@ public class WhitelistFileImporterTest {
         expectedEntry.setObsolete(false);
 
         String expectedUsername = "tc" + TC_NUMBER;
-        String expectedPassword = expectedEntry.getLicensePlate().toLowerCase();
+        String expectedPassword = "aabbcc";
 
         InOrder inOrder = inOrder(importDao, cardBindingService, systemUserDao);
         inOrder.verify(importDao).markAllAsObsolete();

@@ -138,6 +138,6 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
     }
 
     private String password(WhitelistEntry entry) {
-        return entry.getLicensePlate().toLowerCase();
+        return entry.getLicensePlate().toLowerCase().replaceAll("\\W|_", "");
     }
 }
