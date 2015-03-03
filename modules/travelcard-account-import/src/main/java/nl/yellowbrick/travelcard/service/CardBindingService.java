@@ -2,10 +2,15 @@ package nl.yellowbrick.travelcard.service;
 
 import nl.yellowbrick.data.dao.AnnotationDao;
 import nl.yellowbrick.data.dao.TransponderCardDao;
-import nl.yellowbrick.data.domain.*;
+import nl.yellowbrick.data.domain.AnnotationDefinition;
+import nl.yellowbrick.data.domain.CardStatus;
+import nl.yellowbrick.data.domain.TransponderCard;
+import nl.yellowbrick.data.domain.WhitelistEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import static nl.yellowbrick.data.domain.AnnotationType.TRANSPONDER_CARD;
 
 @Component
 public class CardBindingService {
@@ -49,15 +54,21 @@ public class CardBindingService {
     }
 
     private void annotateCardWithTravelcardNumber(TransponderCard card, String tcNumber) {
-        Annotation annotation = new Annotation();
+        AnnotationDefinition annotationDef = annotationDao
+                .findDefinition(mainAccountId, ANNOTATION_NAME, TRANSPONDER_CARD)
+                .orElseGet(this::createDefaultAnnotationDefinition);
+
+        annotationDao.createAnnotationValue(annotationDef, card.getId(), tcNumber);
+    }
+
+    private AnnotationDefinition createDefaultAnnotationDefinition() {
+        AnnotationDefinition annotation = new AnnotationDefinition();
         annotation.setCustomerId(mainAccountId);
-        annotation.setType(AnnotationType.TRANSPONDER_CARD);
-        annotation.setRecordId(card.getId());
-        annotation.setValue(tcNumber);
+        annotation.setType(TRANSPONDER_CARD);
         annotation.setName(ANNOTATION_NAME);
         annotation.setDefaultAnnotation(true);
         annotation.setFreeInput(true);
 
-        annotationDao.createAnnotation(annotation);
+        return annotationDao.createAnnotationDefinition(annotation);
     }
 }

@@ -2,13 +2,13 @@ package nl.yellowbrick.data.dao.impl;
 
 import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.database.DbHelper;
-import nl.yellowbrick.data.domain.Annotation;
-import nl.yellowbrick.data.domain.AnnotationType;
+import nl.yellowbrick.data.domain.AnnotationDefinition;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
+import static nl.yellowbrick.data.domain.AnnotationType.TRANSPONDER_CARD;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -23,34 +23,51 @@ public class AnnotationJdbcDaoTest extends BaseSpringTestCase {
     DbHelper db;
 
     @Test
-    public void inserts_new_annotation_definition_and_value() {
-        Annotation ann = sampleAnnotation();
-        dao.createAnnotation(ann);
+    public void inserts_new_annotation_definition() {
+        AnnotationDefinition ann = sampleAnnotation();
+        dao.createAnnotationDefinition(ann);
 
         Map<String, Object> def = fetchLatestAnnotationDefinition();
         assertThat(def.get("id"), notNullValue());
         assertThat(def.get("customer_id").toString(), is(String.valueOf(ann.getCustomerId())));
-        assertThat(def.get("annotation_type"), is(AnnotationType.TRANSPONDER_CARD.getCode()));
+        assertThat(def.get("annotation_type"), is(TRANSPONDER_CARD.getCode()));
         assertThat(def.get("name"), is(ann.getName()));
         assertThat(def.get("mutator"), is("TEST MUTATOR"));
         assertThat(def.get("mutation_date"), notNullValue());
         assertThat(def.get("is_default"), is("1"));
         assertThat(def.get("free_input"), is("1"));
+    }
+
+    @Test
+    public void finds_definition_by_name_and_type_and_customer_id() {
+        AnnotationDefinition definition = sampleAnnotation();
+        definition.setId(1l);
+        definition.setCustomerId(4776);
+
+        AnnotationDefinition actualDefinition = dao.findDefinition(4776, "Travelcard nummer", TRANSPONDER_CARD).get();
+
+        assertThat(actualDefinition, equalTo(definition));
+    }
+
+    @Test
+    public void inserts_new_annotation_value() {
+        AnnotationDefinition definition = sampleAnnotation();
+        definition.setId(1l);
+
+        dao.createAnnotationValue(definition, 123l, "test");
 
         Map<String, Object> val = fetchLatestAnnotationValue();
         assertThat(val.get("id"), notNullValue());
-        assertThat(val.get("definition_id"), equalTo(def.get("id")));
-        assertThat(val.get("record_id").toString(), is(String.valueOf(ann.getRecordId())));
-        assertThat(val.get("annotation_value"), is(ann.getValue()));
+        assertThat(val.get("definition_id").toString(), equalTo(definition.getId().toString()));
+        assertThat(val.get("record_id").toString(), is("123"));
+        assertThat(val.get("annotation_value"), is("test"));
     }
 
-    private Annotation sampleAnnotation() {
-        Annotation annotation = new Annotation();
+    private AnnotationDefinition sampleAnnotation() {
+        AnnotationDefinition annotation = new AnnotationDefinition();
 
         annotation.setCustomerId(1l);
-        annotation.setType(AnnotationType.TRANSPONDER_CARD);
-        annotation.setRecordId(2l);
-        annotation.setValue("1111");
+        annotation.setType(TRANSPONDER_CARD);
         annotation.setName("Travelcard nummer");
         annotation.setDefaultAnnotation(true);
         annotation.setFreeInput(true);

@@ -2,16 +2,20 @@ package nl.yellowbrick.travelcard.service;
 
 import nl.yellowbrick.data.dao.AnnotationDao;
 import nl.yellowbrick.data.dao.TransponderCardDao;
-import nl.yellowbrick.data.domain.*;
+import nl.yellowbrick.data.domain.AnnotationDefinition;
+import nl.yellowbrick.data.domain.CardStatus;
+import nl.yellowbrick.data.domain.TransponderCard;
+import nl.yellowbrick.data.domain.WhitelistEntry;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Optional;
+
+import static nl.yellowbrick.data.domain.AnnotationType.TRANSPONDER_CARD;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class CardBindingServiceTest {
 
@@ -40,7 +44,10 @@ public class CardBindingServiceTest {
         card.setCountry("NL");
         card.setStatus(CardStatus.ACTIVE);
 
+        AnnotationDefinition def = new AnnotationDefinition();
+
         when(transponderCardDao.createCard(card)).thenReturn(card);
+        when(annotationDao.findDefinition(mainAccountId, "Travelcard nummer", TRANSPONDER_CARD)).thenReturn(Optional.of(def));
 
         assertThat(cardBindingService.createTransponderCard(entry), is(card));
     }
@@ -50,19 +57,35 @@ public class CardBindingServiceTest {
         TransponderCard card = new TransponderCard();
         card.setId(123l);
 
+        AnnotationDefinition def = new AnnotationDefinition();
+
         when(transponderCardDao.createCard(any())).thenReturn(card);
+        when(annotationDao.findDefinition(mainAccountId, "Travelcard nummer", TRANSPONDER_CARD)).thenReturn(Optional.of(def));
 
         cardBindingService.createTransponderCard(new WhitelistEntry("1111", "AA-BB-CC"));
 
-        Annotation annotation = new Annotation();
-        annotation.setCustomerId(mainAccountId);
-        annotation.setType(AnnotationType.TRANSPONDER_CARD);
-        annotation.setRecordId(123l);
-        annotation.setValue("1111");
-        annotation.setName("Travelcard nummer");
-        annotation.setDefaultAnnotation(true);
-        annotation.setFreeInput(true);
+        verify(annotationDao).createAnnotationValue(def, 123l, "1111");
+    }
 
-        verify(annotationDao).createAnnotation(annotation);
+    @Test
+    public void creates_definition_if_needed() {
+        TransponderCard card = new TransponderCard();
+        card.setId(123l);
+
+        AnnotationDefinition def = new AnnotationDefinition();
+        def.setCustomerId(mainAccountId);
+        def.setType(TRANSPONDER_CARD);
+        def.setName("Travelcard nummer");
+        def.setDefaultAnnotation(true);
+        def.setFreeInput(true);
+
+        when(transponderCardDao.createCard(any())).thenReturn(card);
+        when(annotationDao.findDefinition(mainAccountId, "Travelcard nummer", TRANSPONDER_CARD)).thenReturn(Optional.empty());
+        when(annotationDao.createAnnotationDefinition(any())).thenReturn(def);
+
+        cardBindingService.createTransponderCard(new WhitelistEntry("1111", "AA-BB-CC"));
+
+        verify(annotationDao).createAnnotationDefinition(def);
+        verify(annotationDao).createAnnotationValue(def, 123l, "1111");
     }
 }

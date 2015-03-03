@@ -1,5 +1,7 @@
 package nl.yellowbrick.data.domain;
 
+import java.util.Arrays;
+
 public enum AnnotationType {
 
     PHONE("lblPhone", "TEL"),
@@ -22,5 +24,11 @@ public enum AnnotationType {
 
     public String getLabelName() {
         return labelName;
+    }
+
+    public static AnnotationType byCode(String code) {
+        return Arrays.asList(AnnotationType.values()).stream().filter((type) -> {
+            return type.getCode().equalsIgnoreCase(code);
+        }).findFirst().get();
     }
 }

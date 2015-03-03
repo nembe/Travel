@@ -550,3 +550,16 @@ INSERT INTO TRANSPONDERCARD VALUES (
              NULL,
              'ADMIN:ron',
              TO_DATE ('12/14/2014 19:04:22', 'MM/DD/YYYY HH24:MI:SS'));
+
+INSERT INTO ANNOTATION_DEFINITION VALUES (
+             ANNOTATION_DEFINITION_SEQ.NEXTVAL,
+             4776,
+             'TRK',
+             'Travelcard nummer',
+             'TCIMPORT',
+             TO_DATE ('02/26/2015 22:06:22', 'MM/DD/YYYY HH24:MI:SS'),
+             '1',
+             '1',
+             '0',
+             '0',
+             0);
