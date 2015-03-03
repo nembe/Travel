@@ -8,7 +8,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class WhitelistCsvParserTest {
 
@@ -16,14 +18,21 @@ public class WhitelistCsvParserTest {
 
     @Test
     public void readsCsvEntriesFromFile() throws Exception {
-        List<WhitelistEntry> entries = parser.parseFile(testFile());
+        List<WhitelistEntry> entries = parser.parseFile(testFile("whitelist.csv"));
 
         assertEquals(new WhitelistEntry("111111111", "AA-BB-CC"), entries.get(0));
         assertEquals(new WhitelistEntry("222222222", "DD-EE-FF"), entries.get(1));
     }
 
-    private Path testFile() throws Exception {
-        URL csv = getClass().getClassLoader().getResource("whitelist.csv");
+    @Test
+    public void ignoresEmptyLines() throws Exception {
+        List<WhitelistEntry> entries = parser.parseFile(testFile("whitelist_with_empty_line.csv"));
+
+        assertThat(entries, hasSize(2));
+    }
+
+    private Path testFile(String fileName) throws Exception {
+        URL csv = getClass().getClassLoader().getResource(fileName);
         return Paths.get(csv.toURI());
     }
 }

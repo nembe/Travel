@@ -3,8 +3,6 @@ package nl.yellowbrick.travelcard.service;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import nl.yellowbrick.data.domain.WhitelistEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +11,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 public class WhitelistCsvParser {
@@ -29,11 +29,13 @@ public class WhitelistCsvParser {
         mapper.enable(CsvParser.Feature.WRAP_AS_ARRAY);
 
         MappingIterator<String[]> rowIterator = mapper.reader(String[].class).readValues(path.toFile());
+        Iterable<String[]> iterable = () -> rowIterator;
 
-        return Lists.newArrayList(Iterators.transform(rowIterator, this::mapRow));
+        return StreamSupport
+                .stream(iterable.spliterator(), false)
+                .filter(row -> row.length > 1)
+                .map(row -> new WhitelistEntry(row[0], row[1]))
+                .collect(Collectors.toList());
     }
 
-    private WhitelistEntry mapRow(String[] row) {
-        return new WhitelistEntry(row[0], row[1]);
-    }
 }
