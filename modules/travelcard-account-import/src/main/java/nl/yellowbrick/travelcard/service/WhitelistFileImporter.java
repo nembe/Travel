@@ -54,24 +54,13 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
     }
 
     @Override
-    @Transactional
     public void fileCreated(Path path) {
         Exception failure = null;
 
         try {
             List<WhitelistEntry> csvEntries = parser.parseFile(path);
             LOGGER.info("processing {} entries from file {}", csvEntries.size(), path.getFileName());
-
-            importDao.markAllAsObsolete();
-
-            csvEntries.forEach(this::createOrUpdateEntry);
-
-            importDao.scanObsolete((entry) -> {
-                cardBindingService.cancelTransponderCard(entry);
-                systemUserDao.deleteAppUserByCardId(entry.getTransponderCardId());
-            });
-
-            importDao.deleteAllObsolete();
+            importEntries(csvEntries);
         } catch (Exception e) {
             failure = e;
         }
@@ -87,6 +76,20 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
             LOGGER.error("Error importing file " + doneFile.toString(), failure);
             emailNotificationService.notifyImportFailed(doneFile, "Import error");
         }
+    }
+
+    @Transactional
+    public void importEntries(List<WhitelistEntry> entries) {
+        importDao.markAllAsObsolete();
+
+        entries.forEach(this::createOrUpdateEntry);
+
+        importDao.scanObsolete((entry) -> {
+            cardBindingService.cancelTransponderCard(entry);
+            systemUserDao.deleteAppUserByCardId(entry.getTransponderCardId());
+        });
+
+        importDao.deleteAllObsolete();
     }
 
     private void createOrUpdateEntry(WhitelistEntry entry) {
