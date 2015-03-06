@@ -3,7 +3,15 @@
 read -d '' PARSER << 'EOF'
 function format_license_plate(lp) {
   lp = toupper(lp)
-  gsub(/[0-9]+|[A-Z]+/, "&-", lp) # insert dashes
+  gsub(/[0-9]+|[A-Z]+/, "&-", lp) # insert dashes when switching between numeric and non-numeric
+
+  # split group of 4 non-numeric characters
+  # unfortunately regular awk's regex doesnt support lookahead/lookbehind
+  # so we use this match to work around that
+  if(match(lp, /[A-Z]{4}/) > 0) {
+    sub(/[A-Z]{2}/, "&-", lp)
+  }
+
   gsub(/-$/, "", lp) # remove trailing dash
 
   return lp
