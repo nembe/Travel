@@ -15,16 +15,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +29,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/provisioning")
@@ -50,6 +47,7 @@ public class AccountProvisioningController {
     @Autowired private SubscriptionDao subscriptionDao;
     @Autowired private AccountActivationService accountActivationService;
     @Autowired private RateTranslationService rateTranslationService;
+    @Autowired private ProductGroupDao productGroupDao;
 
     // validators
     @Autowired private List<AccountRegistrationValidator> accountRegistrationValidators;
@@ -57,9 +55,35 @@ public class AccountProvisioningController {
     // formatters
     @Autowired private ConversionService conversionService;
 
+    @RequestMapping(method = RequestMethod.GET, params = { "productGroup" })
+    public String accountsPendingValidation(ModelMap model, @RequestParam("productGroup") long productGroupId) {
+        List<ProductGroup> allProductGroups = productGroupDao.all();
+        ProductGroup selectedProductGroup = allProductGroups.stream()
+                .filter(pg -> pg.getId() == productGroupId)
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("could not find product group with id " + productGroupId));
+
+        return accountsPendingValidation(model, allProductGroups, selectedProductGroup);
+    }
+
     @RequestMapping(method = RequestMethod.GET)
-    public String pendingValidation(Model model) {
-        model.addAttribute("customers", customersPendingManualValidation());
+    public String accountsPendingValidation(ModelMap model) {
+        List<ProductGroup> allProductGroups = productGroupDao.all();
+        ProductGroup defaultProductGroup = allProductGroups.stream()
+                .findFirst()
+                .orElseThrow(() -> new InconsistentDataException("no product groups"));
+
+        return accountsPendingValidation(model, allProductGroups, defaultProductGroup);
+    }
+
+    private String accountsPendingValidation(ModelMap model,
+                                             List<ProductGroup> allProductGroups,
+                                             ProductGroup selectedProductGroup) {
+        model.addAttribute("allProductGroups", allProductGroups);
+        model.addAttribute("productGroup", selectedProductGroup);
+        model.addAttribute("customers", customersPendingManualValidation()
+                .filter(customer -> customer.getProductGroupId() == selectedProductGroup.getId())
+                .collect(Collectors.toList()));
 
         return "provisioning/index";
     }
@@ -199,14 +223,13 @@ public class AccountProvisioningController {
         return "redirect:/provisioning";
     }
 
-    private List<Customer> customersPendingManualValidation() {
+    private Stream<Customer> customersPendingManualValidation() {
         return customerDao.findAllPendingActivation().stream()
-                .filter((customer) -> customer.getCustomerStatusIdfk() == CustomerStatus.ACTIVATION_FAILED.code())
-                .collect(Collectors.toList());
+                .filter(customer -> customer.getCustomerStatusIdfk() == CustomerStatus.ACTIVATION_FAILED.code());
     }
 
     private Customer customerById(int customerId) {
-        return customersPendingManualValidation().stream()
+        return customersPendingManualValidation()
                 .filter((cust) -> cust.getCustomerId() == customerId)
                 .findFirst()
                 .orElseThrow(ResourceNotFoundException::new);

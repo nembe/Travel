@@ -7,8 +7,18 @@ INSERT INTO PRODUCT_GROUP VALUES (
              'YBBEHEER:agsterj',
              NULL,
              10,
-             NULL,
+             TO_DATE ('09/03/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
              NULL);
+
+INSERT INTO PRODUCT_GROUP VALUES (
+             2,
+             'ABN',
+             '0',
+             'YBBEHEER:max@prod',
+             NULL,
+             8,
+             TO_DATE ('09/02/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             TO_DATE ('09/02/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
 
 INSERT INTO PRODUCT_SUBGROUP VALUES (
              2,
