@@ -21,7 +21,6 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,14 +33,12 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Controller
-@RequestMapping("/provisioning/accounts")
-public class AccountProvisioningController {
+@RequestMapping("/provisioning/accounts/{id}")
+public class AccountProvisioningFormController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AccountProvisioningController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AccountProvisioningListController.class);
     private static final String FORM_ERRORS = BindingResult.MODEL_KEY_PREFIX + "form";
 
     // collaborators
@@ -53,7 +50,6 @@ public class AccountProvisioningController {
     @Autowired private SubscriptionDao subscriptionDao;
     @Autowired private AccountActivationService accountActivationService;
     @Autowired private RateTranslationService rateTranslationService;
-    @Autowired private ProductGroupDao productGroupDao;
 
     // validators
     @Autowired private List<AccountRegistrationValidator> accountRegistrationValidators;
@@ -61,40 +57,7 @@ public class AccountProvisioningController {
     // formatters
     @Autowired private ConversionService conversionService;
 
-    @RequestMapping(method = RequestMethod.GET, params = { "productGroup" })
-    public String accountsPendingValidation(ModelMap model, @RequestParam("productGroup") long productGroupId) {
-        List<ProductGroup> allProductGroups = productGroupDao.all();
-        ProductGroup selectedProductGroup = allProductGroups.stream()
-                .filter(pg -> pg.getId() == productGroupId)
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("could not find product group with id " + productGroupId));
-
-        return accountsPendingValidation(model, allProductGroups, selectedProductGroup);
-    }
-
     @RequestMapping(method = RequestMethod.GET)
-    public String accountsPendingValidation(ModelMap model) {
-        List<ProductGroup> allProductGroups = productGroupDao.all();
-        ProductGroup defaultProductGroup = allProductGroups.stream()
-                .findFirst()
-                .orElseThrow(() -> new InconsistentDataException("no product groups"));
-
-        return accountsPendingValidation(model, allProductGroups, defaultProductGroup);
-    }
-
-    private String accountsPendingValidation(ModelMap model,
-                                             List<ProductGroup> allProductGroups,
-                                             ProductGroup selectedProductGroup) {
-        model.addAttribute("allProductGroups", allProductGroups);
-        model.addAttribute("productGroup", selectedProductGroup);
-        model.addAttribute("customers", customersPendingManualValidation()
-                .filter(customer -> customer.getProductGroupId() == selectedProductGroup.getId())
-                .collect(Collectors.toList()));
-
-        return "provisioning/accounts/index";
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "{id}")
     public String validate(ModelMap model, @PathVariable("id") int id, Locale locale) {
         Customer customer = customerById(id);
         CustomerAddress address = addressForCustomer(id);
@@ -153,7 +116,7 @@ public class AccountProvisioningController {
         }
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"validatePersonalAccount"})
+    @RequestMapping(method = RequestMethod.POST, params = {"validatePersonalAccount"})
     public String saveValidatedPersonalAccount(
             @PathVariable("id") int id,
             @ModelAttribute("form") PersonalAccountProvisioningForm form,
@@ -187,7 +150,7 @@ public class AccountProvisioningController {
         return "redirect:/provisioning/accounts";
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"validateBusinessAccount"})
+    @RequestMapping(method = RequestMethod.POST, params = {"validateBusinessAccount"})
     public String saveValidatedBusinessAccount(
             @PathVariable("id") int id,
             @ModelAttribute("form") BusinessAccountProvisioningForm form,
@@ -233,13 +196,9 @@ public class AccountProvisioningController {
         return "redirect:/provisioning/accounts";
     }
 
-    private Stream<Customer> customersPendingManualValidation() {
-        return customerDao.findAllPendingActivation().stream()
-                .filter(customer -> customer.getCustomerStatusIdfk() == CustomerStatus.ACTIVATION_FAILED.code());
-    }
-
     private Customer customerById(int customerId) {
-        return customersPendingManualValidation()
+        return customerDao.findAllPendingActivation()
+                .stream()
                 .filter((cust) -> cust.getCustomerId() == customerId)
                 .findFirst()
                 .orElseThrow(ResourceNotFoundException::new);

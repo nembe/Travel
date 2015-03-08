@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebAppConfiguration
-public class AccountProvisioningControllerTest extends BaseSpringTestCase {
+public class AccountProvisioningFormControllerTest extends BaseSpringTestCase {
 
     private static final String BASE = "/provisioning/accounts/";
 
@@ -49,7 +49,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
     // under test
     @Autowired WebApplicationContext wac;
-    @Autowired @InjectMocks AccountProvisioningController controller;
+    @Autowired @InjectMocks AccountProvisioningFormController controller;
 
     // spy on collaborators
     @Autowired @Spy CustomerDao customerDao;
