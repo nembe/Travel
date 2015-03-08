@@ -1,7 +1,7 @@
 package nl.yellowbrick.admin.dialect;
 
 import org.springframework.core.Ordered;
-import org.springframework.web.servlet.support.RequestContext;
+import org.springframework.web.servlet.HandlerMapping;
 import org.thymeleaf.Arguments;
 import org.thymeleaf.dom.Element;
 import org.thymeleaf.processor.attr.AbstractAttributeModifierAttrProcessor;
@@ -21,11 +21,13 @@ public class ActiveForContextAttrProcessor extends AbstractAttributeModifierAttr
 
     @Override
     protected Map<String, String> getModifiedAttributeValues(Arguments arguments, Element element, String attributeName) {
-        final String contextPath = element.getAttributeValue(attributeName);
         final Map<String, String> values = new HashMap<>();
+        final String pathToMatch = element.getAttributeValue(attributeName);
+        final String actualPath = arguments.getContext().getVariables()
+                .get(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)
+                .toString();
 
-        RequestContext requestContext = (RequestContext) arguments.getContext().getVariables().get("springRequestContext");
-        if (requestContext.getRequestUri().startsWith(contextPath)) {
+        if (actualPath.startsWith(pathToMatch)) {
             values.put("class", "active");
         }
 
