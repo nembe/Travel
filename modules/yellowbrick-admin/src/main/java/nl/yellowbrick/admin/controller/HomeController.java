@@ -10,6 +10,6 @@ public class HomeController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String index() {
-        return "redirect:/provisioning";
+        return "redirect:/provisioning/accounts";
     }
 }

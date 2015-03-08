@@ -51,6 +51,29 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     }
 
     @Override
+    public Optional<Customer> findById(long id) {
+        String sql = buildQuery(
+                "SELECT c.*,",
+                "c.productgroup_id AS product_group_id,",
+                "c.billingagentidfk AS billing_agent_id,",
+                "c.invoice_annotations AS extra_invoice_annotations,",
+                "c.phonenr_tcard AS first_card_mobile,",
+                "c.license_plate_tcard AS first_card_license_plate,",
+                "ba.agentnaam AS agentname,",
+                "cs.label AS status,",
+                "pg.description product_group,",
+                "0 as parkadammertotal",
+                "FROM CUSTOMER c",
+                "INNER JOIN PRODUCT_GROUP pg ON pg.id = c.productgroup_id",
+                "INNER JOIN TBLBILLINGAGENT ba ON c.billingagentidfk = ba.billingagentid",
+                "INNER JOIN CUSTOMERSTATUS cs ON c.customerstatusidfk = cs.customerstatusid",
+                "WHERE c.customerid = ?"
+        );
+
+        return template.query(sql, beanRowMapper(Customer.class), id).stream().findFirst();
+    }
+
+    @Override
     public List<Customer> findAllPendingActivation() {
         String sql = buildQuery(
                 "SELECT c.*,",

@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html layout:decorator="provisioning/_layout">
+<head>
+    <title>Validate Business Account</title>
+    <script type="text/javascript" charset="utf-8" th:src="@{/javascript/provisioning/accounts.js}"></script>
+</head>
+<body>
+    <div layout:fragment="content-inner">
+        <form th:object="${form}" th:action="@{#}" method="post">
+            <div class="section">
+
+                <div th:if="${#fields.hasErrors('global')}" class="global-errors">
+                    <h3>Validation errors</h3>
+                    <ul>
+                        <li th:each="err : ${#fields.errors('global')}" th:text="${err}"></li>
+                    </ul>
+                </div>
+
+                <h2>General data</h2>
+
+                <h3>Company data</h3>
+
+                <div th:replace="provisioning/accounts/_form_fields :: businessName"></div>
+
+                <div th:each="identifier,rowStat : *{businessIdentifiers}">
+                    <div class="field">
+                        <label th:for="'businessIdentifiers' + ${__${rowStat.index}__} + '.value'" class="field-label" th:text="${identifier.label}">vat number</label>
+                        <input type="text" th:field="*{businessIdentifiers[__${rowStat.index}__].value}" th:errorclass="field-error" />
+                        <input type="hidden" th:field="*{businessIdentifiers[__${rowStat.index}__].id}" />
+                        <input type="hidden" th:field="*{businessIdentifiers[__${rowStat.index}__].label}" />
+                    </div>
+                </div>
+
+                <h3>Contact person</h3>
+
+                <div th:replace="provisioning/accounts/_form_fields :: gender"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: initials"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: firstName"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: lastName"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: dateOfBirth"></div>
+
+                <h3>Contact details</h3>
+
+                <div th:replace="provisioning/accounts/_form_fields :: email"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: phoneNr"></div>
+
+                <h3>Establishment address</h3>
+
+                <div th:replace="provisioning/accounts/_form_fields :: street"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: houseNr"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: supplement"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: postalCode"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: city"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: country"></div>
+
+                <h3>Billing address</h3>
+
+                <div th:replace="provisioning/accounts/_form_fields :: billingAddressSameAsMailingAddress"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: billingAddressIsPoBox"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: billingAddressPoBox"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: billingAddressStreet"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: billingAddressHouseNr"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: billingAddressSupplement"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: billingAddressPostalCode"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: billingAddressCity"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: billingAddressCountry"></div>
+            </div>
+
+            <div class="section">
+                <h2>Membership data</h2>
+
+                <div th:replace="provisioning/accounts/_form_fields :: applicationDate"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: actionCode"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: numberOfTransponderCards"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: numberOfPPlusCards"></div>
+
+                <h2>Transponder card association data</h2>
+
+                <div th:replace="provisioning/accounts/_form_fields :: firstCardLicensePlate"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: firstCardMobile"></div>
+
+                <h3>Payment data</h3>
+
+                <div th:replace="provisioning/accounts/_form_fields :: paymentMethod"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: accountNumber"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: accountHolderName"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: cardType"></div>
+
+                <h3>Fees</h3>
+
+                <div th:replace="provisioning/accounts/_form_fields :: subscriptionStatus"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: subscriptionFee"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: registrationFee"></div>
+                <div th:replace="provisioning/accounts/_form_fields :: specialRateDescription"></div>
+            </div>
+
+            <div class="section">
+                <input type="submit" name="validateBusinessAccount" value="Submit" />
+            </div>
+        </form>
+    </div>
+</body>
+</html>

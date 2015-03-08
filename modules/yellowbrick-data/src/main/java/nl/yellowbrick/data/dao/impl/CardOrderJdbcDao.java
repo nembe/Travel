@@ -120,6 +120,27 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         return template.query(sql, cardOrderRowMapper(), status.code(), type.description());
     }
 
+    @Override
+    public List<CardOrder> findByStatus(CardOrderStatus status) {
+        String sql = "SELECT * FROM CARDORDER WHERE ORDERSTATUS = ? ORDER BY ORDERDATE DESC";
+
+        return template.query(sql, cardOrderRowMapper(), status.code());
+    }
+
+    @Override
+    public Optional<CardOrder> findById(long id) {
+        String sql = "SELECT * FROM CARDORDER WHERE ORDERID = ?";
+
+        return template.query(sql, cardOrderRowMapper(), id).stream().findFirst();
+    }
+
+    @Override
+    public void delete(long id) {
+        log.info("Deleting order id {}", id);
+
+        template.update("DELETE FROM CARDORDER WHERE ORDERID = ?", id);
+    }
+
     private RowMapper<CardOrder> cardOrderRowMapper() {
         return new RowMapper<CardOrder>() {
             @Override
@@ -127,7 +148,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                 CardOrder co = new CardOrder();
 
                 co.setId(rs.getLong("ORDERID"));
-                co.setDate(rs.getDate("ORDERDATE"));
+                co.setDate(rs.getTimestamp("ORDERDATE"));
                 co.setStatus(CardOrderStatus.byCode(rs.getInt("ORDERSTATUS")));
                 co.setCustomerId(rs.getLong("CUSTOMERID"));
                 co.setCardType(CardType.fromDescription(rs.getString("CARDTYPE")));

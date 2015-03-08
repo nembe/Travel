@@ -3,13 +3,14 @@ package nl.yellowbrick.data.dao.impl;
 import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.database.DbHelper;
 import nl.yellowbrick.data.domain.CardOrder;
+import nl.yellowbrick.data.domain.CardOrderStatus;
 import nl.yellowbrick.data.domain.CardType;
 import nl.yellowbrick.data.domain.Customer;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -18,10 +19,9 @@ import java.util.concurrent.TimeUnit;
 
 import static nl.yellowbrick.data.database.Functions.CALL_RECORDERS;
 import static nl.yellowbrick.data.database.Functions.FunctionCall;
-import static nl.yellowbrick.data.domain.CardOrderStatus.ACCEPTED;
-import static nl.yellowbrick.data.domain.CardOrderStatus.EXPORTED;
-import static nl.yellowbrick.data.domain.CardOrderStatus.INSERTED;
+import static nl.yellowbrick.data.domain.CardOrderStatus.*;
 import static nl.yellowbrick.data.domain.CardType.*;
+import static nl.yellowbrick.data.matchers.DateMatchers.after;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -85,8 +85,8 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         assertThat(firstCall.functionName, equalTo("cardOrderUpdate"));
         assertThat(firstCall.getNumericArg(0).longValue(), equalTo(72031l)); // card order id
         assertThat(firstCall.arguments[1], equalTo("2")); // STATUS_ACCEPTED
-        assertThat(firstCall.getNumericArg(2).longValue(), equalTo(0l));
-        assertThat(firstCall.getNumericArg(3).intValue(), equalTo(1));
+        assertThat(firstCall.getNumericArg(2).longValue(), equalTo(600l));
+        assertThat(firstCall.getNumericArg(3).intValue(), equalTo(2));
 
         // then calls WEBAPP.CardOrderValidate
         FunctionCall secondCall = calls.get(1);
@@ -158,19 +158,19 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
     public void returns_card_orders_per_customer() {
         CardOrder orderA = new CardOrder();
         orderA.setId(72031);
-        orderA.setDate(Date.valueOf("2010-12-23"));
+        orderA.setDate(Timestamp.valueOf("2010-12-23 16:26:39"));
         orderA.setStatus(INSERTED);
         orderA.setCustomerId(4776);
         orderA.setCardType(QPARK_CARD);
         orderA.setBriefCode("2");
-        orderA.setAmount(1);
-        orderA.setPricePerCard(0);
-        orderA.setSurcharge(0);
+        orderA.setAmount(2);
+        orderA.setPricePerCard(600);
+        orderA.setSurcharge(300);
         orderA.setExport(false);
         
         CardOrder orderB = new CardOrder();
         orderB.setId(72032);
-        orderB.setDate(Date.valueOf("2010-12-23"));
+        orderB.setDate(Timestamp.valueOf("2010-12-23 16:00:00"));
         orderB.setStatus(ACCEPTED);
         orderB.setCustomerId(4776);
         orderB.setCardType(TRANSPONDER_CARD);
@@ -226,7 +226,32 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         assertThat(cardOrderDao.findByStatusAndType(EXPORTED, RTP_CARD), empty());
     }
 
+    @Test
+    public void fetches_orders_by_status() {
+        assertThat(cardOrderDao.findByStatus(EXPORTED), empty());
+
+        updateCardStatus(CardOrderStatus.EXPORTED.code());
+
+        List<CardOrder> orders = cardOrderDao.findByStatus(EXPORTED);
+
+        assertThat(orders, hasSize(2));
+        assertThat(orders.get(0).getDate(), after(orders.get(1).getDate()));
+    }
+
+    @Test
+    public void deletes_orders_by_id() {
+        CardOrder cardOrder = cardOrderDao.findById(72031).get();
+
+        cardOrderDao.delete(cardOrder.getId());
+
+        assertThat(cardOrderDao.findById(72031).isPresent(), is(false));
+    }
+
     private void updateCardType(String cardType) {
         db.accept((template) -> template.update("UPDATE CARDORDER SET cardtype = ?", cardType));
+    }
+
+    private void updateCardStatus(int status) {
+        db.accept((template) -> template.update("UPDATE CARDORDER SET orderstatus = ?", status));
     }
 }

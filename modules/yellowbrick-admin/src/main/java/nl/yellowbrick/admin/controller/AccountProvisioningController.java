@@ -8,6 +8,7 @@ import nl.yellowbrick.admin.form.BusinessAccountProvisioningForm;
 import nl.yellowbrick.admin.form.FormData;
 import nl.yellowbrick.admin.form.PersonalAccountProvisioningForm;
 import nl.yellowbrick.admin.service.RateTranslationService;
+import nl.yellowbrick.admin.util.MessageHelper;
 import nl.yellowbrick.data.dao.*;
 import nl.yellowbrick.data.domain.*;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +37,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/provisioning")
+@RequestMapping("/provisioning/accounts")
 public class AccountProvisioningController {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccountProvisioningController.class);
@@ -61,7 +63,7 @@ public class AccountProvisioningController {
     public String pendingValidation(Model model) {
         model.addAttribute("customers", customersPendingManualValidation());
 
-        return "provisioning/index";
+        return "provisioning/accounts/index";
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "{id}")
@@ -105,8 +107,8 @@ public class AccountProvisioningController {
         });
 
         if(customer.isBusinessCustomer())
-            return "provisioning/validate_business";
-        return "provisioning/validate_personal";
+            return "provisioning/accounts/validate_business";
+        return "provisioning/accounts/validate_personal";
     }
 
     private void addPaymentData(ModelMap model, Customer customer) {
@@ -129,7 +131,8 @@ public class AccountProvisioningController {
             @ModelAttribute("form") PersonalAccountProvisioningForm form,
             BindingResult bindingResult,
             ModelMap model,
-            Locale locale) {
+            Locale locale,
+            RedirectAttributes ra) {
 
         if(bindingResult.hasErrors())
             return validate(model, id, locale);
@@ -152,7 +155,8 @@ public class AccountProvisioningController {
         // and activate customer
         accountActivationService.activateCustomerAccount(customer, priceModel);
 
-        return "redirect:/provisioning";
+        MessageHelper.flash(ra, "account.validated");
+        return "redirect:/provisioning/accounts";
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"validateBusinessAccount"})
@@ -161,7 +165,8 @@ public class AccountProvisioningController {
             @ModelAttribute("form") BusinessAccountProvisioningForm form,
             BindingResult bindingResult,
             ModelMap model,
-            Locale locale) {
+            Locale locale,
+            RedirectAttributes ra) {
 
         if(bindingResult.hasErrors())
             return validate(model, id, locale);
@@ -196,7 +201,8 @@ public class AccountProvisioningController {
         // and activate customer
         accountActivationService.activateCustomerAccount(customer, priceModel);
 
-        return "redirect:/provisioning";
+        MessageHelper.flash(ra, "account.validated");
+        return "redirect:/provisioning/accounts";
     }
 
     private List<Customer> customersPendingManualValidation() {
