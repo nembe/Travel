@@ -1,7 +1,5 @@
 package nl.yellowbrick.data.dao.impl;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import nl.yellowbrick.data.audit.Mutator;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
@@ -19,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,33 +52,6 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     @Override
     public void saveSpecialTarifIfApplicable(Customer customer) {
         saveSpecialTarifCall.execute(customer.getCustomerId());
-    }
-
-    @Override
-    public void validateCardOrders(Customer customer) {
-        String sql = Joiner.on(' ').join(ImmutableList.of(
-                "SELECT co.ORDERID, co.ORDERDATE, c.BUSINESS, c.LASTNAME, co.CARDTYPE, co.AMOUNT, co.PRICEPERCARD",
-                "FROM CARDORDER co",
-                "INNER JOIN CUSTOMER c ON c.CUSTOMERID = co.CUSTOMERID",
-                "WHERE co.ORDERSTATUS = ?",
-                "AND co.CARDTYPE != ? ",
-                "AND co.CUSTOMERID = ? "
-        ));
-
-        RowCallbackHandler processCardOrder = (rs) -> {
-            double pricePerCard = rs.getDouble("PricePerCard");
-            double orderid = rs.getDouble("OrderId");
-
-            int amount = new Double(rs.getDouble("Amount")).intValue();
-
-            saveAndAcceptCardOrder(orderid, pricePerCard, amount);
-
-            CardType cardType = CardType.fromDescription(rs.getString("CardType"));
-            validateCardOrder(orderid, cardType.code());
-        };
-
-        template.query(sql, processCardOrder,
-                CardOrderStatus.INSERTED.code(), CardType.SLEEVE.description(), customer.getCustomerId());
     }
 
     @Override
@@ -121,35 +93,10 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                 updateMobileWithCard ? 1 : 0);
     }
 
-    private RowMapper<CardOrder> cardOrderRowMapper() {
-        return new RowMapper<CardOrder>() {
-            @Override
-            public CardOrder mapRow(ResultSet rs, int rowNum) throws SQLException {
-                CardOrder co = new CardOrder();
+    public void validateCardOrder(CardOrder cardOrder) {
+        acceptCardOrder(cardOrder.getId(), cardOrder.getPricePerCard(), cardOrder.getAmount());
 
-                co.setId(rs.getLong("ORDERID"));
-                co.setDate(rs.getDate("ORDERDATE"));
-                co.setStatus(CardOrderStatus.byCode(rs.getInt("ORDERSTATUS")));
-                co.setCustomerId(rs.getLong("CUSTOMERID"));
-                co.setCardType(CardType.fromDescription(rs.getString("CARDTYPE")));
-                co.setBriefCode(rs.getString("BRIEFCODE"));
-                co.setAmount(rs.getInt("AMOUNT"));
-                co.setPricePerCard(rs.getDouble("PRICEPERCARD"));
-                co.setSurcharge(rs.getDouble("SURCHARGE"));
-                co.setExport(rs.getString("EXPORT").equals("Y"));
-                co.setCardNumber(rs.getString("CARD_NUMBER"));
-
-                return co;
-            }
-        };
-    }
-
-    private void saveAndAcceptCardOrder(double orderId, double pricePerCard, int amount) {
-        cardOrderUpdateCall.execute(orderId, CardOrderStatus.ACCEPTED.code(), pricePerCard, amount);
-    }
-
-    private void validateCardOrder(double orderId, String typeOfCard) {
-        Map<String, Object> res = cardOrderValidateCall.execute(orderId, typeOfCard);
+        Map<String, Object> res = cardOrderValidateCall.execute(cardOrder.getId(), cardOrder.getCardType().code());
         String returnStr = res.get("Return_out").toString();
 
         Runnable logUnmetExpectation = () -> {
@@ -162,6 +109,70 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         } catch(NumberFormatException e) {
             logUnmetExpectation.run();
         }
+    }
+
+    @Override
+    public List<CardOrder> findByStatusAndType(CardOrderStatus status, CardType type) {
+        String sql = "SELECT * FROM CARDORDER " +
+                "WHERE ORDERSTATUS = ? " +
+                "AND UPPER(CARDTYPE) = UPPER(?)";
+
+        return template.query(sql, cardOrderRowMapper(), status.code(), type.description());
+    }
+
+    @Override
+    public List<CardOrder> findByStatus(CardOrderStatus status) {
+        String sql = "SELECT * FROM CARDORDER WHERE ORDERSTATUS = ? ORDER BY ORDERDATE DESC";
+
+        return template.query(sql, cardOrderRowMapper(), status.code());
+    }
+
+    @Override
+    public Optional<CardOrder> findById(long id) {
+        String sql = "SELECT * FROM CARDORDER WHERE ORDERID = ?";
+
+        return template.query(sql, cardOrderRowMapper(), id).stream().findFirst();
+    }
+
+    @Override
+    public void delete(long id) {
+        log.info("Deleting order id {}", id);
+
+        template.update("DELETE FROM CARDORDER WHERE ORDERID = ?", id);
+    }
+
+    private RowMapper<CardOrder> cardOrderRowMapper() {
+        return new RowMapper<CardOrder>() {
+            @Override
+            public CardOrder mapRow(ResultSet rs, int rowNum) throws SQLException {
+                CardOrder co = new CardOrder();
+
+                co.setId(rs.getLong("ORDERID"));
+                co.setDate(rs.getTimestamp("ORDERDATE"));
+                co.setStatus(CardOrderStatus.byCode(rs.getInt("ORDERSTATUS")));
+                co.setCustomerId(rs.getLong("CUSTOMERID"));
+                co.setCardType(CardType.fromDescription(rs.getString("CARDTYPE")));
+                co.setBriefCode(rs.getString("BRIEFCODE"));
+                co.setAmount(rs.getInt("AMOUNT"));
+                co.setPricePerCard(rs.getDouble("PRICEPERCARD"));
+                co.setSurcharge(rs.getDouble("SURCHARGE"));
+                co.setExport("Y".equals(rs.getString("EXPORT")));
+                co.setCardNumber(rs.getString("CARD_NUMBER"));
+
+                return co;
+            }
+        };
+    }
+
+    private void acceptCardOrder(double orderId, double pricePerCard, int amount) {
+        cardOrderUpdateCall.execute(orderId, CardOrderStatus.ACCEPTED.code(), pricePerCard, amount);
+    }
+
+    @Override
+    public void validateCardOrders(Customer customer, CardType... cardTypes) {
+        Arrays.asList(cardTypes).forEach((cardType) -> {
+            findForCustomer(customer, CardOrderStatus.INSERTED, cardType).forEach(this::validateCardOrder);
+        });
     }
 
     private void compileJdbcCalls() {

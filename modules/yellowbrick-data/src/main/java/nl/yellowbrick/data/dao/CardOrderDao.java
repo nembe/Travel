@@ -10,13 +10,23 @@ import java.util.Optional;
 
 public interface CardOrderDao {
 
-    public void saveSpecialTarifIfApplicable(Customer customer);
+    void saveSpecialTarifIfApplicable(Customer customer);
 
-    public void validateCardOrders(Customer customer);
+    void validateCardOrder(CardOrder cardOrder);
 
-    public List<String> nextTransponderCardNumbers(int productGroupId, int numberOfCards, Optional<String> lastUsedCardNumber);
+    void validateCardOrders(Customer customer, CardType... cardTypes);
 
-    public List<CardOrder> findForCustomer(Customer customer, CardOrderStatus orderStatus, CardType cardType);
+    List<String> nextTransponderCardNumbers(int productGroupId, int numberOfCards, Optional<String> lastUsedCardNumber);
 
-    public void processTransponderCard(String cardNumber, Customer customer, boolean updateMobileWithCard);
+    List<CardOrder> findForCustomer(Customer customer, CardOrderStatus orderStatus, CardType cardType);
+
+    void processTransponderCard(String cardNumber, Customer customer, boolean updateMobileWithCard);
+
+    List<CardOrder> findByStatusAndType(CardOrderStatus status, CardType cardType);
+
+    List<CardOrder> findByStatus(CardOrderStatus status);
+
+    Optional<CardOrder> findById(long id);
+
+    void delete(long id);
 }

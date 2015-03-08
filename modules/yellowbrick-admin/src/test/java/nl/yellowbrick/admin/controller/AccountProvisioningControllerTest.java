@@ -41,6 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
+    private static final String BASE = "/provisioning/accounts/";
+
     // ids of customers pending manual validation
     private static final long PRIVATE_CUSTOMER_ID = 394744;
     private static final long BUSINESS_CUSTOMER_ID = 398734;
@@ -67,14 +69,14 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
     @Test
     public void returns_404_if_customer_id_not_found() throws Exception {
-        mockMvc.perform(get("/provisioning/12345")).andExpect(status().is(404));
+        mockMvc.perform(get(BASE + "12345")).andExpect(status().is(404));
     }
 
     @Test
     public void returns_409_if_customer_address_not_found() throws Exception {
         db.truncateTable("CUSTOMERADDRESS");
 
-        mockMvc.perform(get("/provisioning/" + PRIVATE_CUSTOMER_ID)).andExpect(status().is(409));
+        mockMvc.perform(get(BASE + PRIVATE_CUSTOMER_ID)).andExpect(status().is(409));
     }
 
     @Test
@@ -82,7 +84,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
         // make use of the age restriction to check validations
         db.accept((t) -> t.update("UPDATE CUSTOMER SET DATEOFBIRTH = NULL WHERE CUSTOMERID = ?", PRIVATE_CUSTOMER_ID));
 
-        MvcResult res = mockMvc.perform(get("/provisioning/" + PRIVATE_CUSTOMER_ID)).andReturn();
+        MvcResult res = mockMvc.perform(get(BASE + PRIVATE_CUSTOMER_ID)).andReturn();
 
         assertThat(res.getResponse().getStatus(), equalTo(200));
         assertThat(res.getResponse().getContentAsString(), containsString("must be specified"));
@@ -90,7 +92,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
     @Test
     public void shows_iban_if_direct_debit() throws Exception {
-        MvcResult res = mockMvc.perform(get("/provisioning/" + PRIVATE_CUSTOMER_ID)).andReturn();
+        MvcResult res = mockMvc.perform(get(BASE + PRIVATE_CUSTOMER_ID)).andReturn();
 
         assertThat(res.getResponse().getContentAsString(), containsString("NL39 RABO 0300 0652 64"));
     }
@@ -102,14 +104,14 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
             t.update("UPDATE CUSTOMER SET BILLINGAGENTIDFK = ? WHERE CUSTOMERID = ?", 601, PRIVATE_CUSTOMER_ID);
         });
 
-        MvcResult res = mockMvc.perform(get("/provisioning/" + PRIVATE_CUSTOMER_ID)).andReturn();
+        MvcResult res = mockMvc.perform(get(BASE + PRIVATE_CUSTOMER_ID)).andReturn();
 
         assertThat(res.getResponse().getContentAsString(), containsString("Visa"));
     }
 
     @Test
     public void shows_transponder_card_association_data() throws Exception {
-        MvcResult res = mockMvc.perform(get("/provisioning/" + PRIVATE_CUSTOMER_ID)).andReturn();
+        MvcResult res = mockMvc.perform(get(BASE + PRIVATE_CUSTOMER_ID)).andReturn();
 
         assertThat(res.getResponse().getContentAsString(), containsString("0616545500"));
         assertThat(res.getResponse().getContentAsString(), containsString("27-HZZ-9"));
@@ -132,14 +134,14 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
     @Test
     public void shows_different_form_for_business_accounts() throws Exception {
-        MvcResult res = mockMvc.perform(get("/provisioning/" + BUSINESS_CUSTOMER_ID)).andReturn();
+        MvcResult res = mockMvc.perform(get(BASE + BUSINESS_CUSTOMER_ID)).andReturn();
 
-        assertThat(res.getModelAndView().getViewName(), is("provisioning/validate_business"));
+        assertThat(res.getModelAndView().getViewName(), is("provisioning/accounts/validate_business"));
     }
 
     @Test
     public void loads_private_customer_data() throws Exception {
-        MvcResult res = mockMvc.perform(get("/provisioning/" + PRIVATE_CUSTOMER_ID)).andReturn();
+        MvcResult res = mockMvc.perform(get(BASE + PRIVATE_CUSTOMER_ID)).andReturn();
 
         Document html = Jsoup.parse(res.getResponse().getContentAsString());
 
@@ -161,7 +163,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
     @Test
     public void loads_business_customer_data() throws Exception {
-        MvcResult res = mockMvc.perform(get("/provisioning/" + BUSINESS_CUSTOMER_ID)).andReturn();
+        MvcResult res = mockMvc.perform(get(BASE + BUSINESS_CUSTOMER_ID)).andReturn();
 
         Document html = Jsoup.parse(res.getResponse().getContentAsString());
 
@@ -250,11 +252,11 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
 
     @Test
     public void shows_subscription_status() throws Exception {
-        mockMvc.perform(get("/provisioning/" + PRIVATE_CUSTOMER_ID)).andExpect(content().string(containsString(
+        mockMvc.perform(get(BASE + PRIVATE_CUSTOMER_ID)).andExpect(content().string(containsString(
                 "Subscription active"
         )));
 
-        mockMvc.perform(get("/provisioning/" + BUSINESS_CUSTOMER_ID)).andExpect(content().string(containsString(
+        mockMvc.perform(get(BASE + BUSINESS_CUSTOMER_ID)).andExpect(content().string(containsString(
                 "Subscription inactive"
         )));
     }
@@ -304,7 +306,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
     }
 
     private MockHttpServletRequestBuilder postPersonalAccountProvisioningForm() throws Exception {
-        return post("/provisioning/" + PRIVATE_CUSTOMER_ID)
+        return post("/provisioning/accounts/" + PRIVATE_CUSTOMER_ID)
                 .param("email", "some.other.email@test.com")
                 .param("street", "middle of nowhere")
                 .param("numberOfPPlusCards", "2")
@@ -313,7 +315,7 @@ public class AccountProvisioningControllerTest extends BaseSpringTestCase {
     }
 
     private MockHttpServletRequestBuilder postBusinessAccountProvisioningForm() throws Exception  {
-        return post("/provisioning/" + BUSINESS_CUSTOMER_ID)
+        return post("/provisioning/accounts/" + BUSINESS_CUSTOMER_ID)
                 .param("businessName", "ACME inc")
                 .param("email", "ceo@business.com")
                 .param("street", "North Orange")

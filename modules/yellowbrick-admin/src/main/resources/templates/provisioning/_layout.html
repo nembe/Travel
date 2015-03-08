@@ -1,19 +1,22 @@
 <!DOCTYPE HTML>
 <html layout:decorator="layouts/_default">
 <head>
-    <script type="text/javascript" charset="utf-8" th:src="@{/javascript/provisioning.js}"></script>
 </head>
 <body>
     <div layout:fragment="content">
         <div id="main-menu">
             <ul>
                 <li>
-                    <a th:href="@{/provisioning}">PENDING VALIDATION</a>
+                    <a th:href="@{/provisioning/cards}" bw:activeforctx="/provisioning/cards">CARD ORDER VALIDATION</a>
+                </li>
+                <li>
+                    <a th:href="@{/provisioning/accounts}" bw:activeforctx="/provisioning/accounts">ACCOUNT VALIDATION</a>
                 </li>
             </ul>
         </div>
 
         <div class="main-body">
+            <div th:replace="snippets/_flash :: flash"></div>
             <div layout:fragment="content-inner"></div>
         </div>
     </div>

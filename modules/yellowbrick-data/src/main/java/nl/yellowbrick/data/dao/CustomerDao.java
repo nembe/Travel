@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface CustomerDao {
 
+    Optional<Customer> findById(long id);
+
     List<Customer> findAllPendingActivation();
 
     List<Customer> findAllByFuzzyNameAndDateOfBirth(String firstName, String lastName, Date dateOfBirth);

@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html layout:decorator="provisioning/_layout">
+<head>
+    <title>Validate Card Order</title>
+    <script type="text/javascript" charset="utf-8" th:src="@{/javascript/provisioning/cards.js}"></script>
+</head>
+<body>
+    <div layout:fragment="content-inner">
+        <form th:object="${form}" th:action="@{#}" method="post">
+            <div class="section">
+
+                <div th:if="${#fields.hasErrors('global')}" class="global-errors">
+                    <h3>Validation errors</h3>
+                    <ul>
+                        <li th:each="err : ${#fields.errors('global')}" th:text="${err}"></li>
+                    </ul>
+                </div>
+
+                <div class="field">
+                    <span class="field-label">Card type</span>
+                    <span class="field-value" name="cardType" th:text="${order.cardType}"></span>
+                </div>
+
+                <div class="field">
+                    <span class="field-label">Order date</span>
+                    <span class="field-value" name="orderDate" th:text="${order.date}"></span>
+                </div>
+
+                <div class="field">
+                    <span class="field-label">Business customer</span>
+                    <span class="field-value" name="businessCustomer" th:text="${customer.businessCustomer}"></span>
+                </div>
+
+                <div class="field">
+                    <span class="field-label">Customer name</span>
+                    <span class="field-value" name="customerName" th:text="${customer.fullName}"></span>
+                </div>
+
+                <div class="field">
+                    <span class="field-label">Export order</span>
+                    <input type="radio" th:field="*{export}" th:value="true" />
+                    <label th:for="${#ids.prev('export')}">Yes</label>
+                    <input type="radio" th:field="*{export}" th:value="false" />
+                    <label th:for="${#ids.prev('export')}">No</label>
+                </div>
+
+                <div class="field">
+                    <label for="amount" class="field-label">Amount ordered</label>
+                    <select th:field="*{amount}" th:errorclass="field-error">
+                        <option th:each="n : ${#numbers.sequence(1,20)}" th:value="${n}" th:text="${n}"/>
+                    </select>
+                    <span class="field-error" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></span>
+                </div>
+
+                <div class="field">
+                    <label for="pricePerCard" class="field-label">Price per card</label>
+                    <input type="text" th:field="*{pricePerCard}" th:errorclass="field-error"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('pricePerCard')}" th:errors="*{pricePerCard}"></span>
+                </div>
+
+                <div class="field">
+                    <label for="surcharge" class="field-label">Surcharge</label>
+                    <input type="text" th:field="*{surcharge}" th:errorclass="field-error"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('surcharge')}" th:errors="*{surcharge}"></span>
+                </div>
+            </div>
+
+            <div class="section">
+                <input type="submit" name="validateCardOrder" value="Validate" />
+                <input type="submit" name="deleteCardOrder" value="Delete"/>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

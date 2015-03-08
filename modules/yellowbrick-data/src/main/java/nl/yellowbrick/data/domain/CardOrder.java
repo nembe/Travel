@@ -1,5 +1,7 @@
 package nl.yellowbrick.data.domain;
 
+import com.google.common.base.MoreObjects;
+
 import java.util.Date;
 
 public class CardOrder {
@@ -144,5 +146,22 @@ public class CardOrder {
         result = 31 * result + (export ? 1 : 0);
         result = 31 * result + (cardNumber != null ? cardNumber.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("date", date)
+                .add("status", status)
+                .add("customerId", customerId)
+                .add("cardType", cardType)
+                .add("briefCode", briefCode)
+                .add("amount", amount)
+                .add("pricePerCard", pricePerCard)
+                .add("surcharge", surcharge)
+                .add("export", export)
+                .add("cardNumber", cardNumber)
+                .toString();
     }
 }
