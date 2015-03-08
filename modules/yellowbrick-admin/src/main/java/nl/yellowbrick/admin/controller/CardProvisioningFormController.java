@@ -9,9 +9,7 @@ import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,14 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static nl.yellowbrick.data.domain.CardOrderStatus.INSERTED;
 
 @Controller
-@RequestMapping("/provisioning/cards")
-public class CardProvisioningController {
+@RequestMapping("/provisioning/cards/{id}")
+public class CardProvisioningFormController {
 
     @Autowired
     private CardOrderDao cardOrderDao;
@@ -35,22 +30,7 @@ public class CardProvisioningController {
     @Autowired
     private CustomerDao customerDao;
 
-    @Autowired
-    private MessageSource messageSource;
-
     @RequestMapping(method = RequestMethod.GET)
-    public String pendingValidation(Model model) {
-        List<CardOrderListItem> orderList = cardOrderDao.findByStatus(INSERTED)
-                .stream()
-                .map(this::toListItem)
-                .collect(Collectors.toList());
-
-        model.addAttribute("orders", orderList);
-
-        return "provisioning/cards/index";
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "{id}")
     public String showValidationForm(ModelMap model, @PathVariable("id") int id) {
         CardOrder cardOrder = order(id);
 
@@ -69,7 +49,7 @@ public class CardProvisioningController {
         return "provisioning/cards/validate_order";
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"validateCardOrder"})
+    @RequestMapping(method = RequestMethod.POST, params = {"validateCardOrder"})
     public String validateCardOrder(@PathVariable("id") int id,
                                     @ModelAttribute("form") CardOrderValidationForm form,
                                     BindingResult bindingResult,
@@ -90,7 +70,7 @@ public class CardProvisioningController {
         return "redirect:/provisioning/cards";
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"deleteCardOrder"})
+    @RequestMapping(method = RequestMethod.POST, params = {"deleteCardOrder"})
     public String deleteCardOrder(@PathVariable("id") int id, RedirectAttributes ra) {
         cardOrderDao.delete(id);
 
@@ -108,28 +88,5 @@ public class CardProvisioningController {
 
     private CardOrder order(long orderId) {
         return cardOrderDao.findById(orderId).orElseThrow(ResourceNotFoundException::new);
-    }
-
-    private CardOrderListItem toListItem(CardOrder cardOrder) {
-        return new CardOrderListItem(cardOrder, customerForOrder(cardOrder));
-    }
-
-    private class CardOrderListItem {
-
-        private final CardOrder order;
-        private final Customer customer;
-
-        private CardOrderListItem(CardOrder cardOrder, Customer customer) {
-            this.order = cardOrder;
-            this.customer = customer;
-        }
-
-        public CardOrder getOrder() {
-            return order;
-        }
-
-        public Customer getCustomer() {
-            return customer;
-        }
     }
 }
