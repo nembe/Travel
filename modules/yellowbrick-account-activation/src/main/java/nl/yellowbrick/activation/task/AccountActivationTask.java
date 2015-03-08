@@ -1,4 +1,4 @@
-package nl.yellowbrick.activation.bootstrap;
+package nl.yellowbrick.activation.task;
 
 import com.google.common.base.Strings;
 import nl.yellowbrick.activation.service.AccountActivationService;
@@ -14,7 +14,6 @@ import nl.yellowbrick.data.errors.ActivationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.DataBinder;
 
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@EnableScheduling
 public class AccountActivationTask {
 
     private static final Logger log = LoggerFactory.getLogger(AccountActivationTask.class);
@@ -45,7 +43,7 @@ public class AccountActivationTask {
         this.accountRegistrationValidators = validators;
     }
 
-    @Scheduled(fixedDelayString = "${activation.delay}")
+    @Scheduled(fixedDelayString = "${tasks.customer-activation-delay}")
     public void validateAndActivateAccounts()  {
         log.debug("starting validateAndActivateAccounts");
 
