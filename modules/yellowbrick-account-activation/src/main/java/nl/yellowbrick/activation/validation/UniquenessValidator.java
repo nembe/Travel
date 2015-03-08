@@ -5,12 +5,14 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.Customer;
-import nl.yellowbrick.data.domain.CustomerStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
 import java.util.List;
+
+import static nl.yellowbrick.data.domain.CustomerStatus.ACTIVATION_FAILED;
+import static nl.yellowbrick.data.domain.CustomerStatus.REGISTERED;
 
 /**
  * Attempts to determine whether new customer account might be a duplicate of existing account
@@ -48,7 +50,6 @@ public class UniquenessValidator extends AccountRegistrationValidator {
     }
 
     private Predicate<Customer> activatedCustomers() {
-        return (cust) -> cust.getCustomerStatusIdfk() != CustomerStatus.ACTIVATION_FAILED.code()
-                && cust.getCustomerStatusIdfk() != CustomerStatus.REGISTERED.code();
+        return (cust) -> cust.getStatus() != ACTIVATION_FAILED && cust.getStatus() != REGISTERED;
     }
 }

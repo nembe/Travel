@@ -46,7 +46,7 @@ public class UniquenessValidatorTest extends BaseSpringTestCase {
     public void invalidates_match_on_name_and_date_of_birth() {
         mockQueryByNameAndDob();
 
-        customer.setCustomerStatusIdfk(CustomerStatus.ACTIVE.code());
+        customer.setStatus(CustomerStatus.ACTIVE);
 
         invokeValidator();
 
@@ -57,11 +57,11 @@ public class UniquenessValidatorTest extends BaseSpringTestCase {
     public void ignores_pre_active_results() {
         mockQueryByNameAndDob();
 
-        customer.setCustomerStatusIdfk(CustomerStatus.REGISTERED.code());
+        customer.setStatus(CustomerStatus.REGISTERED);
         invokeValidator();
         assertThat(errors.getAllErrors(), empty());
 
-        customer.setCustomerStatusIdfk(CustomerStatus.ACTIVATION_FAILED.code());
+        customer.setStatus(CustomerStatus.ACTIVATION_FAILED);
         invokeValidator();
         assertThat(errors.getAllErrors(), empty());
     }
@@ -70,7 +70,7 @@ public class UniquenessValidatorTest extends BaseSpringTestCase {
     public void invalidates_match_on_email() {
         when(customerDao.findAllByEmail(eq(customer.getEmail()))).thenReturn(Arrays.asList(customer));
 
-        customer.setCustomerStatusIdfk(CustomerStatus.ACTIVE.code());
+        customer.setStatus(CustomerStatus.ACTIVE);
         invokeValidator();
 
         assertThat(errors.getFieldError("email").getCode(), equalTo("errors.duplicate"));

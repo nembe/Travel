@@ -136,7 +136,7 @@ public class AccountActivationTaskTest {
 
     private Customer testCustomer() {
         Customer customer = new Customer();
-        customer.setCustomerStatusIdfk(CustomerStatus.REGISTERED.code());
+        customer.setStatus(CustomerStatus.REGISTERED);
         customer.setActionCode("BOOYAKASHA");
 
         return customer;
