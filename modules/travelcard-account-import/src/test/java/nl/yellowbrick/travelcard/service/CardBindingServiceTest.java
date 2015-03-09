@@ -47,9 +47,10 @@ public class CardBindingServiceTest {
         AnnotationDefinition def = new AnnotationDefinition();
 
         when(transponderCardDao.createCard(card)).thenReturn(card);
+        when(transponderCardDao.findByCardNumber(any())).thenReturn(Optional.empty());
         when(annotationDao.findDefinition(mainAccountId, "Travelcard nummer", TRANSPONDER_CARD)).thenReturn(Optional.of(def));
 
-        assertThat(cardBindingService.createTransponderCard(entry), is(card));
+        assertThat(cardBindingService.assignActiveTransponderCard(entry), is(card));
     }
 
     @Test
@@ -60,9 +61,10 @@ public class CardBindingServiceTest {
         AnnotationDefinition def = new AnnotationDefinition();
 
         when(transponderCardDao.createCard(any())).thenReturn(card);
+        when(transponderCardDao.findByCardNumber(any())).thenReturn(Optional.empty());
         when(annotationDao.findDefinition(mainAccountId, "Travelcard nummer", TRANSPONDER_CARD)).thenReturn(Optional.of(def));
 
-        cardBindingService.createTransponderCard(new WhitelistEntry("1111", "AA-BB-CC"));
+        cardBindingService.assignActiveTransponderCard(new WhitelistEntry("1111", "AA-BB-CC"));
 
         verify(annotationDao).createAnnotationValue(def, 123l, "1111");
     }
@@ -80,12 +82,40 @@ public class CardBindingServiceTest {
         def.setFreeInput(true);
 
         when(transponderCardDao.createCard(any())).thenReturn(card);
+        when(transponderCardDao.findByCardNumber(any())).thenReturn(Optional.empty());
         when(annotationDao.findDefinition(mainAccountId, "Travelcard nummer", TRANSPONDER_CARD)).thenReturn(Optional.empty());
         when(annotationDao.createAnnotationDefinition(any())).thenReturn(def);
 
-        cardBindingService.createTransponderCard(new WhitelistEntry("1111", "AA-BB-CC"));
+        cardBindingService.assignActiveTransponderCard(new WhitelistEntry("1111", "AA-BB-CC"));
 
         verify(annotationDao).createAnnotationDefinition(def);
         verify(annotationDao).createAnnotationValue(def, 123l, "1111");
+    }
+
+    @Test
+    public void reactivates_transponder_card_if_one_already_exists() {
+        WhitelistEntry entry = new WhitelistEntry("1111", "AA-BB-CC");
+        TransponderCard existingCard = new TransponderCard();
+        existingCard.setId(123l);
+        existingCard.setCardNumber("1111");
+        existingCard.setCustomerId(mainAccountId);
+
+        when(transponderCardDao.findByCardNumber(any())).thenReturn(Optional.of(existingCard));
+
+        assertThat(cardBindingService.assignActiveTransponderCard(entry), is(existingCard));
+
+        verify(transponderCardDao, atLeastOnce()).findByCardNumber(existingCard.getCardNumber());
+        verify(transponderCardDao).activateCard(existingCard.getId());
+        verifyNoMoreInteractions(transponderCardDao);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void raises_exception_if_matched_cards_is_associated_to_different_customer() {
+        TransponderCard existingCard = new TransponderCard();
+        existingCard.setCustomerId(mainAccountId + 1); // associated to different customer
+
+        when(transponderCardDao.findByCardNumber(any())).thenReturn(Optional.of(existingCard));
+
+        cardBindingService.assignActiveTransponderCard(new WhitelistEntry("1111", "AA-BB-CC"));
     }
 }

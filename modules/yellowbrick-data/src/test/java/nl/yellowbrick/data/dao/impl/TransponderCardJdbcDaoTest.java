@@ -19,6 +19,7 @@ import static org.junit.Assert.assertThat;
 public class TransponderCardJdbcDaoTest extends BaseSpringTestCase {
 
     public static final long CARD_ID = 222005;
+    public static final String CARD_NUMBER = "278577";
 
     @Autowired
     TransponderCardJdbcDao dao;
@@ -28,19 +29,16 @@ public class TransponderCardJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void fetches_card_by_id() {
-        TransponderCard card = new TransponderCard();
-        card.setId(CARD_ID);
-        card.setCardNumber("278577");
-        card.setCustomerId(398744);
-        card.setStatus(CardStatus.ACTIVE);
-        card.setLicenseplate("39-LB-40");
-        card.setCountry("NL");
-        card.setMutationDate(Timestamp.from(Instant.parse("2014-12-14T19:04:22.000Z")));
-        card.setMutator("ADMIN:ron");
-
         TransponderCard actualCard = dao.findById(CARD_ID).get();
 
-        assertThat(actualCard, equalTo(card));
+        assertThat(actualCard, equalTo(testCard()));
+    }
+
+    @Test
+    public void fetches_card_by_card_number() {
+        TransponderCard actualCard = dao.findByCardNumber(CARD_NUMBER).get();
+
+        assertThat(actualCard, equalTo(testCard()));
     }
 
     @Test
@@ -81,5 +79,30 @@ public class TransponderCardJdbcDaoTest extends BaseSpringTestCase {
         TransponderCard card = dao.findById(CARD_ID).get();
 
         assertThat(card.getStatus(), is(CardStatus.INACTIVE));
+    }
+
+    @Test
+    public void sets_card_as_active() {
+        db.accept(t -> t.update("update transpondercard set cardstatusidfk = ?", CardStatus.INACTIVE.code()));
+
+        assertThat(dao.findById(CARD_ID).get().getStatus(), is(CardStatus.INACTIVE));
+
+        dao.activateCard(CARD_ID);
+
+        assertThat(dao.findById(CARD_ID).get().getStatus(), is(CardStatus.ACTIVE));
+    }
+
+    private TransponderCard testCard() {
+        TransponderCard card = new TransponderCard();
+        card.setId(CARD_ID);
+        card.setCardNumber(CARD_NUMBER);
+        card.setCustomerId(398744);
+        card.setStatus(CardStatus.ACTIVE);
+        card.setLicenseplate("39-LB-40");
+        card.setCountry("NL");
+        card.setMutationDate(Timestamp.from(Instant.parse("2014-12-14T19:04:22.000Z")));
+        card.setMutator("ADMIN:ron");
+
+        return card;
     }
 }

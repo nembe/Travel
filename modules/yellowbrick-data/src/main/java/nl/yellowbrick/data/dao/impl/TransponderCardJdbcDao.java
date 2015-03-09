@@ -55,10 +55,24 @@ public class TransponderCardJdbcDao implements TransponderCardDao {
     }
 
     @Override
+    public Optional<TransponderCard> findByCardNumber(String cardNumber) {
+        String sql = "select * from transpondercard where cardnr = ?";
+
+        return template.query(sql, rowMapper(), cardNumber).stream().findFirst();
+    }
+
+    @Override
     public void cancelCard(long transponderCardId) {
         String sql = "update transpondercard set cardstatusidfk = ? where transpondercardid = ?";
 
         template.update(sql, CardStatus.INACTIVE.code(), transponderCardId);
+    }
+
+    @Override
+    public void activateCard(long transponderCardId) {
+        String sql = "update transpondercard set cardstatusidfk = ? where transpondercardid = ?";
+
+        template.update(sql, CardStatus.ACTIVE.code(), transponderCardId);
     }
 
     private RowMapper<TransponderCard> rowMapper() {

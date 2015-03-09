@@ -103,7 +103,7 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
             importDao.updateEntry(existingEntry);
             cardBindingService.updateLicensePlate(existingEntry);
         } else {
-            TransponderCard card = cardBindingService.createTransponderCard(entry);
+            TransponderCard card = cardBindingService.assignActiveTransponderCard(entry);
             entry.setTransponderCardId(card.getId());
 
             importDao.createEntry(entry);

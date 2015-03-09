@@ -12,5 +12,9 @@ public interface TransponderCardDao {
 
     Optional<TransponderCard> findById(Long id);
 
+    Optional<TransponderCard> findByCardNumber(String cardNumber);
+
     void cancelCard(long transponderCardId);
+
+    void activateCard(long transponderCardId);
 }

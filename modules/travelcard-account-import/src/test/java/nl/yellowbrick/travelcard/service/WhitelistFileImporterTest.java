@@ -63,7 +63,7 @@ public class WhitelistFileImporterTest {
         testFile = placeTestFile();
 
         // just set some ID when creating a card
-        when(cardBindingService.createTransponderCard(any())).thenReturn(EXAMPLE_CARD);
+        when(cardBindingService.assignActiveTransponderCard(any())).thenReturn(EXAMPLE_CARD);
     }
 
     @Test(expected = IOException.class)
@@ -131,7 +131,7 @@ public class WhitelistFileImporterTest {
 
         InOrder inOrder = inOrder(importDao, cardBindingService, systemUserDao);
         inOrder.verify(importDao).markAllAsObsolete();
-        inOrder.verify(cardBindingService).createTransponderCard(expectedEntry);
+        inOrder.verify(cardBindingService).assignActiveTransponderCard(expectedEntry);
         inOrder.verify(importDao).createEntry(expectedEntry);
         inOrder.verify(systemUserDao).createAppUser(EXAMPLE_CARD, expectedUsername, expectedPassword, RESTRICTED_SUBACCOUNT);
         inOrder.verify(importDao).deleteAllObsolete();

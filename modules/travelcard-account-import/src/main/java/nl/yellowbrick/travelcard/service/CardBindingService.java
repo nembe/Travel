@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 import static nl.yellowbrick.data.domain.AnnotationType.TRANSPONDER_CARD;
 
 @Component
@@ -39,7 +41,14 @@ public class CardBindingService {
         transponderCardDao.updateLicensePlate(entry.getTransponderCardId(), entry.getLicensePlate());
     }
 
-    public TransponderCard createTransponderCard(WhitelistEntry entry) {
+    public TransponderCard assignActiveTransponderCard(WhitelistEntry entry) {
+        String cardNr = entry.getTravelcardNumber();
+        Optional<TransponderCard> maybeCard = transponderCardDao.findByCardNumber(cardNr);
+
+        return maybeCard.isPresent() ? assignExistingCard(maybeCard.get(), entry) : assignNewCard(entry);
+    }
+
+    private TransponderCard assignNewCard(WhitelistEntry entry) {
         TransponderCard card = new TransponderCard();
         card.setCustomerId(mainAccountId);
         card.setCardNumber(entry.getTravelcardNumber());
@@ -51,6 +60,19 @@ public class CardBindingService {
         annotateCardWithTravelcardNumber(card, entry.getTravelcardNumber());
 
         return card;
+    }
+
+    private TransponderCard assignExistingCard(TransponderCard card, WhitelistEntry entry) {
+        if(card.getCustomerId() != mainAccountId) {
+            String err = String.format("Travelcard number %s matches card belonging to customer id %s",
+                    entry.getTravelcardNumber(),
+                    card.getCustomerId());
+            throw new IllegalStateException(err);
+        }
+
+        transponderCardDao.activateCard(card.getId());
+
+        return transponderCardDao.findByCardNumber(card.getCardNumber()).get();
     }
 
     private void annotateCardWithTravelcardNumber(TransponderCard card, String tcNumber) {
