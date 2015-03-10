@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -21,6 +22,18 @@ public class ProductGroupJdbcDaoTest extends BaseSpringTestCase {
     public void fetches_all_records() {
         List<ProductGroup> all = dao.all();
 
+        assertThat(all.size(), is(2));
+        assertThat(all.get(1), equalTo(testProductGroup()));
+    }
+
+    @Test
+    public void fetches_record_by_case_insensitive_description() {
+        assertThat(dao.findByDescription("bla bla bla"), is(Optional.empty()));
+        assertThat(dao.findByDescription("ABN"), is(Optional.of(testProductGroup())));
+        assertThat(dao.findByDescription("aBn"), is(Optional.of(testProductGroup())));
+    }
+
+    private ProductGroup testProductGroup() {
         ProductGroup pg = new ProductGroup();
         pg.setId(2l);
         pg.setDescription("ABN");
@@ -31,7 +44,6 @@ public class ProductGroupJdbcDaoTest extends BaseSpringTestCase {
         pg.setStartDate(Date.valueOf("2012-09-02"));
         pg.setEndDate(Date.valueOf("2012-09-02"));
 
-        assertThat(all.size(), is(2));
-        assertThat(all.get(1), equalTo(pg));
+        return pg;
     }
 }

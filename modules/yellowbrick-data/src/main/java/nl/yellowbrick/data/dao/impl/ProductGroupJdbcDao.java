@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class ProductGroupJdbcDao implements ProductGroupDao {
@@ -19,6 +20,13 @@ public class ProductGroupJdbcDao implements ProductGroupDao {
     @Override
     public List<ProductGroup> all() {
         return template.query("select * from product_group", rowMapper());
+    }
+
+    @Override
+    public Optional<ProductGroup> findByDescription(String description) {
+        String sql = "select * from product_group where lower(description) = ?";
+
+        return template.query(sql, rowMapper(), description.toLowerCase()).stream().findFirst();
     }
 
     private RowMapper<ProductGroup> rowMapper() {

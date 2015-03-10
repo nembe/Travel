@@ -1,8 +1,8 @@
 package nl.yellowbrick.admin.controller;
 
+import com.google.common.collect.Lists;
 import nl.yellowbrick.admin.BaseMvcTestCase;
 import nl.yellowbrick.data.dao.CardOrderDao;
-import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.CardOrderStatus;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,8 +13,6 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
-
-import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -32,8 +30,8 @@ public class CardProvisioningListControllerTest extends BaseMvcTestCase {
 
     @Test
     public void displays_message_when_no_card_orders() throws Exception {
-        // interpect call to dao and return 0 orders
-        when(cardOrderDao.findByStatus(CardOrderStatus.INSERTED)).thenReturn(new ArrayList<CardOrder>());
+        // intercept call to dao and return 0 orders
+        when(cardOrderDao.findByStatus(CardOrderStatus.INSERTED)).thenReturn(Lists.newArrayList());
 
         MvcResult res = mockMvc.perform(get(URL)).andReturn();
 
