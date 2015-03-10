@@ -7,17 +7,12 @@ import nl.yellowbrick.data.domain.CardOrderStatus;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
 
@@ -32,18 +27,8 @@ public class CardProvisioningListControllerTest extends BaseMvcTestCase {
     private static final String ORDER_ID = "72031";
     private static final String URL = "/provisioning/cards/";
 
-    @Autowired WebApplicationContext wac;
     @Autowired @InjectMocks CardProvisioningListController controller;
-
     @Autowired @Spy CardOrderDao cardOrderDao;
-
-    MockMvc mockMvc;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-    }
 
     @Test
     public void displays_message_when_no_card_orders() throws Exception {

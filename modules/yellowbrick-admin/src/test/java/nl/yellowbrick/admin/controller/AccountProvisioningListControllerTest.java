@@ -1,58 +1,47 @@
 package nl.yellowbrick.admin.controller;
 
 import com.google.common.collect.Lists;
+import nl.yellowbrick.admin.BaseMvcTestCase;
 import nl.yellowbrick.admin.builders.CustomerBuilder;
-import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.dao.ProductGroupDao;
 import nl.yellowbrick.data.domain.CustomerStatus;
 import nl.yellowbrick.data.domain.ProductGroup;
 import org.hamcrest.Matcher;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebAppConfiguration
-public class AccountProvisioningListControllerTest extends BaseSpringTestCase {
+public class AccountProvisioningListControllerTest extends BaseMvcTestCase {
 
     private static final String BASE = "/provisioning/accounts";
 
-    @Autowired WebApplicationContext wac;
     @Autowired @InjectMocks AccountProvisioningListController controller;
 
     @Autowired @Mock CustomerDao customerDao;
     @Autowired ProductGroupDao productGroupDao;
 
     // test helpers
-    MockMvc mockMvc;
     List<ProductGroup> productGroups;
 
     @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-        productGroups = productGroupDao.all();
+    public void setUp() throws Exception {
+        super.setUp();
 
+        productGroups = productGroupDao.all();
         stubCustomers();
     }
 
@@ -103,8 +92,7 @@ public class AccountProvisioningListControllerTest extends BaseSpringTestCase {
     }
 
     private Document doGet(String path) throws Exception {
-        MvcResult res = mockMvc.perform(get(BASE + path)).andReturn();
-        return Jsoup.parse(res.getResponse().getContentAsString());
+        return parseHtml(mockMvc.perform(get(BASE + path)).andReturn());
     }
 
     private void stubCustomers() {

@@ -5,17 +5,12 @@ import nl.yellowbrick.admin.BaseMvcTestCase;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.*;
@@ -31,18 +26,8 @@ public class CardProvisioningFormControllerTest extends BaseMvcTestCase {
     private static final String ORDER_ID = "72031";
     private static final String ORDER_URL = "/provisioning/cards/" + ORDER_ID;
 
-    @Autowired WebApplicationContext wac;
     @Autowired @InjectMocks CardProvisioningFormController controller;
-
     @Autowired @Spy CardOrderDao cardOrderDao;
-
-    MockMvc mockMvc;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-    }
 
     @Test
     public void loads_card_order_data() throws Exception {
