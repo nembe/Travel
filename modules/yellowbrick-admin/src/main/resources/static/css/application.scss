@@ -2,6 +2,7 @@
 @import 'colors';
 @import 'forms';
 
+
 $side-menu-width: 200px;
 
 html, body {
@@ -51,10 +52,36 @@ a, a:active, a:hover, a:visited {
       margin-top: 2px;
     }
 
+    li:hover > .sub {
+      display: block;
+    }
+
     a, a:active, a:hover, a:visited {
       text-decoration: none;
     }
-
+    .sub{
+      position: absolute;
+      float:right;
+      left:205px;
+      background-color: inherit;
+      width: 200px;
+      margin-top:-45px;
+      display:none;
+      -moz-box-shadow: 4px 7px 20px #666;
+      -webkit-box-shadow: 4px 7px 20px #666;
+      box-shadow: 4px 7px 20px #666;
+      &:before{
+          width: 0;
+          height: 0;
+          border-top: 10px solid transparent;
+          border-bottom: 10px solid transparent;
+          border-right:10px solid blue;
+      }
+    }
+    .sub a{
+      text-transform: uppercase;
+      display: block;
+    }
     @mixin active-highlight($color) {
       border-left-color: $color;
 
