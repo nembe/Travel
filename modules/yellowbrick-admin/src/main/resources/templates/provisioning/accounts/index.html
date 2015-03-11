@@ -1,8 +1,5 @@
 <!DOCTYPE HTML>
-<html layout:decorator="provisioning/_layout">
-<head>
-    <title>Provisioning</title>
-</head>
+<html layout:decorator="provisioning/_layout" th:with="title=#{provisioning.accounts.title}">
 <body>
     <div layout:fragment="content-inner">
         <div class="section">

@@ -1,18 +1,12 @@
 <!DOCTYPE HTML>
 <html layout:decorator="layouts/_default">
 <head>
+    <title th:text="${title != null ? title : ''}">FRAGMENT'S TITLE</title>
 </head>
 <body>
     <div layout:fragment="content">
-        <div id="main-menu">
-            <ul>
-                <li>
-                    <a th:href="@{/provisioning/cards}" bw:activeforctx="/provisioning/cards">CARD ORDER VALIDATION</a>
-                </li>
-                <li>
-                    <a th:href="@{/provisioning/accounts}" bw:activeforctx="/provisioning/accounts">ACCOUNT VALIDATION</a>
-                </li>
-            </ul>
+        <div id="top-bar">
+            <span th:text="${title}">FRAGMENT'S TITLE</span>
         </div>
 
         <div class="main-body">

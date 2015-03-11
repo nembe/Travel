@@ -1,8 +1,5 @@
 <!DOCTYPE HTML>
-<html layout:decorator="productgroups/_layout">
-<head>
-    <title>Product group</title>
-</head>
+<html layout:decorator="productgroups/_layout" th:with="title=${productGroup.description}">
 <body>
     <div layout:fragment="content-inner">
         <form th:object="${productGroup}" th:action="@{#}" method="post">

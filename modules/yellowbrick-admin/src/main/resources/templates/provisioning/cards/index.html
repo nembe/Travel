@@ -1,8 +1,5 @@
 <!DOCTYPE HTML>
-<html layout:decorator="provisioning/_layout">
-<head>
-    <title>Card Order Validation</title>
-</head>
+<html layout:decorator="provisioning/_layout" th:with="title=#{provisioning.cards.title}">
 <body>
     <div layout:fragment="content-inner">
         <div class="section" th:if="${#lists.isEmpty(orders)}">

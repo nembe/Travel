@@ -64,7 +64,7 @@ a, a:active, a:hover, a:visited {
       float:right;
       left:205px;
       background-color: inherit;
-      width: 200px;
+      min-width: 255px;
       margin-top:-45px;
       display:none;
       -moz-box-shadow: 4px 7px 20px #666;
@@ -129,31 +129,15 @@ a, a:active, a:hover, a:visited {
   margin-left: $side-menu-width;
 }
 
-#main-menu {
+#top-bar {
   background-color: #199784;
   width: 100%;
   line-height: 60px;
   min-height: 60px;
-  text-align: right;
 
-  a, a:active, a:hover, a:visited {
-    color: #198376;
-    text-decoration: none;
-  }
-
-  a.active, a:hover {
-    color: #FFF;
-  }
-
-  ul {
-    margin: 0;
-    padding-right: 80px;
-  }
-
-  li {
-    list-style-type: none;
-    display: inline;
+  span {
     margin-left: 26px;
+    color: #FFF;
   }
 }
 
