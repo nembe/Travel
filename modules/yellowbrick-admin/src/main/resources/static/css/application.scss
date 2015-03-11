@@ -3,7 +3,7 @@
 @import 'forms';
 
 
-$side-menu-width: 200px;
+$side-menu-width: 255px;
 
 html, body {
   height: 100%;
@@ -35,9 +35,12 @@ a, a:active, a:hover, a:visited {
   height: 100%;
   width: $side-menu-width;
   background-color: $bg-color;
-  max-height: 600px;
-  position: relative;
+  position: fixed;
   float: left;
+  font-size: 15px;
+  letter-spacing: 1px;
+  font-weight: 550;
+  color:#515B6D;
 
   ul {
     margin: 0;
@@ -52,33 +55,45 @@ a, a:active, a:hover, a:visited {
       margin-top: 2px;
     }
 
-    li:hover > .sub {
+    li:hover > .side-submenu {
       display: block;
     }
 
     a, a:active, a:hover, a:visited {
       text-decoration: none;
     }
-    .sub{
+
+    .side-submenu{
       position: absolute;
-      float:right;
-      left:205px;
+      float: right;
+      left: 255px;
       background-color: inherit;
-      width: 200px;
-      margin-top:-45px;
-      display:none;
+      width: $side-menu-width;
+      margin-top: -45px;
+      display: none;
       -moz-box-shadow: 4px 7px 20px #666;
       -webkit-box-shadow: 4px 7px 20px #666;
-      box-shadow: 4px 7px 20px #666;
-      &:before{
-          width: 0;
-          height: 0;
-          border-top: 10px solid transparent;
-          border-bottom: 10px solid transparent;
-          border-right:10px solid blue;
+      box-shadow: 8px 7px 20px #666;
+
+      li{
+        border-left: 0px;
+      }
+       a:after{
+        content:'\A';
+        position:absolute;
+        width:100%; height:100%;
+        top:0;
+        left:0;
+        background:rgba(0,0,0,0.6);
+        transition: all 0.5s;
+        -webkit-transition: all 0.5s;
+
+        &:hover{
+          opacity: 1;
+        }
       }
     }
-    .sub a{
+    .side-submenu a{
       text-transform: uppercase;
       display: block;
     }
@@ -117,11 +132,54 @@ a, a:active, a:hover, a:visited {
     li.provisioning {
       @include active-highlight($provisioning-color);
     }
+    li.settings{
+      @include active-highlight($settings-color);
+    }
   }
 
   ul.baseline {
     position: absolute;
     bottom: 0;
+    width: inherit;
+
+    li {
+      bottom: 0;
+      border-left-style: solid;
+      border-left-width: 4px;
+      padding-left: 20px;
+      line-height: 55px;
+      margin-top: 2px;
+      background-color: inherit;
+    }
+
+    li .side-submenu-settings{
+      position: absolute;
+      float:right;
+      left:255px;
+      background-color: $settings-color;
+      margin-top:-55px;
+      display: none;
+      -moz-box-shadow: 4px 7px 20px #666;
+      -webkit-box-shadow: 4px 7px 20px #666;
+      box-shadow: 4px 7px 20px #666;
+      text-transform: uppercase;
+
+      li {
+        padding-right: 10px;
+        width: $side-menu-width - 80px;
+        border-left: none;
+
+        a {
+          display: block;
+
+        }
+      }
+    }
+
+    li:hover > .side-submenu-settings {
+      display:flex;
+
+    }
   }
 }
 
