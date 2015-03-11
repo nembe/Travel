@@ -10,4 +10,6 @@ public interface ProductGroupDao {
     List<ProductGroup> all();
 
     Optional<ProductGroup> findByDescription(String description);
+
+    Optional<ProductGroup> update(ProductGroup productGroup);
 }

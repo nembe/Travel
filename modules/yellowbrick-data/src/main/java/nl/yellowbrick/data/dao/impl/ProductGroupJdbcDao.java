@@ -1,6 +1,7 @@
 package nl.yellowbrick.data.dao.impl;
 
 
+import nl.yellowbrick.data.audit.Mutator;
 import nl.yellowbrick.data.dao.ProductGroupDao;
 import nl.yellowbrick.data.domain.ProductGroup;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,9 @@ public class ProductGroupJdbcDao implements ProductGroupDao {
     @Autowired
     private JdbcTemplate template;
 
+    @Autowired
+    private Mutator mutator;
+
     @Override
     public List<ProductGroup> all() {
         return template.query("select * from product_group", rowMapper());
@@ -27,6 +31,29 @@ public class ProductGroupJdbcDao implements ProductGroupDao {
         String sql = "select * from product_group where lower(description) = ?";
 
         return template.query(sql, rowMapper(), description.toLowerCase()).stream().findFirst();
+    }
+
+    @Override
+    public Optional<ProductGroup> update(ProductGroup productGroup) {
+        String sql = "update product_group set " +
+                "description = ?, " +
+                "start_date = ?, " +
+                "end_date = ?, " +
+                "annotations_max = ?, " +
+                "internal_card_prov = ?, " +
+                "mutator = ?, " +
+                "mutation_date = sysdate " +
+                "where id = ?";
+
+        template.update(sql, productGroup.getDescription(),
+                productGroup.getStartDate(),
+                productGroup.getEndDate(),
+                productGroup.getMaxAnnotations(),
+                productGroup.isInternalCardProvisioning() ? "1" : "0",
+                mutator.get(),
+                productGroup.getId());
+
+        return findByDescription(productGroup.getDescription());
     }
 
     private RowMapper<ProductGroup> rowMapper() {

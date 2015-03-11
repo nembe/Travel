@@ -1,5 +1,6 @@
 package nl.yellowbrick.admin.matchers;
 
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.CombinableMatcher;
 import org.jsoup.nodes.Element;

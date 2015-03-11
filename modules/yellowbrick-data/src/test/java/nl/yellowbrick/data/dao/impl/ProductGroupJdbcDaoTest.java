@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class ProductGroupJdbcDaoTest extends BaseSpringTestCase {
 
@@ -22,7 +21,7 @@ public class ProductGroupJdbcDaoTest extends BaseSpringTestCase {
     public void fetches_all_records() {
         List<ProductGroup> all = dao.all();
 
-        assertThat(all.size(), is(2));
+        assertThat(all.size(), is(3));
         assertThat(all.get(1), equalTo(testProductGroup()));
     }
 
@@ -31,6 +30,28 @@ public class ProductGroupJdbcDaoTest extends BaseSpringTestCase {
         assertThat(dao.findByDescription("bla bla bla"), is(Optional.empty()));
         assertThat(dao.findByDescription("ABN"), is(Optional.of(testProductGroup())));
         assertThat(dao.findByDescription("aBn"), is(Optional.of(testProductGroup())));
+    }
+
+    @Test
+    public void updates_product_group_properties_and_sets_mutator() {
+        ProductGroup pg = testProductGroup();
+        pg.setDescription("TEST");
+        pg.setStartDate(Date.valueOf("2015-01-01"));
+        pg.setEndDate(Date.valueOf("2020-01-01"));
+        pg.setInternalCardProvisioning(!pg.isInternalCardProvisioning());
+        pg.setMaxAnnotations(5);
+
+        dao.update(pg);
+
+        ProductGroup updatedPg = dao.findByDescription("TEST").get();
+
+        assertThat(updatedPg.getDescription(), is(pg.getDescription()));
+        assertThat(updatedPg.getStartDate(), is(pg.getStartDate()));
+        assertThat(updatedPg.getEndDate(), is(pg.getEndDate()));
+        assertThat(updatedPg.isInternalCardProvisioning(), is(pg.isInternalCardProvisioning()));
+        assertThat(updatedPg.getMaxAnnotations(), is(updatedPg.getMaxAnnotations()));
+        assertThat(updatedPg.getMutator(), is("TEST MUTATOR"));
+        assertThat(updatedPg.getMutationDate(), notNullValue());
     }
 
     private ProductGroup testProductGroup() {
