@@ -1,6 +1,7 @@
 @import 'normalize.css';
 @import 'colors';
 @import 'forms';
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600|Open+Sans:400,600,700);
 
 $side-menu-width: 255px;
 
@@ -9,11 +10,24 @@ html, body {
   width: 100%;
   color: $text-color;
   font-size: $base-font-size;
+  font-family: 'Source Sans Pro', sans-serif;
 }
-h3{
+h2 {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-top:-5px;
+  font-family:'Open Sans', sans-serif;
+  font-weight: 600;
+
+}
+
+h3 {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top:30px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 600;
+
 }
 
 a, a:active, a:hover, a:visited {
@@ -43,7 +57,7 @@ a, a:active, a:hover, a:visited {
   float: left;
   font-size: 15px;
   letter-spacing: 1px;
-  font-weight: 550;
+  font-weight: 500;
   color:#515B6D;
 
   ul {
@@ -78,6 +92,9 @@ a, a:active, a:hover, a:visited {
       -moz-box-shadow: 4px 7px 20px #666;
       -webkit-box-shadow: 4px 7px 20px #666;
       box-shadow: 8px 7px 20px #666;
+      z-index: 9;
+
+
 
       li {
         border-left: 0px;
@@ -157,6 +174,7 @@ a, a:active, a:hover, a:visited {
       -webkit-box-shadow: 4px 7px 20px #666;
       box-shadow: 4px 7px 20px #666;
       text-transform: uppercase;
+      z-index: 9;
 
       li {
         padding-right: 10px;
@@ -286,6 +304,8 @@ table td {
   background-color: $bg-color;
   height: 30.5px;
   border-bottom: 4px solid rgba(0,0,0,0.1);
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
   a{
     text-transform: uppercase;
     text-decoration: none;
