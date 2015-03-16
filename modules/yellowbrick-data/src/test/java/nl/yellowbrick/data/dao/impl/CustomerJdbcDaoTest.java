@@ -6,6 +6,7 @@ import nl.yellowbrick.data.database.DbHelper;
 import nl.yellowbrick.data.database.Functions;
 import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
+import nl.yellowbrick.data.domain.CustomerStatus;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,7 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(c.getCreditLimit(), equalTo(5000l));
         assertThat(c.getCustomerId(), equalTo(4776l));
         assertThat(c.getCustomerNr(), equalTo("203126"));
-        assertThat(c.getCustomerStatusIdfk(), equalTo(1));
+        assertThat(c.getStatus(), equalTo(CustomerStatus.REGISTERED));
         assertThat(c.getDateOfBirth(), nullValue());
         assertThat(c.getEmail(), equalTo("bestaatniet@taxameter.nl"));
         assertThat(c.getExitDate(), nullValue());
@@ -92,7 +93,6 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(c.getPincode(), equalTo("6858"));
         assertThat(c.getProductGroup(), equalTo("YELLOWBRICK"));
         assertThat(c.getProductGroupId(), equalTo(1));
-        assertThat(c.getStatus(), equalTo("lblSignedIt"));
         assertThat(c.getInvoiceAttn(), equalTo("bar"));
         assertThat(c.getInvoiceEmail(), equalTo("foo"));
         assertThat(c.isExtraInvoiceAnnotations(), is(true));
@@ -101,14 +101,13 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     @Test
     public void marks_customer_as_pending_review() {
         Customer customer = customerDao.findAllPendingActivation().get(0);
-        int activationFailedStatus = 0;
 
-        assertThat(customer.getCustomerStatusIdfk(), equalTo(1));
+        assertThat(customer.getStatus(), equalTo(CustomerStatus.REGISTERED));
 
         customerDao.markAsPendingHumanReview(customer);
 
-        assertThat(customer.getCustomerStatusIdfk(), equalTo(activationFailedStatus));
-        assertThat(fetchCustomerStatus(customer.getCustomerId()), equalTo(activationFailedStatus));
+        assertThat(customer.getStatus(), equalTo(CustomerStatus.ACTIVATION_FAILED));
+        assertThat(fetchCustomerStatus(customer.getCustomerId()), equalTo(CustomerStatus.ACTIVATION_FAILED.code()));
     }
 
     @Test

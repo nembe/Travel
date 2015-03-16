@@ -8,12 +8,22 @@
         <div class="section">
             <form>
                 <label for="productGroup">Product group:</label>
-                <select name="productGroup" id="productGroup" onchange="this.form.submit()">
+                <select name="productGroup" id="productGroup">
                     <option th:each="pg : ${allProductGroups}"
                             th:value="${pg.id}"
                             th:selected="${pg == productGroup}"
                             th:text="${pg.description}">Description</option>
                 </select>
+
+                <label for="statusFilter">Status:</label>
+                <select name="statusFilter" id="statusFilter">
+                    <option th:each="status : ${allStatuses}"
+                            th:value="${status.key}"
+                            th:selected="${status.value == statusFilter}"
+                            th:text="${status.value}">Name</option>
+                </select>
+
+                <input type="submit" value="Apply" />
             </form>
         </div>
 
@@ -32,16 +42,18 @@
                         <th>Client name</th>
                         <th>Location</th>
                         <th>Product group</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="cust : ${customers}">
                         <td th:text="${cust.applicationDate}"></td>
-                        <td th:text="${cust.accountType}"></td>
+                        <td th:text="${cust.businessCustomer ? 'business' : 'personal'}"></td>
                         <td th:text="${cust.fullName}"></td>
                         <td th:text="${cust.accountCity}"></td>
                         <td th:text="${cust.productGroup}"></td>
+                        <td th:text="${cust.status}"></td>
                         <td>
                             <a th:href="@{'/provisioning/accounts/' + ${cust.customerId}}">validate</a>
                         </td>

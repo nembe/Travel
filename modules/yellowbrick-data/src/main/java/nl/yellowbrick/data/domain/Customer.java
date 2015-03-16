@@ -20,7 +20,6 @@ public class Customer {
     private long creditLimit = 0;
     private long customerId = 0;
     private String customerNr = "";
-    private int customerStatusIdfk = 0;
     private Date dateOfBirth = null;
     private String email = "";
     private Date exitDate = null;
@@ -42,7 +41,7 @@ public class Customer {
     private String pincode = "";
     private String productGroup = "";
     private int productGroupId = -1;
-    private String status = "";
+    private CustomerStatus status;
     private String invoiceAttn = "";
     private String invoiceEmail = "";
     private boolean extraInvoiceAnnotations = false;
@@ -107,10 +106,6 @@ public class Customer {
 
     public String getCustomerNr() {
         return customerNr;
-    }
-
-    public int getCustomerStatusIdfk() {
-        return customerStatusIdfk;
     }
 
     public Date getDateOfBirth() {
@@ -203,7 +198,7 @@ public class Customer {
         return productGroupId;
     }
 
-    public String getStatus() {
+    public CustomerStatus getStatus() {
         return status;
     }
 
@@ -265,10 +260,6 @@ public class Customer {
 
     public void setCustomerNr(String customerNr) {
         this.customerNr = (customerNr != null) ? customerNr.trim() : "";
-    }
-
-    public void setCustomerStatusIdfk(int customerStatusIdfk) {
-        this.customerStatusIdfk = customerStatusIdfk;
     }
 
     public void setDateOfBirth(Date dateOfBirth) {
@@ -355,7 +346,7 @@ public class Customer {
         this.productGroupId = productGroupId;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(CustomerStatus status) {
         this.status = status;
     }
 
