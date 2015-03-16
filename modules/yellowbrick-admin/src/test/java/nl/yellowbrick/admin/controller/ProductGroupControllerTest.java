@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.sql.Date;
@@ -17,8 +18,7 @@ import java.sql.Timestamp;
 
 import static nl.yellowbrick.admin.matchers.HtmlMatchers.isCheckbox;
 import static nl.yellowbrick.admin.matchers.HtmlMatchers.isField;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -57,6 +57,18 @@ public class ProductGroupControllerTest extends BaseMvcTestCase {
         // using an outdated description of the product group
 
         postProductGroupUpdate("something", 123).andExpect(status().is(404));
+    }
+
+    @Test
+    public void validates_product_group_uniqueness_based_on_description() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(post("/productgroups/yellowbrick")
+                .param("id", "1")
+                .param("description", "travelcard") // should class with another subgroup
+                .param("save", "Save")).andReturn();
+
+        Document html = parseHtml(mvcResult);
+
+        assertThat(html.select(".field-error"), not(empty()));
     }
 
     @Test

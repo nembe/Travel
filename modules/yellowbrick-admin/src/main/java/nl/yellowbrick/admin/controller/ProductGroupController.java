@@ -2,6 +2,7 @@ package nl.yellowbrick.admin.controller;
 
 import nl.yellowbrick.admin.exceptions.ResourceNotFoundException;
 import nl.yellowbrick.admin.util.MessageHelper;
+import nl.yellowbrick.admin.validation.ProductGroupValidator;
 import nl.yellowbrick.data.dao.ProductGroupDao;
 import nl.yellowbrick.data.domain.ProductGroup;
 import nl.yellowbrick.data.domain.ProductSubgroup;
@@ -11,12 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,24 +30,27 @@ public class ProductGroupController {
     @Autowired
     private ProductGroupDao productGroupDao;
 
+    @InitBinder("productGroup")
+    private void setValidators(WebDataBinder binder) {
+        binder.addValidators(new ProductGroupValidator(productGroupDao));
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public String showProductGroupForm(ModelMap model, @PathVariable("group") String groupDesc) {
-        ProductGroup productGroup = getProductGroupOrFail(groupDesc);
-        model.addAttribute("productGroup", productGroup);
-        model.addAttribute("subgroups", linksToSubgroups(productGroup));
+        model.addAttribute("productGroup", getProductGroupOrFail(groupDesc));
 
         return "productgroups/form";
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public String updateProductGroup(@PathVariable("group") String groupDesc,
-                                     @ModelAttribute("productGroup") ProductGroup productGroup,
+                                     @Valid @ModelAttribute("productGroup") ProductGroup productGroup,
                                      BindingResult bindingResult,
                                      ModelMap model,
                                      RedirectAttributes ra) {
 
         if(bindingResult.hasErrors())
-            return showProductGroupForm(model, groupDesc);
+            return "productgroups/form";
 
         Optional<ProductGroup> updatedProductGroup = productGroupDao.update(productGroup);
 
@@ -73,7 +76,6 @@ public class ProductGroupController {
         ProductSubgroup productSubgroup = getSubgroupOrFail(productGroup, subgroupDesc);
 
         model.addAttribute("productGroup", productGroup);
-        model.addAttribute("subgroups", linksToSubgroups(productGroup));
         model.addAttribute("subgroup", productSubgroup);
 
         return "productgroups/subgroup_form";
@@ -103,6 +105,16 @@ public class ProductGroupController {
         return String.format("redirect:/productgroups/%s/subgroups/%s", groupDesc, subgroupDesc);
     }
 
+    @ModelAttribute("subgroups")
+    private List<LinkHelper> linksToSubgroups(@PathVariable("group") String group) {
+        ProductGroup productGroup = getProductGroupOrFail(group);
+
+        return productGroupDao.findSubgroupsForProductGroup(productGroup.getId())
+                .stream()
+                .map(subgroup -> new LinkHelper(productGroup, subgroup))
+                .collect(Collectors.toList());
+    }
+
     private ProductGroup getProductGroupOrFail(String group) {
         return productGroupDao
                 .findByDescription(group)
@@ -116,13 +128,6 @@ public class ProductGroupController {
                 .filter(sg -> sg.getDescription().equalsIgnoreCase(subgroupDesc))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Found no subgroup described as " + subgroupDesc));
-    }
-
-    private List<LinkHelper> linksToSubgroups(ProductGroup productGroup) {
-        return productGroupDao.findSubgroupsForProductGroup(productGroup.getId())
-                .stream()
-                .map(subgroup -> new LinkHelper(productGroup, subgroup))
-                .collect(Collectors.toList());
     }
 
     private class LinkHelper {
