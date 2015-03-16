@@ -436,6 +436,8 @@ INSERT INTO SYSTEMUSER VALUES (
              0,
              NULL,
              NULL,
+             NULL,
+             NULL,
              NULL);
 
 INSERT INTO MARKETINGACTION VALUES (
@@ -529,3 +531,35 @@ INSERT INTO TBLADMINISTRATOR VALUES (
              NULL,
              99,
              NULL);
+
+INSERT INTO TRAVELCARD_WHITELIST_IMPORT VALUES (
+             'tc111111111',
+             'AA-BB-CC',
+             1,
+             TO_DATE ('02/25/2015 11:26:26', 'MM/DD/YYYY HH24:MI:SS'),
+             'N');
+
+INSERT INTO TRANSPONDERCARD VALUES (
+             222005,
+             '278577',
+             398744,
+             1,
+             NULL,
+             '39-LB-40',
+             'NL',
+             NULL,
+             'ADMIN:ron',
+             TO_DATE ('12/14/2014 19:04:22', 'MM/DD/YYYY HH24:MI:SS'));
+
+INSERT INTO ANNOTATION_DEFINITION VALUES (
+             ANNOTATION_DEFINITION_SEQ.NEXTVAL,
+             4776,
+             'TRK',
+             'Travelcard nummer',
+             'TCIMPORT',
+             TO_DATE ('02/26/2015 22:06:22', 'MM/DD/YYYY HH24:MI:SS'),
+             '1',
+             '1',
+             '0',
+             '0',
+             0);

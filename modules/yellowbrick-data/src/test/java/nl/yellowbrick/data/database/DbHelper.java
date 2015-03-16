@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.function.Consumer;
 
 @Component
@@ -26,5 +27,12 @@ public class DbHelper {
 
     public void accept(Consumer<JdbcTemplate> dbAction) {
         dbAction.accept(template);
+    }
+
+    public Map<String, Object> fetchLatestRecord(String tableName, String idColumn) {
+        String sql = String.format("select * from (select * from %s order by %s desc) where rownum = 1",
+                tableName, idColumn);
+
+        return template.queryForMap(sql);
     }
 }
