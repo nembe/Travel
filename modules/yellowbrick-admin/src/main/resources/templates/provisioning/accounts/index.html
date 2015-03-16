@@ -1,8 +1,5 @@
 <!DOCTYPE HTML>
-<html layout:decorator="provisioning/_layout">
-<head>
-    <title>Provisioning</title>
-</head>
+<html layout:decorator="provisioning/_layout" th:with="title=#{provisioning.accounts.title}">
 <body>
     <div layout:fragment="content-inner">
         <div class="section">
@@ -55,7 +52,9 @@
                         <td th:text="${cust.productGroup}"></td>
                         <td th:text="${cust.status}"></td>
                         <td>
-                            <a th:href="@{'/provisioning/accounts/' + ${cust.customerId}}">validate</a>
+                            <div class="btn">
+                                <a th:href="@{'/provisioning/accounts/' + ${cust.customerId}}">validate</a>
+                            </div>
                         </td>
                     </tr>
                 </tbody>

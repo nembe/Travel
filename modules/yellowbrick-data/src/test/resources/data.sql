@@ -20,6 +20,16 @@ INSERT INTO PRODUCT_GROUP VALUES (
              TO_DATE ('09/02/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
              TO_DATE ('09/02/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
 
+INSERT INTO PRODUCT_GROUP VALUES (
+             3,
+             'TRAVELCARD',
+             '1',
+             'YBBEHEER:martijn',
+             NULL,
+             8,
+             TO_DATE ('09/03/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             TO_DATE ('09/03/2015 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+
 INSERT INTO PRODUCT_SUBGROUP VALUES (
              2,
              1,
@@ -27,7 +37,8 @@ INSERT INTO PRODUCT_SUBGROUP VALUES (
              'N',
              'SYSTEM',
              null,
-             'Y');
+             'Y',
+             'default');
 
 INSERT INTO PRODUCT_SUBGROUP VALUES (
              1,
@@ -36,7 +47,8 @@ INSERT INTO PRODUCT_SUBGROUP VALUES (
              'Y',
              'SYSTEM',
              TO_DATE ('06/01/2012 00:46:39', 'MM/DD/YYYY HH24:MI:SS'),
-             'N');
+             'N',
+             'default');
 
 INSERT INTO PRICEMODEL VALUES (
              81,

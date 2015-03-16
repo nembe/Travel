@@ -4,6 +4,9 @@
   background-color: $bg-color;
   padding: 20px 10px;
   margin-bottom: 18px;
+  position: static;
+  overflow: hidden;
+  z-index: 8;
 }
 
 .field {
@@ -26,6 +29,8 @@ input.field-error {
 
 span.field-error {
   color: #f00;
+  position: relative;
+  right: -210px;
 }
 
 .global-errors {
@@ -34,4 +39,34 @@ span.field-error {
 
 input[type='submit'] + input[type='submit'] {
   margin-left: 10px;
+}
+
+input {
+  padding: 5px 10px;
+  border: none;
+  background-color: white;
+  color: $head-color;
+
+}
+input[type='text'] {
+  width: 220px;
+  height: 30px;
+}
+.row-33 {
+  width: 33%;
+  float: left;
+}
+.row-50 {
+  width: 50%;
+  float: left;
+}
+input[type=radio]{
+  display: inline-block;
+  width: 0.875em;
+  height: 0.875em;
+  margin: 0.25em 0.5em 0.25em 0.25em;
+  border: 0.0625em solid rgb(192,192,192);
+  border-radius: 0.25em;
+  background: rgb(224,224,224);
+  &:checked{}
 }

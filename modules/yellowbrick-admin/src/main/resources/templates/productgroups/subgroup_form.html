@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html layout:decorator="productgroups/_layout">
+<head>
+    <title th:text="${productGroup.description}">Product Group Description</title>
+</head>
+<body>
+    <div layout:fragment="content-inner">
+        <form th:object="${subgroup}" th:action="@{#}" method="post">
+            <div class="section">
+                <h2>Subgroup: <span th:text="${subgroup.description}"></span></h2>
+
+                <div class="field">
+                    <label for="defaultIssuePhysicalCard" class="field-label">Issue physical transpondercard by default</label>
+                    <input type="checkbox" th:field="*{defaultIssuePhysicalCard}" />
+                </div>
+            </div>
+
+            <div class="section">
+                <input type="hidden" th:field="*{id}" />
+                <input type="submit" name="save" value="Save" />
+            </div>
+        </form>
+    </div>
+</body>
+</html>

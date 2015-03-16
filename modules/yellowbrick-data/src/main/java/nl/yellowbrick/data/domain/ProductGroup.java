@@ -1,5 +1,7 @@
 package nl.yellowbrick.data.domain;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 
 public class ProductGroup {
@@ -10,7 +12,11 @@ public class ProductGroup {
     private String mutator;
     private Date mutationDate;
     private int maxAnnotations;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date startDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
 
     public Long getId() {

@@ -1,7 +1,7 @@
 package nl.yellowbrick.admin.controller;
 
 import nl.yellowbrick.activation.service.AccountActivationService;
-import nl.yellowbrick.data.BaseSpringTestCase;
+import nl.yellowbrick.admin.BaseMvcTestCase;
 import nl.yellowbrick.data.dao.CustomerAddressDao;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.dao.DirectDebitDetailsDao;
@@ -11,18 +11,16 @@ import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
 import org.hamcrest.Matcher;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.ArgumentMatcher;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.sql.Date;
 
@@ -39,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebAppConfiguration
-public class AccountProvisioningFormControllerTest extends BaseSpringTestCase {
+public class AccountProvisioningFormControllerTest extends BaseMvcTestCase {
 
     private static final String BASE = "/provisioning/accounts/";
 
@@ -48,7 +46,6 @@ public class AccountProvisioningFormControllerTest extends BaseSpringTestCase {
     private static final long BUSINESS_CUSTOMER_ID = 398734;
 
     // under test
-    @Autowired WebApplicationContext wac;
     @Autowired @InjectMocks AccountProvisioningFormController controller;
 
     // spy on collaborators
@@ -59,13 +56,6 @@ public class AccountProvisioningFormControllerTest extends BaseSpringTestCase {
 
     // test helpers
     @Autowired DbHelper db;
-    MockMvc mockMvc;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-    }
 
     @Test
     public void returns_404_if_customer_id_not_found() throws Exception {
@@ -141,9 +131,7 @@ public class AccountProvisioningFormControllerTest extends BaseSpringTestCase {
 
     @Test
     public void loads_private_customer_data() throws Exception {
-        MvcResult res = mockMvc.perform(get(BASE + PRIVATE_CUSTOMER_ID)).andReturn();
-
-        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+        Document html = parseHtml(mockMvc.perform(get(BASE + PRIVATE_CUSTOMER_ID)).andReturn());
 
         assertThat(html.select(".field input"), hasItems(
                 isField("initials", "W.J."),
@@ -163,9 +151,7 @@ public class AccountProvisioningFormControllerTest extends BaseSpringTestCase {
 
     @Test
     public void loads_business_customer_data() throws Exception {
-        MvcResult res = mockMvc.perform(get(BASE + BUSINESS_CUSTOMER_ID)).andReturn();
-
-        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+        Document html = parseHtml(mockMvc.perform(get(BASE + BUSINESS_CUSTOMER_ID)).andReturn());
 
         assertThat(html.select(".field input"), hasItems(
                 isField("businessName", "kabisa"),
@@ -279,7 +265,7 @@ public class AccountProvisioningFormControllerTest extends BaseSpringTestCase {
                 postPersonalAccountProvisioningForm().param("numberOfTransponderCards", "totally not a number")
         ).andReturn();
 
-        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+        Document html = parseHtml(res);
 
         assertThat(html.select("input[name=numberOfTransponderCards]").first(), allOf(
                 hasAttr("class", "field-error"),
@@ -295,7 +281,7 @@ public class AccountProvisioningFormControllerTest extends BaseSpringTestCase {
                 postBusinessAccountProvisioningForm().param("numberOfTransponderCards", "totally not a number")
         ).andReturn();
 
-        Document html = Jsoup.parse(res.getResponse().getContentAsString());
+        Document html = parseHtml(res);
 
         assertThat(html.select("input[name=numberOfTransponderCards]").first(), allOf(
                 hasAttr("class", "field-error"),
