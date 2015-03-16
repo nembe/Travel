@@ -13,6 +13,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import static nl.yellowbrick.admin.matchers.HtmlMatchers.isCheckbox;
 import static nl.yellowbrick.admin.matchers.HtmlMatchers.isField;
@@ -131,6 +132,8 @@ public class ProductGroupControllerTest extends BaseMvcTestCase {
         psg.setBusiness(true);
         psg.setDefaultIssuePhysicalCard(true);
         psg.setTheme("default");
+        psg.setMutator("SYSTEM");
+        psg.setMutationDate(Timestamp.valueOf("2012-06-01 00:46:39"));
 
         return psg;
     }

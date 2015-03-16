@@ -69,8 +69,8 @@ public class ProductGroupJdbcDao implements ProductGroupDao {
                 "where id = ?";
 
         template.update(sql, productSubgroup.getDescription(),
-                productSubgroup.isBusiness() ? "1" : "0",
-                productSubgroup.isDefaultIssuePhysicalCard() ? "1" : "0",
+                productSubgroup.isBusiness() ? "Y" : "N",
+                productSubgroup.isDefaultIssuePhysicalCard() ? "Y" : "N",
                 productSubgroup.getTheme(),
                 mutator.get(),
                 productSubgroup.getId());
@@ -92,6 +92,8 @@ public class ProductGroupJdbcDao implements ProductGroupDao {
             subgroup.setDefaultIssuePhysicalCard(rs.getString("default_issue_physical_card").equals("Y"));
             subgroup.setTheme(rs.getString("theme"));
             subgroup.setProductGroupId(rs.getLong("product_group_id"));
+            subgroup.setMutator(rs.getString("mutator"));
+            subgroup.setMutationDate(rs.getTimestamp("mutation_date"));
 
             return subgroup;
         };

@@ -1,5 +1,7 @@
 package nl.yellowbrick.data.domain;
 
+import java.util.Date;
+
 public class ProductSubgroup {
 
     private Long id;
@@ -8,6 +10,8 @@ public class ProductSubgroup {
     private boolean business;
     private boolean defaultIssuePhysicalCard;
     private String theme;
+    private String mutator;
+    private Date mutationDate;
 
     public Long getId() {
         return id;
@@ -57,19 +61,39 @@ public class ProductSubgroup {
         this.theme = theme;
     }
 
+    public String getMutator() {
+        return mutator;
+    }
+
+    public void setMutator(String mutator) {
+        this.mutator = mutator;
+    }
+
+    public Date getMutationDate() {
+        return mutationDate;
+    }
+
+    public void setMutationDate(Date mutationDate) {
+        this.mutationDate = mutationDate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ProductSubgroup that = (ProductSubgroup) o;
+        ProductSubgroup subgroup = (ProductSubgroup) o;
 
-        if (business != that.business) return false;
-        if (defaultIssuePhysicalCard != that.defaultIssuePhysicalCard) return false;
-        if (productGroupId != that.productGroupId) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (theme != null ? !theme.equals(that.theme) : that.theme != null) return false;
+        if (business != subgroup.business) return false;
+        if (defaultIssuePhysicalCard != subgroup.defaultIssuePhysicalCard) return false;
+        if (productGroupId != subgroup.productGroupId) return false;
+        if (description != null ? !description.equals(subgroup.description) : subgroup.description != null)
+            return false;
+        if (id != null ? !id.equals(subgroup.id) : subgroup.id != null) return false;
+        if (mutationDate != null ? !mutationDate.equals(subgroup.mutationDate) : subgroup.mutationDate != null)
+            return false;
+        if (mutator != null ? !mutator.equals(subgroup.mutator) : subgroup.mutator != null) return false;
+        if (theme != null ? !theme.equals(subgroup.theme) : subgroup.theme != null) return false;
 
         return true;
     }
@@ -82,6 +106,8 @@ public class ProductSubgroup {
         result = 31 * result + (business ? 1 : 0);
         result = 31 * result + (defaultIssuePhysicalCard ? 1 : 0);
         result = 31 * result + (theme != null ? theme.hashCode() : 0);
+        result = 31 * result + (mutator != null ? mutator.hashCode() : 0);
+        result = 31 * result + (mutationDate != null ? mutationDate.hashCode() : 0);
         return result;
     }
 }
