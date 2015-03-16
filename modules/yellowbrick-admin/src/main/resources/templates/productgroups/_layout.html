@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html layout:decorator="layouts/_default">
+<head>
+    <title th:text="${productGroup.description}">Product Group Description</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div id="top-bar">
+            <span th:text="${productGroup.description}">FRAGMENT'S TITLE</span>
+
+            <ul>
+                <li th:each="subgroup : ${subgroups}">
+                    <a th:href="@{${subgroup.path}}"
+                       bw:activeforctx="${subgroup.path}"
+                       th:text="${subgroup.text}">SUBGROUP</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-body">
+            <div th:replace="snippets/_flash :: flash"></div>
+
+            <div layout:fragment="content-inner"></div>
+        </div>
+    </div>
+</body>
+</html>

@@ -32,13 +32,11 @@ public class ProductGroupController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String showProductGroupForm(ModelMap model, @PathVariable("group") String groupDesc) {
-        Optional<ProductGroup> productGroup = productGroupDao.findByDescription(groupDesc);
+        ProductGroup productGroup = getProductGroupOrFail(groupDesc);
+        model.addAttribute("productGroup", productGroup);
+        model.addAttribute("subgroups", linksToSubgroups(productGroup));
 
-        return productGroup.map(pg -> {
-            model.addAttribute("productGroup", pg);
-            model.addAttribute("subgroups", linksToSubgroups(pg));
-            return "productgroups/form";
-        }).orElseThrow(() -> new ResourceNotFoundException("Found no product group described as " + groupDesc));
+        return "productgroups/form";
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -71,16 +69,8 @@ public class ProductGroupController {
                                           @PathVariable("group") String groupDesc,
                                           @PathVariable("subgroup") String subgroupDesc) {
 
-        ProductGroup productGroup = productGroupDao
-                .findByDescription(groupDesc)
-                .orElseThrow(() -> new ResourceNotFoundException("Found no product group described as " + groupDesc));
-
-        ProductSubgroup productSubgroup = productGroupDao
-                .findSubgroupsForProductGroup(productGroup.getId())
-                .stream()
-                .filter(sg -> sg.getDescription().equalsIgnoreCase(subgroupDesc))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Found no subgroup described as " + subgroupDesc));
+        ProductGroup productGroup = getProductGroupOrFail(groupDesc);
+        ProductSubgroup productSubgroup = getSubgroupOrFail(productGroup, subgroupDesc);
 
         model.addAttribute("productGroup", productGroup);
         model.addAttribute("subgroups", linksToSubgroups(productGroup));
@@ -100,16 +90,8 @@ public class ProductGroupController {
         if(bindingResult.hasErrors())
             return showProductSubgroupForm(model, groupDesc, subgroupDesc);
 
-        ProductGroup productGroup = productGroupDao
-                .findByDescription(groupDesc)
-                .orElseThrow(() -> new ResourceNotFoundException("Found no product group described as " + groupDesc));
-
-        ProductSubgroup existingSubgroup = productGroupDao
-                .findSubgroupsForProductGroup(productGroup.getId())
-                .stream()
-                .filter(sg -> sg.getDescription().equalsIgnoreCase(subgroupDesc))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Found no subgroup described as " + subgroupDesc));
+        ProductGroup productGroup = getProductGroupOrFail(groupDesc);
+        ProductSubgroup existingSubgroup = getSubgroupOrFail(productGroup, subgroupDesc);
 
         existingSubgroup.setDefaultIssuePhysicalCard(productSubgroup.isDefaultIssuePhysicalCard());
 
@@ -119,6 +101,21 @@ public class ProductGroupController {
         MessageHelper.flash(ra, "productsubgroup.updated");
 
         return String.format("redirect:/productgroups/%s/subgroups/%s", groupDesc, subgroupDesc);
+    }
+
+    private ProductGroup getProductGroupOrFail(String group) {
+        return productGroupDao
+                .findByDescription(group)
+                .orElseThrow(() -> new ResourceNotFoundException("Found no product group described as " + group));
+    }
+
+    private ProductSubgroup getSubgroupOrFail(ProductGroup productGroup, String subgroupDesc) {
+        return productGroupDao
+                .findSubgroupsForProductGroup(productGroup.getId())
+                .stream()
+                .filter(sg -> sg.getDescription().equalsIgnoreCase(subgroupDesc))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Found no subgroup described as " + subgroupDesc));
     }
 
     private List<LinkHelper> linksToSubgroups(ProductGroup productGroup) {

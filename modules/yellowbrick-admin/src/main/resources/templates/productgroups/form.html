@@ -1,65 +1,48 @@
 <!DOCTYPE HTML>
-<html layout:decorator="layouts/_default">
+<html layout:decorator="productgroups/_layout">
 <head>
-    <title th:text="${productGroup.description}">Product Group Description</title>
 </head>
 <body>
-    <div layout:fragment="content">
-        <div id="top-bar">
-            <span th:text="${productGroup.description}">FRAGMENT'S TITLE</span>
+    <div layout:fragment="content-inner">
+        <form th:object="${productGroup}" th:action="@{#}" method="post">
+            <div class="section">
+                <h2>Product group settings</h2>
 
-            <ul>
-                <li th:each="subgroup : ${subgroups}">
-                    <a th:href="@{${subgroup.path}}"
-                       bw:activeforctx="${subgroup.path}"
-                       th:text="${subgroup.text}">SUBGROUP</a>
-                </li>
-            </ul>
-        </div>
-
-        <div class="main-body">
-            <div th:replace="snippets/_flash :: flash"></div>
-
-            <form th:object="${productGroup}" th:action="@{#}" method="post">
-                <div class="section">
-                    <h2>Product group settings</h2>
-
-                    <div class="field">
-                        <label for="description" class="field-label">Description</label>
-                        <input type="text" th:field="*{description}" th:errorclass="field-error" />
-                        <span class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
-                    </div>
-
-                    <div class="field">
-                        <label for="startDate" class="field-label">Active from</label>
-                        <input type="text" th:field="*{startDate}" th:errorclass="field-error" />
-                        <span class="field-error" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></span>
-                    </div>
-
-                    <div class="field">
-                        <label for="endDate" class="field-label">Active to</label>
-                        <input type="text" th:field="*{endDate}" th:errorclass="field-error" />
-                        <span class="field-error" th:if="${#fields.hasErrors('endDate')}" th:errors="*{startDate}"></span>
-                    </div>
-
-                    <div class="field">
-                        <label for="maxAnnotations" class="field-label">Number of allowed annotations</label>
-                        <input type="number" th:field="*{maxAnnotations}" th:errorclass="field-error" />
-                        <span class="field-error" th:if="${#fields.hasErrors('maxAnnotations')}" th:errors="*{maxAnnotations}"></span>
-                    </div>
-
-                    <div class="field">
-                        <label for="internalCardProvisioning" class="field-label">Card provisioning by Yellowbrick</label>
-                        <input type="checkbox" th:field="*{internalCardProvisioning}" />
-                    </div>
+                <div class="field">
+                    <label for="description" class="field-label">Description</label>
+                    <input type="text" th:field="*{description}" th:errorclass="field-error" />
+                    <span class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
                 </div>
 
-                <div class="section">
-                    <input type="hidden" th:field="*{id}" />
-                    <input type="submit" name="save" value="Save" />
+                <div class="field">
+                    <label for="startDate" class="field-label">Active from</label>
+                    <input type="text" th:field="*{startDate}" th:errorclass="field-error" />
+                    <span class="field-error" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></span>
                 </div>
-            </form>
-        </div>
+
+                <div class="field">
+                    <label for="endDate" class="field-label">Active to</label>
+                    <input type="text" th:field="*{endDate}" th:errorclass="field-error" />
+                    <span class="field-error" th:if="${#fields.hasErrors('endDate')}" th:errors="*{startDate}"></span>
+                </div>
+
+                <div class="field">
+                    <label for="maxAnnotations" class="field-label">Number of allowed annotations</label>
+                    <input type="number" th:field="*{maxAnnotations}" th:errorclass="field-error" />
+                    <span class="field-error" th:if="${#fields.hasErrors('maxAnnotations')}" th:errors="*{maxAnnotations}"></span>
+                </div>
+
+                <div class="field">
+                    <label for="internalCardProvisioning" class="field-label">Card provisioning by Yellowbrick</label>
+                    <input type="checkbox" th:field="*{internalCardProvisioning}" />
+                </div>
+            </div>
+
+            <div class="section">
+                <input type="hidden" th:field="*{id}" />
+                <input type="submit" name="save" value="Save" />
+            </div>
+        </form>
     </div>
 </body>
 </html>
