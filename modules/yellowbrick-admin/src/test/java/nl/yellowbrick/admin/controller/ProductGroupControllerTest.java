@@ -3,6 +3,7 @@ package nl.yellowbrick.admin.controller;
 import nl.yellowbrick.admin.BaseMvcTestCase;
 import nl.yellowbrick.data.dao.ProductGroupDao;
 import nl.yellowbrick.data.domain.ProductGroup;
+import nl.yellowbrick.data.domain.ProductSubgroup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -15,6 +16,7 @@ import java.sql.Date;
 
 import static nl.yellowbrick.admin.matchers.HtmlMatchers.isCheckbox;
 import static nl.yellowbrick.admin.matchers.HtmlMatchers.isField;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
@@ -37,7 +39,7 @@ public class ProductGroupControllerTest extends BaseMvcTestCase {
 
     @Test
     public void renders_prefilled_product_group_form() throws Exception {
-        Document html = parseHtml(mockMvc.perform(get("/productgroups/travelcard")).andReturn());
+        Document html = parseHtml(getProductGroup("travelcard").andReturn());
 
         assertThat(html.select(".field input"), hasItems(
                 isField("description", "TRAVELCARD"),
@@ -63,8 +65,32 @@ public class ProductGroupControllerTest extends BaseMvcTestCase {
         verify(productGroupDao).update(eq(updatedProductGroup()));
     }
 
+    @Test
+    public void returns_404_if_product_subgroup_not_found_on_get() throws Exception {
+        getProductGroup("something").andExpect(status().is(404));
+    }
+
+    @Test
+    public void renders_product_subgroup_form() throws Exception {
+        Document html = parseHtml(getProductSubgroup("yellowbrick", "particulier").andReturn());
+
+        assertThat(html.select(".field input"), hasItem(isCheckbox("defaultIssuePhysicalCard", true)));
+    }
+
+    @Test
+    public void updates_product_subgroup() throws Exception {
+        postProductSubGroupUpdate("yellowbrick", "zakelijk", 1)
+                .andExpect(redirectedUrl("/productgroups/yellowbrick/subgroups/zakelijk"));
+
+        verify(productGroupDao).update(eq(updatedProductSubgroup()));
+    }
+
     private ResultActions getProductGroup(String group) throws Exception {
         return mockMvc.perform(get("/productgroups/" + group));
+    }
+
+    private ResultActions getProductSubgroup(String group, String subgroup) throws Exception {
+        return mockMvc.perform(get(String.format("/productgroups/%s/subgroups/%s", group, subgroup)));
     }
 
     private ResultActions postProductGroupUpdate(String group, int id) throws Exception  {
@@ -78,6 +104,13 @@ public class ProductGroupControllerTest extends BaseMvcTestCase {
                 .param("save", "Save"));
     }
 
+    private ResultActions postProductSubGroupUpdate(String group, String subgroup, int id) throws Exception  {
+        return mockMvc.perform(post(String.format("/productgroups/%s/subgroups/%s", group, subgroup))
+                .param("id", String.valueOf(id))
+                .param("defaultIssuePhysicalCard", "true")
+                .param("save", "Save"));
+    }
+
     private ProductGroup updatedProductGroup() {
         ProductGroup pg = new ProductGroup();
         pg.setId(3l);
@@ -88,5 +121,17 @@ public class ProductGroupControllerTest extends BaseMvcTestCase {
         pg.setInternalCardProvisioning(true);
 
         return pg;
+    }
+
+    private ProductSubgroup updatedProductSubgroup() {
+        ProductSubgroup psg = new ProductSubgroup();
+        psg.setId(1l);
+        psg.setProductGroupId(1l);
+        psg.setDescription("Zakelijk");
+        psg.setBusiness(true);
+        psg.setDefaultIssuePhysicalCard(true);
+        psg.setTheme("default");
+
+        return psg;
     }
 }

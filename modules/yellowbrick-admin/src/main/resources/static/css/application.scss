@@ -134,8 +134,31 @@ a, a:active, a:hover, a:visited {
   width: 100%;
   line-height: 60px;
   min-height: 60px;
+  text-align: right;
 
   span {
+    margin-left: 26px;
+    color: #FFF;
+    float: left;
+  }
+
+  a, a:active, a:hover, a:visited {
+    color: #198376;
+    text-decoration: none;
+  }
+
+  a.active, a:hover {
+    color: #FFF;
+  }
+
+  ul {
+    margin: 0;
+    padding-right: 80px;
+  }
+
+  li {
+    list-style-type: none;
+    display: inline;
     margin-left: 26px;
     color: #FFF;
   }

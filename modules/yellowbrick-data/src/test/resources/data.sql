@@ -37,7 +37,8 @@ INSERT INTO PRODUCT_SUBGROUP VALUES (
              'N',
              'SYSTEM',
              null,
-             'Y');
+             'Y',
+             'default');
 
 INSERT INTO PRODUCT_SUBGROUP VALUES (
              1,
@@ -46,7 +47,8 @@ INSERT INTO PRODUCT_SUBGROUP VALUES (
              'Y',
              'SYSTEM',
              TO_DATE ('06/01/2012 00:46:39', 'MM/DD/YYYY HH24:MI:SS'),
-             'N');
+             'N',
+             'default');
 
 INSERT INTO PRICEMODEL VALUES (
              81,
