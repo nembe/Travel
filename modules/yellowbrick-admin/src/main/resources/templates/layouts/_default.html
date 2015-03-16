@@ -5,6 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
     <link rel="stylesheet" type="text/css" media="all" th:href="@{/css/application.css}" />
+
     <script type="text/javascript" charset="utf-8" th:src="@{/javascript/lib/jquery-2.1.1.js}"></script>
     <script type="text/javascript" charset="utf-8" th:src="@{/javascript/application.js}"></script>
 </head>
@@ -20,7 +21,7 @@
             </li>
             <li class="product-groups" bw:activeforctx="/product-groups">
                 <a href="#">PRODUCT GROUPS</a>
-                <ul class="sub">
+                <ul class="side-submenu">
                     <li th:each="pg : ${allProductGroups}">
                         <a th:href="@{'/productgroups/' + ${pg.description.toLowerCase()}}"
                            th:text="${pg.description}">PRODUCTGROUP DESCRIPTION</a>
@@ -35,7 +36,7 @@
             </li>
             <li class="provisioning" bw:activeforctx="/provisioning">
                 <a th:href="@{/provisioning/accounts}">PROVISIONING</a>
-                <ul class="sub">
+                <ul class="side-submenu">
                     <li><a th:href="@{/provisioning/cards}">CARD ORDER VALIDATION</a></li>
                     <li><a th:href="@{/provisioning/accounts}">ACCOUNT VALIDATION</a></li>
                 </ul>
@@ -43,11 +44,23 @@
         </ul>
 
         <ul class="baseline">
-            <li>
-                <form id="logout-btn" th:action="@{/logout}" method="post">
-                    <input type="submit" value="Sign out"/>
-                </form>
-                <span th:inline="text">[[${#httpServletRequest.remoteUser}]]</span>
+            <li class="settings" >
+                <a href="#">SETTINGS</a>
+                <ul class="side-submenu-settings">
+                    <li>
+                        <form id="logout-btn" th:action="@{/logout}" method="post">
+                            <input type="submit" value="Sign out"/>
+                            <span th:inline="text">[[${#httpServletRequest.remoteUser}]]</span>
+                        </form>
+
+                    </li>
+                   <li>
+                        <a href="#">one</a>
+                    </li>
+                    <li>
+                        <a href="#">two</a>
+                    </li>
+                </ul>
             </li>
         </ul>
     </div>

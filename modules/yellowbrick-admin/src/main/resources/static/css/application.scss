@@ -1,15 +1,33 @@
 @import 'normalize.css';
 @import 'colors';
 @import 'forms';
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600|Open+Sans:400,600,700);
 
-
-$side-menu-width: 200px;
+$side-menu-width: 255px;
 
 html, body {
   height: 100%;
   width: 100%;
   color: $text-color;
   font-size: $base-font-size;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+h2 {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top:-5px;
+  font-family:'Open Sans', sans-serif;
+  font-weight: 600;
+
+}
+
+h3 {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top:30px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 600;
+
 }
 
 a, a:active, a:hover, a:visited {
@@ -35,9 +53,12 @@ a, a:active, a:hover, a:visited {
   height: 100%;
   width: $side-menu-width;
   background-color: $bg-color;
-  max-height: 600px;
-  position: relative;
+  position: fixed;
   float: left;
+  font-size: 15px;
+  letter-spacing: 1px;
+  font-weight: 500;
+  color:#515B6D;
 
   ul {
     margin: 0;
@@ -52,33 +73,38 @@ a, a:active, a:hover, a:visited {
       margin-top: 2px;
     }
 
-    li:hover > .sub {
+    li:hover > .side-submenu {
       display: block;
     }
 
     a, a:active, a:hover, a:visited {
       text-decoration: none;
     }
-    .sub{
+
+    .side-submenu {
       position: absolute;
-      float:right;
-      left:205px;
+      float: right;
+      left: 255px;
       background-color: inherit;
-      min-width: 255px;
-      margin-top:-45px;
-      display:none;
+      width: $side-menu-width;
+      margin-top: -45px;
+      display: none;
       -moz-box-shadow: 4px 7px 20px #666;
       -webkit-box-shadow: 4px 7px 20px #666;
-      box-shadow: 4px 7px 20px #666;
-      &:before{
-          width: 0;
-          height: 0;
-          border-top: 10px solid transparent;
-          border-bottom: 10px solid transparent;
-          border-right:10px solid blue;
+      box-shadow: 8px 7px 20px #666;
+      z-index: 9;
+
+
+
+      li {
+        border-left: 0px;
+
+        &:hover {
+          background-color:rgba(0,0,0,0.1);
+        }
       }
     }
-    .sub a{
+    .side-submenu a{
       text-transform: uppercase;
       display: block;
     }
@@ -117,11 +143,55 @@ a, a:active, a:hover, a:visited {
     li.provisioning {
       @include active-highlight($provisioning-color);
     }
+    li.settings{
+      @include active-highlight($settings-color);
+    }
   }
 
   ul.baseline {
     position: absolute;
     bottom: 0;
+    width: inherit;
+
+    li {
+      bottom: 0;
+      border-left-style: solid;
+      border-left-width: 4px;
+      padding-left: 20px;
+      line-height: 55px;
+      margin-top: 2px;
+      background-color: inherit;
+    }
+
+    li .side-submenu-settings{
+      position: absolute;
+      float:right;
+      left:255px;
+      background-color: $settings-color;
+      margin-top:-55px;
+      display: none;
+      -moz-box-shadow: 4px 7px 20px #666;
+      -webkit-box-shadow: 4px 7px 20px #666;
+      box-shadow: 4px 7px 20px #666;
+      text-transform: uppercase;
+      z-index: 9;
+
+      li {
+        padding-right: 10px;
+        width: $side-menu-width - 80px;
+        border-left: none;
+
+        a {
+          display: block;
+
+        }
+      }
+    }
+
+    li:hover > .side-submenu-settings {
+      display:flex;
+
+    }
   }
 }
 
@@ -168,19 +238,44 @@ a, a:active, a:hover, a:visited {
   padding: 12px 10px;
 }
 
+
 table {
   border-collapse: collapse;
   text-align: left;
-  margin: 20px;
+  width: 102%;
+  margin-left:-10px;
+
+  thead {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: $head-color;
+    font-weight: 300;
+    font-size: 13px;
+  }
+
+  tbody{
+
+    tr{
+      height: 47px;
+      font-size: 13px;
+
+      &:nth-of-type(odd){
+        background: rgba(255,255,255,0.8);
+      }
+
+      &:nth-of-type(even) {
+
+      }
+    }
+  }
 }
 
 table th {
-  border-bottom: 2px solid;
-  padding: 10px 8px;
+  padding: 10px 15px;
 }
 
 table td {
-  padding: 9px 8px 0;
+  padding: 9px 18px 0;
 }
 
 #logout-btn {
@@ -212,3 +307,26 @@ table td {
     margin-left: 15px;
   }
 }
+.btn{
+  width: 100%;
+  background-color: $bg-color;
+  height: 30.5px;
+  border-bottom: 4px solid rgba(0,0,0,0.1);
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  a{
+    text-transform: uppercase;
+    text-decoration: none;
+    color: white;
+    letter-spacing: 1px;
+    font-weight: bold;
+    display: block;
+    padding-top:10px;
+    padding-left: 5px;
+  }
+  &:hover{
+    opacity: 0.7;
+  }
+}
+
+

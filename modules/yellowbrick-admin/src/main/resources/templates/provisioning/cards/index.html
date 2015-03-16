@@ -34,7 +34,9 @@
                         <td th:text="${orderItem.order.export}"></td>
                         <td th:text="${orderItem.order.amount}"></td>
                         <td>
-                            <a th:href="@{'/provisioning/cards/' + ${orderItem.order.id}}">validate</a>
+                            <div class="btn">
+                                <a th:href="@{'/provisioning/cards/' + ${orderItem.order.id}}">validate</a>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
