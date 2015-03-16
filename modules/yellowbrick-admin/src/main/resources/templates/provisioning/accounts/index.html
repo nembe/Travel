@@ -5,6 +5,18 @@
 </head>
 <body>
     <div layout:fragment="content-inner">
+        <div class="section">
+            <form>
+                <label for="productGroup">Product group:</label>
+                <select name="productGroup" id="productGroup" onchange="this.form.submit()">
+                    <option th:each="pg : ${allProductGroups}"
+                            th:value="${pg.id}"
+                            th:selected="${pg == productGroup}"
+                            th:text="${pg.description}">Description</option>
+                </select>
+            </form>
+        </div>
+
         <div class="section" th:if="${#lists.isEmpty(customers)}">
             <h3>No customers pending validation.</h3>
         </div>
