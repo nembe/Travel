@@ -16,67 +16,62 @@
             <li class="dashboard" bw:activeforctx="/dashboard">
                 <a href="#">DASHBOARD</a>
                 <ul class="side-submenu">
-                     <li>
-                        <a href="#">one</a>
-                    </li>
-                    <li>
-                        <a href="#">two</a>
-                    </li>
+                    <h2> dashboard </h2>
+                    <li class="menu-back-button"><a href="#">back</a></li>
+                    <li><a href="#">one</a></li>
+                    <li><a href="#">two</a></li>
                 </ul>
             </li>
             <li class="customers" bw:activeforctx="/customers">
                 <a href="#">CUSTOMERS</a>
                 <ul class="side-submenu">
-                     <li>
-                        <a href="#">one</a>
+                    <h2> customers </h2>
+                    <li class="menu-back-button"><a href="#">back</a></li>
+                    <li><a href="#">one</a>
+                        <ul class="side-submenu">
+                        <h2> NEXT LEVEL </h2>
+                        <li class="menu-back-button"><a href="#">back</a></li>
+                        <li><a href="#">three</a></li>
+                        <li><a href="#">four</a></li>
+                    </ul>
                     </li>
-                    <li>
-                        <a href="#">two</a>
-                    </li>
+                    <li><a href="#">two</a></li>
                 </ul>
             </li>
             <li class="product-groups" bw:activeforctx="/product-groups">
                 <a href="#">PRODUCT GROUPS</a>
                 <ul class="side-submenu">
-                     <li>
-                        <a href="#">one</a>
-                    </li>
-                    <li>
-                        <a href="#">two</a>
-                    </li>
+                    <h2> product groups </h2>
+                    <li class="menu-back-button"><a href="#">back</a></li>
+                    <li><a href="#">one</a></li>
+                    <li><a href="#">two</a></li>
                 </ul>
             </li>
             <li class="municipalities" bw:activeforctx="/municipalities">
                 <a href="#">MUNICIPALITIES</a>
                 <ul class="side-submenu">
-                     <li>
-                        <a href="#">one</a>
-                    </li>
-                    <li>
-                        <a href="#">two</a>
-                    </li>
+                    <h2> municipalities </h2>
+                    <li class="menu-back-button"><a href="#">back</a></li>
+                    <li><a href="#">one</a></li>
+                    <li><a href="#">two</a></li>
                 </ul>
             </li>
             <li class="action-codes" bw:activeforctx="/action-codes">
                 <a href="#">ACTION CODES</a>
                 <ul class="side-submenu">
-                    <li>
-                        <a href="#">one</a>
-                    </li>
-                    <li>
-                        <a href="#">two</a>
-                    </li>
+                    <h2> action codes </h2>
+                    <li class="menu-back-button"><a href="#">back</a></li>
+                    <li><a href="#">one</a></li>
+                    <li><a href="#">two</a></li>
                 </ul>
             </li>
             <li class="provisioning" bw:activeforctx="/provisioning">
                 <a th:href="@{/provisioning/accounts}">PROVISIONING</a>
                 <ul class="side-submenu">
-                    <li>
-                        <a href="#">one</a>
-                    </li>
-                    <li>
-                        <a href="#">two</a>
-                    </li>
+                    <h2> provisioning </h2>
+                    <li class="menu-back-button"><a href="#">back</a></li>
+                    <li><a href="#">one</a></li>
+                    <li><a href="#">two</a></li>
                 </ul>
             </li>
         </ul>
@@ -102,6 +97,14 @@
             </li>
         </ul>
     </div>
+    <script type="text/javascript">
+
+    $('#side-menu ul li').click(function() {
+        $(this).find('ul').first().toggleClass('active');
+    });
+
+
+    </script>
 
     <div id="main">
         <div layout:fragment="content"></div>
