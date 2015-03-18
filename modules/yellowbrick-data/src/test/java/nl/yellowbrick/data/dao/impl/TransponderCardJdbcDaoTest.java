@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -31,6 +31,7 @@ public class TransponderCardJdbcDaoTest extends BaseSpringTestCase {
     public void fetches_card_by_id() {
         TransponderCard actualCard = dao.findById(CARD_ID).get();
 
+        assertThat(actualCard.getMutationDate(), equalTo(testCard().getMutationDate()));
         assertThat(actualCard, equalTo(testCard()));
     }
 
@@ -100,7 +101,7 @@ public class TransponderCardJdbcDaoTest extends BaseSpringTestCase {
         card.setStatus(CardStatus.ACTIVE);
         card.setLicenseplate("39-LB-40");
         card.setCountry("NL");
-        card.setMutationDate(Timestamp.from(Instant.parse("2014-12-14T19:04:22.000Z")));
+        card.setMutationDate(Timestamp.valueOf(LocalDateTime.of(2014, 12, 14, 19, 4, 22)));
         card.setMutator("ADMIN:ron");
 
         return card;

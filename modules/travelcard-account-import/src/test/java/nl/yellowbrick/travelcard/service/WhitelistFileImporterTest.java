@@ -66,9 +66,12 @@ public class WhitelistFileImporterTest {
         when(cardBindingService.assignActiveTransponderCard(any())).thenReturn(EXAMPLE_CARD);
     }
 
-    @Test(expected = IOException.class)
+    @Test(expected = Exception.class)
     public void throws_early_exception_if_cant_create_done_dir() throws Exception {
-        newFileImporter("/dev/null/something");
+        if(System.getProperty("os.name").toLowerCase().contains("win"))
+            newFileImporter("??????");
+        else
+            newFileImporter("/dev/null/something");
     }
 
     @Test

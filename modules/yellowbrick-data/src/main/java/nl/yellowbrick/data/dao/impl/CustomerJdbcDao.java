@@ -23,7 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.Instant;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
@@ -107,7 +107,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
 
         Date dayOfBirth = Date.from(Instant
                         .ofEpochMilli(dateOfBirth.getTime())
-                        .atOffset(ZoneOffset.ofHours(0))
+                        .atZone(ZoneId.systemDefault())
                         .truncatedTo(ChronoUnit.DAYS)
                         .toInstant()
         );

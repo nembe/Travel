@@ -53,12 +53,6 @@ The following configuration is available (**note**: not an exaustive list):
 * The application ships with embedded configuration for all environments (in a file at the root of the jar named **application.yml**)
 * The embedded configuration is overriden by any config placed at `config/application.yml` (relative to where the jar is being launched from)
 
-## Prerequisites
-
-* JDK 8
-* Access to the artifactory server at Yellowbrick
-* Oracle 10g for running the app locally (tests run against in-memory database)
-
 ## Development workflow
 
 * DAO code should go into the yellowbrick-data module
