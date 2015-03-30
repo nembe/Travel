@@ -48,27 +48,60 @@ END {
 }
 EOF
 
-if [ -z "$1" ]; 
+if [ -z "$1" ];
 then
-  echo "Usage: convert.sh ./in/*.txt ./out"
+  echo "Usage: convert.sh ./out"
   exit 1
 fi
 
-in=(${@:0:$#}) # all except last argument
+# SFTP config
+HOST=sftp.tmcit.nl
+USER=trvlcrdusr
+PASS=1wtuybn
+PORT=2022
+PICKUP_DIR=/files/whitelist
+DROPOFF_DIR=/files/whitelist/backup
+
+function do_in_sftp {
+  lftp -u ${USER},${PASS} -p ${PORT} sftp://${HOST} $1
+}
+
+function copy_files_from_sftp {
+  pushd tmp
+  do_in_sftp <<EOF
+    mget $PICKUP_DIR/*.txt
+    bye
+EOF
+  popd
+}
+
+function move_done_file_sftp {
+  echo "moving $1 to dropoff directory"
+
+  do_in_sftp <<EOF
+    mv $PICKUP_DIR/$1 $DROPOFF_DIR/$1
+EOF
+}
+
 out=${*: -1} # last argument
 
-for file in "${in[@]}"
+copy_files_from_sftp
+
+for file in `ls -v tmp/*.txt`
 do
   csv=$(awk "$PARSER" $file)
-  if [ $? -eq 0 ]; 
+  if [ $? -eq 0 ];
   then
-    filename="$out/$(basename $file).csv"
+    basename=$(basename $file)
+    filename="work/$basename.csv"
     echo "$csv" > $filename
     echo "wrote converted $filename"
-    donefilename="$file.done"
-    mv $file $donefilename
-    echo "moved original $donefilename"
+    mv $filename $out
+    move_done_file_sftp $basename
   else
     echo "parse error or incomplete file: $file"
   fi
 done
+
+rm tmp/*
+
