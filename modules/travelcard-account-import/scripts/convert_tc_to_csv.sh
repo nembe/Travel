@@ -83,6 +83,20 @@ function move_done_file_sftp {
 EOF
 }
 
+function younger_than_last_processed {
+  ! [ -a .processed ] && return 0 # no .processed file yet
+  last_processed=$(cat .processed | head -n 1)
+  [ $1 = $(echo -e "$1\n$last_processed" | sort -V | tail -n 1) ] && return 0 || return 1
+}
+
+function update_last_processed {
+  echo "$1" > .processed
+}
+
+function notify_outdated_file {
+  echo "Skipping file $1" | mail -s "[TCIMPORT] outdated whitelist file" beheer@brickparking.com
+}
+
 out=${*: -1} # last argument
 
 copy_files_from_sftp
@@ -93,11 +107,18 @@ do
   if [ $? -eq 0 ];
   then
     basename=$(basename $file)
-    filename="work/$basename.csv"
-    echo "$csv" > $filename
-    echo "wrote converted $filename"
-    mv $filename $out
-    move_done_file_sftp $basename
+    if younger_than_last_processed $basename;
+    then
+        filename="work/$basename.csv"
+        echo "$csv" > $filename
+        echo "wrote converted $filename"
+        mv $filename $out
+        move_done_file_sftp $basename
+        update_last_processed $basename
+    else
+        echo "skipping outdated file: $basename"
+        notify_outdated_file $basename
+    fi
   else
     echo "parse error or incomplete file: $file"
   fi
