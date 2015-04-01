@@ -93,7 +93,7 @@ public class CardBindingServiceTest {
     }
 
     @Test
-    public void reactivates_transponder_card_if_one_already_exists() {
+    public void reactivates_transponder_card_if_one_already_exists_and_updates_its_license_plate_() {
         WhitelistEntry entry = new WhitelistEntry("1111", "AA-BB-CC");
         TransponderCard existingCard = new TransponderCard();
         existingCard.setId(123l);
@@ -105,7 +105,8 @@ public class CardBindingServiceTest {
         assertThat(cardBindingService.assignActiveTransponderCard(entry), is(existingCard));
 
         verify(transponderCardDao, atLeastOnce()).findByCardNumber(existingCard.getCardNumber());
-        verify(transponderCardDao).activateCard(existingCard.getId());
+        verify(transponderCardDao).activateCard(existingCard.getId(), mainAccountId);
+        verify(transponderCardDao).updateLicensePlate(existingCard.getId(), "AA-BB-CC");
         verifyNoMoreInteractions(transponderCardDao);
     }
 

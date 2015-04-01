@@ -37,10 +37,6 @@ public class CardBindingService {
         transponderCardDao.cancelCard(entry.getTransponderCardId());
     }
 
-    public void updateLicensePlate(WhitelistEntry entry) {
-        transponderCardDao.updateLicensePlate(entry.getTransponderCardId(), entry.getLicensePlate());
-    }
-
     public TransponderCard assignActiveTransponderCard(WhitelistEntry entry) {
         String cardNr = entry.getTravelcardNumber();
         Optional<TransponderCard> maybeCard = transponderCardDao.findByCardNumber(cardNr);
@@ -63,14 +59,15 @@ public class CardBindingService {
     }
 
     private TransponderCard assignExistingCard(TransponderCard card, WhitelistEntry entry) {
-        if(card.getCustomerId() != mainAccountId) {
+        if(card.getCustomerId() > 0 && card.getCustomerId() != mainAccountId) {
             String err = String.format("Travelcard number %s matches card belonging to customer id %s",
                     entry.getTravelcardNumber(),
                     card.getCustomerId());
             throw new IllegalStateException(err);
         }
 
-        transponderCardDao.activateCard(card.getId());
+        transponderCardDao.activateCard(card.getId(), mainAccountId);
+        transponderCardDao.updateLicensePlate(card.getId(), entry.getLicensePlate());
 
         return transponderCardDao.findByCardNumber(card.getCardNumber()).get();
     }

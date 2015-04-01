@@ -16,5 +16,5 @@ public interface TransponderCardDao {
 
     void cancelCard(long transponderCardId);
 
-    void activateCard(long transponderCardId);
+    void activateCard(long transponderCardId, long customerId);
 }
