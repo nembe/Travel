@@ -10,7 +10,9 @@ public interface SystemUserDao {
 
     String createAndStoreUserToken(Customer customer, LocalDateTime validity);
 
-    void deleteAppUserByCardId(Long transponderCardId);
+    void deleteAppUserByCardId(long transponderCardId);
 
     void createAppUser(TransponderCard card, String username, String password, UserAccountType accountType);
+
+    boolean existsAppUserForCard(long transponderCardId);
 }

@@ -21,7 +21,6 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class WhitelistFileImporter implements WhitelistFileWatchListener {
@@ -92,25 +91,22 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
         importDao.deleteAllObsolete();
     }
 
-    private void createOrUpdateEntry(WhitelistEntry entry) {
-        Optional<WhitelistEntry> maybeExistingEntry = importDao.findByTravelcardNumber(entry.getTravelcardNumber());
+    private void createOrUpdateEntry(WhitelistEntry newEntry) {
+        WhitelistEntry entry = importDao.findByTravelcardNumber(newEntry.getTravelcardNumber()).orElse(newEntry);
 
-        if(maybeExistingEntry.isPresent()) {
-            WhitelistEntry existingEntry = maybeExistingEntry.get();
-            existingEntry.setLicensePlate(entry.getLicensePlate());
-            existingEntry.setObsolete(false);
+        TransponderCard card = cardBindingService.assignActiveTransponderCard(entry);
+        entry.setTransponderCardId(card.getId());
 
-            TransponderCard card = cardBindingService.assignActiveTransponderCard(existingEntry);
-            existingEntry.setTransponderCardId(card.getId());
-
-            importDao.updateEntry(existingEntry);
+        if(!entry.equals(newEntry)) {
+            entry.setLicensePlate(newEntry.getLicensePlate());
+            entry.setObsolete(false);
+            importDao.updateEntry(entry);
         } else {
-            TransponderCard card = cardBindingService.assignActiveTransponderCard(entry);
-            entry.setTransponderCardId(card.getId());
-
             importDao.createEntry(entry);
-            systemUserDao.createAppUser(card, username(entry), password(entry), UserAccountType.RESTRICTED_SUBACCOUNT);
         }
+
+        if(!systemUserDao.existsAppUserForCard(card.getId()))
+            systemUserDao.createAppUser(card, username(entry), password(entry), UserAccountType.RESTRICTED_SUBACCOUNT);
     }
 
     private void checkDoneDirectory() throws IOException {
