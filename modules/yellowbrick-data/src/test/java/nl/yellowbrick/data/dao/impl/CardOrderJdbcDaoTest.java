@@ -21,7 +21,7 @@ import static nl.yellowbrick.data.database.Functions.CALL_RECORDERS;
 import static nl.yellowbrick.data.database.Functions.FunctionCall;
 import static nl.yellowbrick.data.domain.CardOrderStatus.*;
 import static nl.yellowbrick.data.domain.CardType.*;
-import static nl.yellowbrick.data.matchers.DateMatchers.after;
+import static org.exparity.hamcrest.date.DateMatchers.after;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;

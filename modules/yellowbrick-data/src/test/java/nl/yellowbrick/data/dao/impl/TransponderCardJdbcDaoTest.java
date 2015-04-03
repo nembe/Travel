@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+import static org.exparity.hamcrest.date.DateMatchers.isToday;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -20,6 +21,7 @@ public class TransponderCardJdbcDaoTest extends BaseSpringTestCase {
 
     public static final long CARD_ID = 222005;
     public static final String CARD_NUMBER = "278577";
+    public static final long CUSTOMER_ID = 4776;
 
     @Autowired
     TransponderCardJdbcDao dao;
@@ -71,6 +73,8 @@ public class TransponderCardJdbcDaoTest extends BaseSpringTestCase {
         TransponderCard card = dao.findById(CARD_ID).get();
 
         assertThat(card.getLicenseplate(), is("bla bla"));
+        assertThat(card.getMutator(), is("TEST MUTATOR"));
+        assertThat(card.getMutationDate(), isToday());
     }
 
     @Test
@@ -80,6 +84,8 @@ public class TransponderCardJdbcDaoTest extends BaseSpringTestCase {
         TransponderCard card = dao.findById(CARD_ID).get();
 
         assertThat(card.getStatus(), is(CardStatus.INACTIVE));
+        assertThat(card.getMutator(), is("TEST MUTATOR"));
+        assertThat(card.getMutationDate(), isToday());
     }
 
     @Test
@@ -88,9 +94,13 @@ public class TransponderCardJdbcDaoTest extends BaseSpringTestCase {
 
         assertThat(dao.findById(CARD_ID).get().getStatus(), is(CardStatus.INACTIVE));
 
-        dao.activateCard(CARD_ID);
+        dao.activateCard(CARD_ID, CUSTOMER_ID);
+        TransponderCard card = dao.findById(CARD_ID).get();
 
-        assertThat(dao.findById(CARD_ID).get().getStatus(), is(CardStatus.ACTIVE));
+        assertThat(card.getStatus(), is(CardStatus.ACTIVE));
+        assertThat(card.getCustomerId(), is(CUSTOMER_ID));
+        assertThat(card.getMutator(), is("TEST MUTATOR"));
+        assertThat(card.getMutationDate(), isToday());
     }
 
     private TransponderCard testCard() {

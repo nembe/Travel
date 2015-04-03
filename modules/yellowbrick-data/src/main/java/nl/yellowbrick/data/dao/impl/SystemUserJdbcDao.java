@@ -49,9 +49,18 @@ public class SystemUserJdbcDao implements SystemUserDao {
     }
 
     @Override
-    public void deleteAppUserByCardId(Long transponderCardId) {
+    public void deleteAppUserByCardId(long transponderCardId) {
         String sql = "delete from SYSTEMUSER where transpondercardidfk = ?";
 
         template.update(sql, transponderCardId);
+    }
+
+    @Override
+    public boolean existsAppUserForCard(long transponderCardId) {
+        String sql = "select case " +
+                "when exists (select * from systemuser where transpondercardidfk = ?) then 1 " +
+                "else 0 end from dual";
+
+        return template.queryForObject(sql, Boolean.class, transponderCardId);
     }
 }

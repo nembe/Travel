@@ -22,9 +22,9 @@ public class TransponderCardJdbcDao implements TransponderCardDao {
 
     @Override
     public void updateLicensePlate(long transponderCardId, String licensePlate) {
-        String sql = "update transpondercard set licenseplate = ? where transpondercardid = ?";
+        String sql = "update transpondercard set licenseplate = ?, mutator = ?, mutation_date = sysdate where transpondercardid = ?";
 
-        template.update(sql, licensePlate, transponderCardId);
+        template.update(sql, licensePlate, mutator.get(), transponderCardId);
     }
 
     @Override
@@ -63,16 +63,25 @@ public class TransponderCardJdbcDao implements TransponderCardDao {
 
     @Override
     public void cancelCard(long transponderCardId) {
-        String sql = "update transpondercard set cardstatusidfk = ? where transpondercardid = ?";
+        String sql = "update transpondercard set " +
+                "cardstatusidfk = ?, " +
+                "mutator = ?, " +
+                "mutation_date = sysdate " +
+                "where transpondercardid = ?";
 
-        template.update(sql, CardStatus.INACTIVE.code(), transponderCardId);
+        template.update(sql, CardStatus.INACTIVE.code(), mutator.get(), transponderCardId);
     }
 
     @Override
-    public void activateCard(long transponderCardId) {
-        String sql = "update transpondercard set cardstatusidfk = ? where transpondercardid = ?";
+    public void activateCard(long transponderCardId, long customerId) {
+        String sql = "update transpondercard set " +
+                "cardstatusidfk = ?, " +
+                "customeridfk = ?, " +
+                "mutator = ?, " +
+                "mutation_date = sysdate " +
+                "where transpondercardid = ?";
 
-        template.update(sql, CardStatus.ACTIVE.code(), transponderCardId);
+        template.update(sql, CardStatus.ACTIVE.code(), customerId, mutator.get(), transponderCardId);
     }
 
     private RowMapper<TransponderCard> rowMapper() {

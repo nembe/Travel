@@ -96,7 +96,7 @@ public class WhitelistFileImporterTest {
     }
 
     @Test
-    public void updates_license_plate_for_existing_entries_removing_others() throws Exception {
+    public void updates_existing_entries() throws Exception {
         WhitelistEntry existing = new WhitelistEntry(TC_NUMBER, "AA-BB-CC", 1l);
         existing.setObsolete(true);
 
@@ -112,13 +112,13 @@ public class WhitelistFileImporterTest {
 
         InOrder inOrder = inOrder(importDao, cardBindingService);
         inOrder.verify(importDao).markAllAsObsolete();
+        inOrder.verify(cardBindingService).assignActiveTransponderCard(expected);
         inOrder.verify(importDao).updateEntry(expected);
-        inOrder.verify(cardBindingService).updateLicensePlate(expected);
         inOrder.verify(importDao).deleteAllObsolete();
     }
 
     @Test
-    public void creates_new_entries_removing_others() throws Exception {
+    public void creates_new_entries() throws Exception {
         WhitelistEntry newEntry = new WhitelistEntry(TC_NUMBER, "AA-BB-CC ");
 
         when(parser.parseFile(testFile)).thenReturn(Lists.newArrayList(newEntry));

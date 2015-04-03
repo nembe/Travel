@@ -4,6 +4,7 @@ import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.database.DbHelper;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.TransponderCard;
+import nl.yellowbrick.data.domain.UserAccountType;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,9 +55,7 @@ public class SystemUserJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void creates_app_user() {
-        TransponderCard card = new TransponderCard();
-        card.setId(123l);
-        card.setCustomerId(456l);
+        TransponderCard card = testCard();
 
         systemUserDao.createAppUser(card, "user", "pass", RESTRICTED_SUBACCOUNT);
 
@@ -78,10 +77,29 @@ public class SystemUserJdbcDaoTest extends BaseSpringTestCase {
         db.accept(t -> {
             assertThat(t.update("update systemuser set transpondercardidfk = 123"), greaterThan(0));
 
-            systemUserDao.deleteAppUserByCardId(123l);
+            systemUserDao.deleteAppUserByCardId(123);
 
             assertThat(userCount(t), is(0));
         });
+    }
+
+    @Test
+    public void checks_existence_of_user_associated_with_card() {
+        assertThat(systemUserDao.existsAppUserForCard(123), is(false));
+
+        // create some user ...
+        systemUserDao.createAppUser(testCard(), "user", "pass", UserAccountType.APPLOGIN);
+
+        // and re-assert
+        assertThat(systemUserDao.existsAppUserForCard(123), is(true));
+    }
+
+    private TransponderCard testCard() {
+        TransponderCard card = new TransponderCard();
+        card.setId(123l);
+        card.setCustomerId(456l);
+
+        return card;
     }
 
     private Map<String, Object> fetchLatestUser(JdbcTemplate template) {
