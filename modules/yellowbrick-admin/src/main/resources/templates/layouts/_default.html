@@ -100,7 +100,10 @@
     <script type="text/javascript">
 
     $('#side-menu ul li').click(function() {
-        $(this).find('ul').first().toggleClass('active');
+        $(this).find('ul').first().addClass('active');
+    });
+     $('.menu-back-button').click(function() {
+        $(".menu-back-button").parent('').removeClass('active');
     });
     </script>
 

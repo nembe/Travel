@@ -88,7 +88,7 @@ a, a:active, a:hover, a:visited {
       position: absolute;
       color: $text-color;
       float: right;
-      top: 0;
+      top: 60px;
       height: 100%;
       background-color: $bg-color;
       left: -90%;
@@ -97,6 +97,10 @@ a, a:active, a:hover, a:visited {
       border-right: 1px solid rgba(0,0,0,0.2);
       transition: 0.5s;
 
+      .side-submenu{
+        top: 0;
+
+      }
 
       h2 {
         font-size: 1.2em;
@@ -109,7 +113,6 @@ a, a:active, a:hover, a:visited {
 
         &:hover {
           background-color:rgba(0,0,0,0.1);
-
 
         }
       }
@@ -336,5 +339,21 @@ table td {
 #side-menu ul li .active{
   transition: 0.5s;
   left: 0;
+
+  &:after{
+    height: 100%;
+    width: 8%;
+    background-color: black;
+    opacity: 0.1;
+    right: -25px;
+    position: absolute;
+    content: " ";
+    z-index: -1;
+    top: 0;
+    filter: blur(9px);
+    -webkit-filter: blur(9px);
+    -moz-filter: blur(9px);
+
+  }
 }
 
