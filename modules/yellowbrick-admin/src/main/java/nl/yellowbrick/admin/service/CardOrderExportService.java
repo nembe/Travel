@@ -24,9 +24,6 @@ public class CardOrderExportService {
     private CardOrderDao cardOrderDao;
 
     @Autowired
-    private ProductGroupDao productGroupDao;
-
-    @Autowired
     private CustomerDao customerDao;
 
     @Autowired
@@ -44,7 +41,7 @@ public class CardOrderExportService {
     public void exportForProductGroup(ProductGroup productGroup) {
         cardOrderDao.findPendingExport(productGroup)
                 .stream()
-                .map(this::createExportRecord)
+                .map(order -> createExportRecord(order, productGroup))
                 .collect(groupingBy(CardOrderExportRecord::target, toList()))
                 .forEach((target, exports) -> exportRecords(target, productGroup, exports));
     }
@@ -58,14 +55,10 @@ public class CardOrderExportService {
 
     }
 
-    private CardOrderExportRecord createExportRecord(CardOrder order) {
+    private CardOrderExportRecord createExportRecord(CardOrder order, ProductGroup productGroup) {
         Customer customer = customerDao
                 .findById(order.getCustomerId())
                 .orElseThrow(() -> new InconsistentDataException("couldn't find customer with id: " + order.getCustomerId()));
-
-        ProductGroup productGroup = productGroupDao
-                .findById(customer.getProductGroupId())
-                .orElseThrow(() -> new InconsistentDataException("couldn't find product group id: " + customer.getProductGroupId()));
 
         // assign qpark code if needed
         String qparkCode = order.getCardType().equals(CardType.QPARK_CARD)

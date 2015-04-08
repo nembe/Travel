@@ -74,6 +74,6 @@ public class CardOrderCsvExporter {
                 .on("_").join(time, productGroup.getDescription(), SUFFIXES.get(target))
                 .concat(".csv");
 
-        return baseExportPath.resolve(path);
+        return baseExportPath.resolve(path.replaceAll("\\s", ""));
     }
 }

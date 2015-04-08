@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  */
 public class Functions {
 
-    public static final String TEST_QCARD_NUMBER = "TEST_QCARD_NUMBER";
+    public static final String TEST_QCARD_NUMBER = "004695";
     public static int VALIDATE_MEMBERSHIP_RETVAL = -1;
 
     public static List<Consumer<FunctionCall>> CALL_RECORDERS = new ArrayList<>();
