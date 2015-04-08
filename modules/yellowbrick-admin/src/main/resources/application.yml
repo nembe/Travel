@@ -17,6 +17,9 @@ ldap:
   userDn: CN=ldap_user,CN=Users,DC=waysis,DC=local
   password: ldap_user
 
+orderexport:
+  path: /tmp
+
 mutator: ADMIN
 
 ---

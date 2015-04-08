@@ -1,9 +1,6 @@
 package nl.yellowbrick.data.dao;
 
-import nl.yellowbrick.data.domain.CardOrder;
-import nl.yellowbrick.data.domain.CardOrderStatus;
-import nl.yellowbrick.data.domain.CardType;
-import nl.yellowbrick.data.domain.Customer;
+import nl.yellowbrick.data.domain.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +23,13 @@ public interface CardOrderDao {
 
     List<CardOrder> findByStatus(CardOrderStatus status);
 
+    List<CardOrder> findPendingExport(ProductGroup productGroup);
+
     Optional<CardOrder> findById(long id);
 
     void delete(long id);
+
+    void updateCardNumber(long cardOrderId, String cardNumber);
+
+    void updateOrderStatus(long cardOrderId, CardOrderStatus status);
 }

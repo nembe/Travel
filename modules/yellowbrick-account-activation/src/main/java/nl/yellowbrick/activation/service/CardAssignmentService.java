@@ -24,7 +24,7 @@ public class CardAssignmentService {
     @Autowired
     private CardOrderDao cardOrderDao;
 
-    public void assignToCustomer(Customer customer) {
+    public void assignAllOrderedByCustomer(Customer customer) {
         log.info("Assigning cards to customer ID " + customer.getCustomerId());
 
         List<CardOrder> cardOrders = ordersForCustomer(customer);
@@ -52,8 +52,21 @@ public class CardAssignmentService {
 
                 log.info("Assigning card number {} to customer ID {}", lastUsedNumber, customer.getCustomerId());
                 cardOrderDao.processTransponderCard(lastUsedNumber, customer, updateMobileWithCard);
+                cardOrderDao.updateCardNumber(cardOrder.getId(), lastUsedNumber);
             }
         }
+    }
+
+    public String assignQcardNumber(CardOrder order) {
+        if(!order.getCardType().equals(CardType.QPARK_CARD)) {
+            log.error("assignQcardNumber called with card type {} for order id {}",
+                    order.getCardType().name(), order.getId());
+            throw new IllegalArgumentException("Expected card type " + CardType.QPARK_CARD.name());
+        }
+
+        // TODO implement
+        // call WEBAPP.getQcardNr(?,?)
+        return "";
     }
 
     private List<CardOrder> ordersForCustomer(Customer customer) {

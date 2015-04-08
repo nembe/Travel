@@ -56,7 +56,7 @@ public class CardAssignmentServiceTest {
 
         tCardOrderA.setAmount(5);
 
-        cardAssignmentService.assignToCustomer(customer);
+        cardAssignmentService.assignAllOrderedByCustomer(customer);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class CardAssignmentServiceTest {
         tCardOrderA.setCardNumber("12345");
         tCardOrderB.setCardNumber("67890");
 
-        cardAssignmentService.assignToCustomer(customer);
+        cardAssignmentService.assignAllOrderedByCustomer(customer);
 
         verify(cardOrderDao, never()).processTransponderCard(any(), any(), anyBoolean());
     }
@@ -75,7 +75,7 @@ public class CardAssignmentServiceTest {
         when(cardOrderDao.nextTransponderCardNumbers(eq(customer.getProductGroupId()), anyInt(), any()))
                 .thenReturn(Arrays.asList("1"), Arrays.asList("2"));
 
-        cardAssignmentService.assignToCustomer(customer);
+        cardAssignmentService.assignAllOrderedByCustomer(customer);
 
         InOrder inOrder = inOrder(cardOrderDao);
 
