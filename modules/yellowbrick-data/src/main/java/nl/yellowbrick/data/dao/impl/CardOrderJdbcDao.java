@@ -27,6 +27,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     private static final String CARD_ORDER_UPDATE_PROC = "cardorderUpdate";
     private static final String CARD_ORDER_VALIDATE_PROC = "CardOrderValidate";
     private static final String PROCESS_TRANSPONDERCARDS_PROC = "PROCESS_TRANSPONDERCARDS";
+    private static final String GET_QCARD_NUMBER_PROC = "getQcardNr";
 
     @Autowired
     private JdbcTemplate template;
@@ -38,6 +39,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     private SimpleJdbcCall cardOrderUpdateCall;
     private SimpleJdbcCall cardOrderValidateCall;
     private SimpleJdbcCall processTransponderCardsCall;
+    private SimpleJdbcCall getQCardNumber;
 
     private Logger log = LoggerFactory.getLogger(CardOrderJdbcDao.class);
 
@@ -157,6 +159,13 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         template.update("UPDATE CARDORDER SET ORDERSTATUS = ? WHERE ORDERID = ?", status.code(), cardOrderId);
     }
 
+    @Override
+    public String nextQCardNumber(long customerId) {
+        Map<String, Object> res = getQCardNumber.execute(customerId);
+
+        return res.get("qcardNR").toString();
+    }
+
     private RowMapper<CardOrder> cardOrderRowMapper() {
         return new RowMapper<CardOrder>() {
             @Override
@@ -226,8 +235,17 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                         new SqlParameter("p_updateMobileWithCard", Types.NUMERIC)
                 );
 
+        getQCardNumber = new SimpleJdbcCall(template)
+                .withCatalogName(PACKAGE)
+                .withProcedureName(GET_QCARD_NUMBER_PROC)
+                .declareParameters(
+                        new SqlParameter("Customer_in", Types.NUMERIC),
+                        new SqlOutParameter("qcardNR", Types.VARCHAR)
+                );
+
         saveSpecialTarifCall.compile();
         cardOrderUpdateCall.compile();
         cardOrderValidateCall.compile();
+        getQCardNumber.compile();
     }
 }

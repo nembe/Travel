@@ -32,4 +32,6 @@ public interface CardOrderDao {
     void updateCardNumber(long cardOrderId, String cardNumber);
 
     void updateOrderStatus(long cardOrderId, CardOrderStatus status);
+
+    String nextQCardNumber(long customerId);
 }

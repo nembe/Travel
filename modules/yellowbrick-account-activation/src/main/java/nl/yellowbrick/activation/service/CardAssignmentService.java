@@ -64,9 +64,7 @@ public class CardAssignmentService {
             throw new IllegalArgumentException("Expected card type " + CardType.QPARK_CARD.name());
         }
 
-        // TODO implement
-        // call WEBAPP.getQcardNr(?,?)
-        return "";
+        return cardOrderDao.nextQCardNumber(order.getCustomerId());
     }
 
     private List<CardOrder> ordersForCustomer(Customer customer) {
