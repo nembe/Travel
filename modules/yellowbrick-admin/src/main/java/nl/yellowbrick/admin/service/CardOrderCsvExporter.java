@@ -3,6 +3,7 @@ package nl.yellowbrick.admin.service;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import nl.yellowbrick.admin.domain.CardOrderExportRecord;
 import nl.yellowbrick.admin.domain.CardOrderExportTarget;
 import nl.yellowbrick.data.domain.ProductGroup;
@@ -21,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class CardOrderCsvExporter {
@@ -69,9 +71,20 @@ public class CardOrderCsvExporter {
         }
     }
 
+    public List<Path> listExports(ProductGroup productGroup) {
+        try {
+            return Files.list(exportsDir(productGroup))
+                    .sorted()
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            LOG.error("Failed to retrieve exports lists for group " + productGroup.getDescription(), e);
+            return Lists.newArrayList();
+        }
+    }
+
     private Path resolveFilePath(CardOrderExportTarget target, ProductGroup productGroup) throws IOException {
         String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm"));
-        Path dir = baseExportPath.resolve(productGroup.getId().toString());
+        Path dir = exportsDir(productGroup);
         dir = Files.createDirectory(dir);
 
         String filename = Joiner
@@ -80,5 +93,9 @@ public class CardOrderCsvExporter {
                 .replaceAll("\\s", "");
 
         return dir.resolve(filename);
+    }
+
+    private Path exportsDir(ProductGroup productGroup) {
+        return baseExportPath.resolve(productGroup.getId().toString());
     }
 }

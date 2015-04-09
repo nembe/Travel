@@ -18,6 +18,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.UnsupportedEncodingException;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
 @ActiveProfiles("test")
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = { MvcTestConfiguration.class, TestConfiguration.class })
@@ -32,6 +34,10 @@ public class BaseMvcTestCase {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
+    }
+
+    protected MvcResult mvcGet(String path) throws Exception {
+        return mockMvc.perform(get(path)).andReturn();
     }
 
     protected static Document parseHtml(MvcResult res) {

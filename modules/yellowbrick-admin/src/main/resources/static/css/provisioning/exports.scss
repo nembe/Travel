@@ -1,0 +1,11 @@
+#card-order-export {
+
+  #exports-list table  {
+    table-layout: fixed;
+    max-width: 800px;
+
+    & th:last-child {
+      width: 150px;
+    }
+  }
+}

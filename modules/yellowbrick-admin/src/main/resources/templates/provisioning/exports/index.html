@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html layout:decorator="provisioning/_layout" th:with="title=#{provisioning.exports.title}">
+<body id="card-order-export">
+    <div layout:fragment="content-inner">
+        <div class="section">
+            <form>
+                <label for="productGroup">Product group:</label>
+                <select name="productGroup" id="productGroup" onchange="this.form.submit()">
+                    <option th:each="pg : ${allProductGroups}"
+                            th:value="${pg.id}"
+                            th:selected="${pg == productGroup}"
+                            th:text="${pg.description}">Description</option>
+                </select>
+            </form>
+        </div>
+
+        <div class="section" th:if="${#lists.isEmpty(exports)}">
+            <h3>No exports available.</h3>
+        </div>
+
+        <div id="exports-list" class="section" th:unless="${#lists.isEmpty(exports)}">
+            <h3>List of card order exports</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>File name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="export : ${exports}">
+                        <td th:text="${export.fileName}"></td>
+                        <td>
+                            <div class="btn">
+                                <a th:href="@{${export.downloadUrl}}">Download</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
