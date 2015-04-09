@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -70,10 +71,14 @@ public class CardOrderCsvExporter {
 
     private Path resolveFilePath(CardOrderExportTarget target, ProductGroup productGroup) throws IOException {
         String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm"));
-        String path = Joiner
-                .on("_").join(time, productGroup.getDescription(), SUFFIXES.get(target))
-                .concat(".csv");
+        Path dir = baseExportPath.resolve(productGroup.getId().toString());
+        dir = Files.createDirectory(dir);
 
-        return baseExportPath.resolve(path.replaceAll("\\s", ""));
+        String filename = Joiner
+                .on("_").join(time, productGroup.getDescription(), SUFFIXES.get(target))
+                .concat(".csv")
+                .replaceAll("\\s", "");
+
+        return dir.resolve(filename);
     }
 }

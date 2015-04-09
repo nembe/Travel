@@ -69,7 +69,7 @@ public class CardOrderExportServiceIntegrationTest extends BaseMvcTestCase {
 
         exportService.exportForProductGroup(yellowbrickPg);
 
-        File export = latestFileFromOutputDir();
+        File export = latestFileFromOutputDir(yellowbrickPg);
         CardOrder order = cardOrderDao.findByStatusAndType(CardOrderStatus.EXPORTED, CardType.TRANSPONDER_CARD).get(0);
 
         assertThat(export.getName(), endsWith("_YELLOWBRICK_Transponderkaart.csv"));
@@ -86,8 +86,7 @@ public class CardOrderExportServiceIntegrationTest extends BaseMvcTestCase {
         when(cardOrderDao.findPendingExport(pg)).thenReturn(Arrays.asList(qcardOrder));
 
         exportService.exportForProductGroup(pg);
-
-        File export = latestFileFromOutputDir();
+        File export = latestFileFromOutputDir(pg);
 
         assertThat(export.getName(), endsWith("_TESTPG_QCARD.csv"));
         assertThat(readFile(export), equalTo(sampleQCardExport()));
@@ -102,8 +101,7 @@ public class CardOrderExportServiceIntegrationTest extends BaseMvcTestCase {
         when(cardOrderDao.findPendingExport(pg)).thenReturn(Arrays.asList(rtpCardOrder));
 
         exportService.exportForProductGroup(pg);
-
-        File export = latestFileFromOutputDir();
+        File export = latestFileFromOutputDir(pg);
 
         assertThat(export.getName(), endsWith("_TESTPG_RTP-Kaart.csv"));
     }
@@ -121,8 +119,7 @@ public class CardOrderExportServiceIntegrationTest extends BaseMvcTestCase {
         when(cardOrderDao.findPendingExport(pg)).thenReturn(Arrays.asList(rtpCardOrder, tCardOrder, qCardOrder));
 
         exportService.exportForProductGroup(pg);
-
-        File export = latestFileFromOutputDir();
+        File export = latestFileFromOutputDir(pg);
 
         assertThat(export.getName(), endsWith("_TESTPG_Transponderkaart.csv"));
         assertThat(Files.readLines(export, Charsets.UTF_8), hasSize(4)); // 3 records and the columns header
@@ -148,8 +145,8 @@ public class CardOrderExportServiceIntegrationTest extends BaseMvcTestCase {
         return Files.toString(file, Charsets.UTF_8);
     }
 
-    private File latestFileFromOutputDir() {
-        return outputDir.toFile().listFiles()[0];
+    private File latestFileFromOutputDir(ProductGroup productGroup) {
+        return outputDir.resolve(productGroup.getId().toString()).toFile().listFiles()[0];
     }
 
     private CardOrder sampleOrder(CardType cardType) {
