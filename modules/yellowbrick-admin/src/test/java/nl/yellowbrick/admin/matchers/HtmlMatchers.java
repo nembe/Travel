@@ -1,6 +1,5 @@
 package nl.yellowbrick.admin.matchers;
 
-import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.CombinableMatcher;
 import org.jsoup.nodes.Element;
@@ -37,5 +36,15 @@ public class HtmlMatchers {
 
     public static Matcher<Element> isCheckbox(String checkboxName, boolean checked) {
         return new CombinableMatcher<>(hasAttr("name", checkboxName)).and(isChecked(checked));
+    }
+
+    public static Matcher<Element> includesText(String text) {
+        return new ArgumentMatcher<Element>() {
+            @Override
+            public boolean matches(Object o) {
+                Element element = (Element) o;
+                return element.text().contains(text);
+            }
+        };
     }
 }

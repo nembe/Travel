@@ -4,20 +4,25 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import nl.yellowbrick.admin.BaseMvcTestCase;
 import nl.yellowbrick.admin.service.CardOrderCsvExporter;
+import nl.yellowbrick.admin.service.CardOrderExportScheduler;
 import nl.yellowbrick.data.dao.ProductGroupDao;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static nl.yellowbrick.admin.matchers.HtmlMatchers.hasAttr;
+import static nl.yellowbrick.admin.matchers.HtmlMatchers.includesText;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -35,6 +40,7 @@ public class CardOrderExportControllerTest extends BaseMvcTestCase {
 
     @Autowired ProductGroupDao productGroupDao;
     @Autowired @Mock CardOrderCsvExporter csvExporter;
+    @Autowired @Spy CardOrderExportScheduler exportScheduler;
 
     @Test
     public void uses_the_first_product_group_by_default() throws Exception {
@@ -80,6 +86,20 @@ public class CardOrderExportControllerTest extends BaseMvcTestCase {
 
         assertThat(res.getResponse().getStatus(), is(200));
         assertThat(res.getResponse().getContentAsString(), is(TEST_FILE_CONTENT));
+    }
+
+    @Test
+    public void shows_next_export_tile() throws Exception {
+        stubCsvExporter();
+        stubScheduler(LocalDateTime.of(2015, 4, 10, 13, 30, 0));
+
+        Document html = parseHtml(mvcGet("/provisioning/exports?productGroup=1"));
+
+        assertThat(html.select(".group-selection span").first(), includesText("2015-04-10 13:30:00"));
+    }
+
+    private void stubScheduler(LocalDateTime nextScheduledExport) {
+        when(exportScheduler.nextScheduledExport(any())).thenReturn(Optional.of(nextScheduledExport));
     }
 
     private void stubCsvExporter() throws Exception {

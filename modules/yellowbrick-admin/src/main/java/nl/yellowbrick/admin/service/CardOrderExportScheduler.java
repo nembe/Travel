@@ -8,10 +8,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class CardOrderExportScheduler {
@@ -56,6 +62,20 @@ public class CardOrderExportScheduler {
         return schedule;
     }
 
+    public Optional<LocalDateTime> nextScheduledExport(ProductGroup productGroup) {
+        if(!schedule.containsKey(productGroup))
+            return Optional.empty();
+
+        // not relevant to get a proper TriggerContext when dealing with CRON expressions
+        // would only make sense for delayed tasks with fixed interval
+        Date nextExecutionTime = schedule.get(productGroup).nextExecutionTime(new SimpleTriggerContext());
+
+        // convert to java 8 date API
+        Instant instant = Instant.ofEpochMilli(nextExecutionTime.getTime());
+
+        return Optional.of(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
+    }
+
     public static class Config {
 
         private final Map<Integer, String> schedule = Maps.newHashMap();
@@ -68,4 +88,9 @@ public class CardOrderExportScheduler {
             this.schedule.put(productGroupId, cronExpression);
         }
     }
+
+
+    private static class DummyTriggerContext extends SimpleTriggerContext {
+    }
+
 }

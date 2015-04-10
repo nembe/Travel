@@ -2,6 +2,7 @@ package nl.yellowbrick.admin.controller;
 
 import nl.yellowbrick.admin.exceptions.ResourceNotFoundException;
 import nl.yellowbrick.admin.service.CardOrderCsvExporter;
+import nl.yellowbrick.admin.service.CardOrderExportScheduler;
 import nl.yellowbrick.data.domain.ProductGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -18,8 +19,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static nl.yellowbrick.admin.util.CommonRequestParams.PRODUCT_GROUP_KEY;
@@ -29,8 +33,10 @@ import static nl.yellowbrick.admin.util.CommonRequestParams.from;
 @RequestMapping("/provisioning/exports")
 public class CardOrderExportController {
 
-    @Autowired
-    private CardOrderCsvExporter cardOrderExporter;
+    private static final DateTimeFormatter SCHEDULE_DISPLAY_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    @Autowired private CardOrderCsvExporter cardOrderExporter;
+    @Autowired private CardOrderExportScheduler exportScheduler;
 
     @RequestMapping(method = RequestMethod.GET)
     public String exports(@ModelAttribute("allProductGroups") List<ProductGroup> allProductGroups) {
@@ -45,13 +51,17 @@ public class CardOrderExportController {
                                         @ModelAttribute("allProductGroups") List<ProductGroup> allProductGroups) {
 
         ProductGroup productGroup = from(requestParams).productGroupOrDefault(allProductGroups);
+
         List<ExportsListItem> exports = cardOrderExporter.listExports(productGroup)
                 .stream()
                 .map(file -> new ExportsListItem(file, productGroup))
                 .collect(Collectors.toList());
 
+        Optional<LocalDateTime> nextExportTime = exportScheduler.nextScheduledExport(productGroup);
+
         model.put(PRODUCT_GROUP_KEY, productGroup);
         model.put("exports", exports);
+        nextExportTime.ifPresent(t -> model.put("nextExportTime", t.format(SCHEDULE_DISPLAY_FORMAT)));
 
         return "/provisioning/exports/index";
     }

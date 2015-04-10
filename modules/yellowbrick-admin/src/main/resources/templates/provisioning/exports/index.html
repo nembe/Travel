@@ -2,7 +2,7 @@
 <html layout:decorator="provisioning/_layout" th:with="title=#{provisioning.exports.title}">
 <body id="card-order-export">
     <div layout:fragment="content-inner">
-        <div class="section">
+        <div class="section group-selection">
             <form>
                 <label for="productGroup">Product group:</label>
                 <select name="productGroup" id="productGroup" onchange="this.form.submit()">
@@ -11,6 +11,9 @@
                             th:selected="${pg == productGroup}"
                             th:text="${pg.description}">Description</option>
                 </select>
+
+                <span th:unless="${nextExportTime}">Next export: <em>not scheduled</em></span>
+                <span th:if="${nextExportTime}">Next export: <em th:text="${nextExportTime}">2015-01-01 15:00</em></span>
             </form>
         </div>
 
