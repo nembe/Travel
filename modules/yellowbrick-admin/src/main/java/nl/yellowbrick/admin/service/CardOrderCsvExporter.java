@@ -65,6 +65,9 @@ public class CardOrderCsvExporter {
                     .withoutQuoteChar()
                     .withColumnSeparator(SEPARATOR);
 
+            LOG.info("writing card order export for product group {} with {} items to file {}",
+                    productGroup.getDescription(), exports.size(), path.toString());
+
             csvMapper.writer(csvSchema).writeValue(path.toFile(), exports);
         } catch(IOException e) {
             throw new RuntimeException(e);
@@ -85,7 +88,6 @@ public class CardOrderCsvExporter {
     private Path resolveFilePath(CardOrderExportTarget target, ProductGroup productGroup) throws IOException {
         String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm"));
         Path dir = exportsDir(productGroup);
-        dir = Files.createDirectory(dir);
 
         String filename = Joiner
                 .on("_").join(time, productGroup.getDescription(), SUFFIXES.get(target))
@@ -95,7 +97,11 @@ public class CardOrderCsvExporter {
         return dir.resolve(filename);
     }
 
-    private Path exportsDir(ProductGroup productGroup) {
-        return baseExportPath.resolve(productGroup.getId().toString());
+    private Path exportsDir(ProductGroup productGroup) throws IOException {
+        Path path = baseExportPath.resolve(productGroup.getId().toString());
+
+        return path.toFile().exists()
+                ? path
+                : Files.createDirectory(path);
     }
 }

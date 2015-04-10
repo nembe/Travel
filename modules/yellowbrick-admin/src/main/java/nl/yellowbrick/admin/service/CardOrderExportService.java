@@ -6,6 +6,8 @@ import nl.yellowbrick.admin.domain.CardOrderExportTarget;
 import nl.yellowbrick.admin.exceptions.InconsistentDataException;
 import nl.yellowbrick.data.dao.*;
 import nl.yellowbrick.data.domain.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,8 @@ import static java.util.stream.Collectors.toList;
 
 @Component
 public class CardOrderExportService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CardOrderExportService.class);
 
     // TODO eventually externalize this
     private static final String COUNTRY = "Nederland";
@@ -39,8 +43,15 @@ public class CardOrderExportService {
     private CardOrderCsvExporter csvExporter;
 
     public void exportForProductGroup(ProductGroup productGroup) {
-        cardOrderDao.findPendingExport(productGroup)
-                .stream()
+        List<CardOrder> orders = cardOrderDao.findPendingExport(productGroup);
+
+        if(orders.isEmpty()) {
+            LOGGER.info("skipping requested card order export for product group {}: none pending export",
+                    productGroup.getDescription());
+            return;
+        }
+
+        orders.stream()
                 .map(order -> createExportRecord(order, productGroup))
                 .collect(groupingBy(CardOrderExportRecord::target, toList()))
                 .forEach((target, exports) -> exportRecords(target, productGroup, exports));
