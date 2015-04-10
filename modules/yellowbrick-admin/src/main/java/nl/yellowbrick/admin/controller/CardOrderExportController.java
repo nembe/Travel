@@ -63,7 +63,7 @@ public class CardOrderExportController {
         model.put("exports", exports);
         nextExportTime.ifPresent(t -> model.put("nextExportTime", t.format(SCHEDULE_DISPLAY_FORMAT)));
 
-        return "/provisioning/exports/index";
+        return "provisioning/exports/index";
     }
 
     @RequestMapping(method = RequestMethod.GET, params = { "productGroup", "fileName" })
