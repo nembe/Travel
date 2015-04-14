@@ -23,7 +23,7 @@ public class NonTestAccountValidator extends AccountRegistrationValidator {
     private static final Logger log = LoggerFactory.getLogger(NonTestAccountValidator.class);
 
     @Override
-    public void validate(Customer customer, Errors errors) {
+    public void doValidate(Customer customer, Errors errors) {
         try {
             final BeanInfo beanInfo = Introspector.getBeanInfo(Customer.class);
 

@@ -20,7 +20,7 @@ public class GeneralCustomerValidator extends AccountRegistrationValidator {
     private MarketingActionDao marketingActionDao;
 
     @Override
-    protected void validate(Customer customer, Errors errors) {
+    protected void doValidate(Customer customer, Errors errors) {
         if(customer.getDateOfBirth() == null) {
             errors.rejectValue("dateOfBirth", "errors.missing");
             return;

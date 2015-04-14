@@ -1,24 +1,11 @@
 package nl.yellowbrick.activation.validation;
 
 import nl.yellowbrick.data.domain.Customer;
-import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
+import nl.yellowbrick.data.validation.ClassValidator;
 
-public abstract class AccountRegistrationValidator implements Validator {
+public abstract class AccountRegistrationValidator extends ClassValidator<Customer> {
 
-    @Override
-    public boolean supports(Class<?> aClass) {
-        return aClass.equals(Customer.class);
+    protected AccountRegistrationValidator() {
+        super(Customer.class);
     }
-
-    @Override
-    public void validate(Object o, Errors errors) {
-        if(!(o instanceof Customer))
-            throw new IllegalArgumentException(String.format("can only validate Customer objects, got %s instead",
-                    o.getClass().getCanonicalName()));
-
-        validate((Customer) o, errors);
-    }
-
-    protected abstract void validate(Customer customer, Errors errors);
 }
