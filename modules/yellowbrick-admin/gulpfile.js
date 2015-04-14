@@ -4,7 +4,7 @@ var sass = require('gulp-sass'),
     argv = require('yargs').argv;
 
 var paths = {
-    scss: 'src/main/resources/static/css/*.scss',
+    scss: 'src/main/resources/static/css/**/*.scss',
     coffee: 'src/main/resources/static/javascript/**/*.coffee',
     target: argv.target || './target/classes/static'
 };

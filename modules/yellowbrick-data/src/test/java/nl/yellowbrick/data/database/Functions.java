@@ -12,6 +12,7 @@ import java.util.function.Consumer;
  */
 public class Functions {
 
+    public static final String TEST_QCARD_NUMBER = "004695";
     public static int VALIDATE_MEMBERSHIP_RETVAL = -1;
 
     public static List<Consumer<FunctionCall>> CALL_RECORDERS = new ArrayList<>();
@@ -104,6 +105,14 @@ public class Functions {
 
             recorder.accept(new FunctionCall("CustomerDeleteAddress", args));
         });
+    }
+
+    public static void getQcardNr(int customerId, String[] returnOut) {
+        CALL_RECORDERS.forEach((recorder) -> {
+            recorder.accept(new FunctionCall("getQcardNr", customerId));
+        });
+
+        returnOut[0] = TEST_QCARD_NUMBER;
     }
 
     public static class FunctionCall {

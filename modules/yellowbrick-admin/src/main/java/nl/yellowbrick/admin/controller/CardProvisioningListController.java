@@ -52,20 +52,12 @@ public class CardProvisioningListController {
 
     private class CardOrderListItem {
 
-        private final CardOrder order;
-        private final Customer customer;
+        public final CardOrder order;
+        public final Customer customer;
 
         private CardOrderListItem(CardOrder cardOrder, Customer customer) {
             this.order = cardOrder;
             this.customer = customer;
-        }
-
-        public CardOrder getOrder() {
-            return order;
-        }
-
-        public Customer getCustomer() {
-            return customer;
         }
     }
 }

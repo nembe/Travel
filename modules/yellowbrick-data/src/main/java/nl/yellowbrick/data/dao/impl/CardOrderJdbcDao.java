@@ -2,10 +2,7 @@ package nl.yellowbrick.data.dao.impl;
 
 import nl.yellowbrick.data.audit.Mutator;
 import nl.yellowbrick.data.dao.CardOrderDao;
-import nl.yellowbrick.data.domain.CardOrder;
-import nl.yellowbrick.data.domain.CardOrderStatus;
-import nl.yellowbrick.data.domain.CardType;
-import nl.yellowbrick.data.domain.Customer;
+import nl.yellowbrick.data.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -30,6 +27,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     private static final String CARD_ORDER_UPDATE_PROC = "cardorderUpdate";
     private static final String CARD_ORDER_VALIDATE_PROC = "CardOrderValidate";
     private static final String PROCESS_TRANSPONDERCARDS_PROC = "PROCESS_TRANSPONDERCARDS";
+    private static final String GET_QCARD_NUMBER_PROC = "getQcardNr";
 
     @Autowired
     private JdbcTemplate template;
@@ -41,6 +39,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     private SimpleJdbcCall cardOrderUpdateCall;
     private SimpleJdbcCall cardOrderValidateCall;
     private SimpleJdbcCall processTransponderCardsCall;
+    private SimpleJdbcCall getQCardNumber;
 
     private Logger log = LoggerFactory.getLogger(CardOrderJdbcDao.class);
 
@@ -128,6 +127,15 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     }
 
     @Override
+    public List<CardOrder> findPendingExport(ProductGroup productGroup) {
+        String sql = "SELECT * FROM CARDORDER CO " +
+                "INNER JOIN CUSTOMER C ON C.CUSTOMERID = CO.CUSTOMERID AND C.PRODUCTGROUP_ID = ? " +
+                "WHERE CO.ORDERSTATUS = ? AND CO.EXPORT = 'Y' ORDER BY CO.ORDERDATE DESC";
+
+        return template.query(sql, cardOrderRowMapper(), productGroup.getId(), CardOrderStatus.ACCEPTED.code());
+    }
+
+    @Override
     public Optional<CardOrder> findById(long id) {
         String sql = "SELECT * FROM CARDORDER WHERE ORDERID = ?";
 
@@ -139,6 +147,23 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         log.info("Deleting order id {}", id);
 
         template.update("DELETE FROM CARDORDER WHERE ORDERID = ?", id);
+    }
+
+    @Override
+    public void updateCardNumber(long cardOrderId, String cardNumber) {
+        template.update("UPDATE CARDORDER SET CARD_NUMBER = ? WHERE ORDERID = ?", cardNumber, cardOrderId);
+    }
+
+    @Override
+    public void updateOrderStatus(long cardOrderId, CardOrderStatus status) {
+        template.update("UPDATE CARDORDER SET ORDERSTATUS = ? WHERE ORDERID = ?", status.code(), cardOrderId);
+    }
+
+    @Override
+    public String nextQCardNumber(long customerId) {
+        Map<String, Object> res = getQCardNumber.execute(customerId);
+
+        return res.get("qcardNR").toString();
     }
 
     private RowMapper<CardOrder> cardOrderRowMapper() {
@@ -210,8 +235,17 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                         new SqlParameter("p_updateMobileWithCard", Types.NUMERIC)
                 );
 
+        getQCardNumber = new SimpleJdbcCall(template)
+                .withCatalogName(PACKAGE)
+                .withProcedureName(GET_QCARD_NUMBER_PROC)
+                .declareParameters(
+                        new SqlParameter("Customer_in", Types.NUMERIC),
+                        new SqlOutParameter("qcardNR", Types.VARCHAR)
+                );
+
         saveSpecialTarifCall.compile();
         cardOrderUpdateCall.compile();
         cardOrderValidateCall.compile();
+        getQCardNumber.compile();
     }
 }

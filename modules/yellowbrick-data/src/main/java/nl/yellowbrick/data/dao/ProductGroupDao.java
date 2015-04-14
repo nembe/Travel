@@ -12,6 +12,8 @@ public interface ProductGroupDao {
 
     Optional<ProductGroup> findByDescription(String description);
 
+    Optional<ProductGroup> findById(long productGroupId);
+
     Optional<ProductGroup> update(ProductGroup productGroup);
 
     List<ProductSubgroup> findSubgroupsForProductGroup(long productGroupId);

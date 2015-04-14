@@ -17,7 +17,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebAppConfiguration
@@ -31,7 +30,7 @@ public class CardProvisioningFormControllerTest extends BaseMvcTestCase {
 
     @Test
     public void loads_card_order_data() throws Exception {
-        MvcResult res = mockMvc.perform(get(ORDER_URL)).andReturn();
+        MvcResult res = mvcGet(ORDER_URL);
 
         Document html = parseHtml(res);
         Elements fields = html.select(".field");

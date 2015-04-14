@@ -35,6 +35,13 @@ public class ProductGroupJdbcDao implements ProductGroupDao {
     }
 
     @Override
+    public Optional<ProductGroup> findById(long id) {
+        String sql = "select * from product_group where id = ?";
+
+        return template.query(sql, rowMapper(), id).stream().findFirst();
+    }
+
+    @Override
     public Optional<ProductGroup> update(ProductGroup productGroup) {
         String sql = "update product_group set " +
                 "description = ?, " +
