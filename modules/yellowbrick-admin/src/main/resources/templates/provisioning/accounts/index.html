@@ -1,10 +1,29 @@
 <!DOCTYPE HTML>
-<html layout:decorator="provisioning/_layout">
-<head>
-    <title>Provisioning</title>
-</head>
+<html layout:decorator="provisioning/_layout" th:with="title=#{provisioning.accounts.title}">
 <body>
     <div layout:fragment="content-inner">
+        <div class="section">
+            <form>
+                <label for="productGroup">Product group:</label>
+                <select name="productGroup" id="productGroup">
+                    <option th:each="pg : ${allProductGroups}"
+                            th:value="${pg.id}"
+                            th:selected="${pg == productGroup}"
+                            th:text="${pg.description}">Description</option>
+                </select>
+
+                <label for="statusFilter">Status:</label>
+                <select name="statusFilter" id="statusFilter">
+                    <option th:each="status : ${allStatuses}"
+                            th:value="${status.key}"
+                            th:selected="${status.value == statusFilter}"
+                            th:text="${status.value}">Name</option>
+                </select>
+
+                <input type="submit" value="Apply" />
+            </form>
+        </div>
+
         <div class="section" th:if="${#lists.isEmpty(customers)}">
             <h3>No customers pending validation.</h3>
         </div>
@@ -20,16 +39,18 @@
                         <th>Client name</th>
                         <th>Location</th>
                         <th>Product group</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="cust : ${customers}">
                         <td th:text="${cust.applicationDate}"></td>
-                        <td th:text="${cust.accountType}"></td>
+                        <td th:text="${cust.businessCustomer ? 'business' : 'personal'}"></td>
                         <td th:text="${cust.fullName}"></td>
                         <td th:text="${cust.accountCity}"></td>
                         <td th:text="${cust.productGroup}"></td>
+                        <td th:text="${cust.status}"></td>
                         <td>
                             <div class="btn">
                                 <a th:href="@{'/provisioning/accounts/' + ${cust.customerId}}">validate</a>

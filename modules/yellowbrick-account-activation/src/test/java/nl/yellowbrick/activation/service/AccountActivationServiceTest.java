@@ -59,7 +59,7 @@ public class AccountActivationServiceTest {
 
         inOrder.verify(cardOrderDao).saveSpecialTarifIfApplicable(eq(customer));
         inOrder.verify(cardOrderDao).validateCardOrders(customer, CardType.TRANSPONDER_CARD, CardType.QPARK_CARD);
-        inOrder.verify(cardAssignmentService).assignToCustomer(customer);
+        inOrder.verify(cardAssignmentService).assignAllOrderedByCustomer(customer);
     }
 
     @Test

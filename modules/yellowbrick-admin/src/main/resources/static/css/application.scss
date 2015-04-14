@@ -1,6 +1,7 @@
 @import 'normalize.css';
 @import 'colors';
 @import 'forms';
+@import 'provisioning/exports';
 @import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600|Open+Sans:400,600,700);
 
 $side-menu-width: 255px;
@@ -209,11 +210,18 @@ a, a:active, a:hover, a:visited {
   margin-left: $side-menu-width;
 }
 
-#main-menu {
+#top-bar {
   background-color: #199784;
   width: 100%;
   line-height: 60px;
+  min-height: 60px;
   text-align: right;
+
+  span {
+    margin-left: 26px;
+    color: #FFF;
+    float: left;
+  }
 
   a, a:active, a:hover, a:visited {
     color: #198376;
@@ -233,6 +241,7 @@ a, a:active, a:hover, a:visited {
     list-style-type: none;
     display: inline;
     margin-left: 26px;
+    color: #FFF;
   }
 }
 

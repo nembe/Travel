@@ -19,9 +19,10 @@ import java.util.concurrent.TimeUnit;
 
 import static nl.yellowbrick.data.database.Functions.CALL_RECORDERS;
 import static nl.yellowbrick.data.database.Functions.FunctionCall;
+import static nl.yellowbrick.data.database.Functions.TEST_QCARD_NUMBER;
 import static nl.yellowbrick.data.domain.CardOrderStatus.*;
 import static nl.yellowbrick.data.domain.CardType.*;
-import static nl.yellowbrick.data.matchers.DateMatchers.after;
+import static org.exparity.hamcrest.date.DateMatchers.after;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -245,6 +246,11 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         cardOrderDao.delete(cardOrder.getId());
 
         assertThat(cardOrderDao.findById(72031).isPresent(), is(false));
+    }
+
+    @Test
+    public void delegates_retrieval_of_qcardnumber_to_procedure() throws Exception {
+        assertThat(cardOrderDao.nextQCardNumber(123l), is(TEST_QCARD_NUMBER));
     }
 
     private void updateCardType(String cardType) {

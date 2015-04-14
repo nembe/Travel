@@ -5,6 +5,7 @@ import nl.yellowbrick.data.audit.Mutator;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
+import nl.yellowbrick.data.domain.CustomerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,9 +18,12 @@ import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
+import java.beans.PropertyDescriptor;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Types;
 import java.time.Instant;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,8 +37,6 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     private static final String PACKAGE = "WEBAPP";
     private static final String SAVE_PRIVATE_DATA = "CustomerSavePrivateData";
     private static final String SAVE_BUSINESS_DATA = "CustomerSaveBusinessData";
-
-    private static final int ACTIVATION_FAILED_STATUS = 0;
 
     @Autowired
     private JdbcTemplate template;
@@ -70,7 +72,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 "WHERE c.customerid = ?"
         );
 
-        return template.query(sql, beanRowMapper(Customer.class), id).stream().findFirst();
+        return template.query(sql, customerRowMapper(), id).stream().findFirst();
     }
 
     @Override
@@ -90,12 +92,11 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 "INNER JOIN PRODUCT_GROUP pg ON pg.id = c.productgroup_id",
                 "INNER JOIN TBLBILLINGAGENT ba ON c.billingagentidfk = ba.billingagentid",
                 "INNER JOIN CUSTOMERSTATUS cs ON c.customerstatusidfk = cs.customerstatusid",
-                "WHERE c.productgroup_id = 1 ",
                 "AND c.customerstatusidfk < 2 ",
                 "ORDER BY applicationdate"
         );
 
-        return template.query(sql, beanRowMapper(Customer.class));
+        return template.query(sql, customerRowMapper());
     }
 
     @Override
@@ -106,7 +107,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
 
         Date dayOfBirth = Date.from(Instant
                         .ofEpochMilli(dateOfBirth.getTime())
-                        .atOffset(ZoneOffset.ofHours(0))
+                        .atZone(ZoneId.systemDefault())
                         .truncatedTo(ChronoUnit.DAYS)
                         .toInstant()
         );
@@ -121,7 +122,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 "AND TRIM(LOWER(lastname)) = ?"
         );
 
-        return template.query(query, beanRowMapper(Customer.class),
+        return template.query(query, customerRowMapper(),
                 dayOfBirth,
                 firstName.toLowerCase().trim(),
                 lastName.toLowerCase().trim());
@@ -129,15 +130,15 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
 
     @Override
     public List<Customer> findAllByEmail(String email) {
-        return template.query("SELECT * FROM CUSTOMER WHERE email = ?", beanRowMapper(Customer.class), email);
+        return template.query("SELECT * FROM CUSTOMER WHERE email = ?", customerRowMapper(), email);
     }
 
     @Override
     public void markAsPendingHumanReview(Customer customer) {
-        customer.setCustomerStatusIdfk(ACTIVATION_FAILED_STATUS);
+        customer.setStatus(CustomerStatus.ACTIVATION_FAILED);
 
         template.update("UPDATE CUSTOMER SET customerstatusidfk = ? WHERE customerid = ?",
-                customer.getCustomerStatusIdfk(),
+                customer.getStatus().code(),
                 customer.getCustomerId());
     }
 
@@ -209,7 +210,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 "LEFT OUTER JOIN CUSTOMER_IDENTIFICATION c ON c.fieldidfk = f.id AND CUSTOMERIDFK = ? " +
                 "WHERE NOT REGEXP_LIKE(f.LABEL, '.*_\\d+$')";
 
-        return template.query(sql, beanRowMapper(BusinessIdentifier.class), customerId);
+        return template.query(sql, businessIdentifierRowMapper(), customerId);
     }
 
     @Override
@@ -271,10 +272,31 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
         return Joiner.on(' ').join(parts);
     }
 
-    private <T> RowMapper<T> beanRowMapper(Class<T> clazz) {
-        BeanPropertyRowMapper<T> rowMapper = new BeanPropertyRowMapper<>(clazz);
+    private RowMapper<Customer> customerRowMapper() {
+        CustomerRowMapper rowMapper = new CustomerRowMapper();
         rowMapper.setPrimitivesDefaultedForNullValue(true);
 
         return rowMapper;
+    }
+
+    private RowMapper<BusinessIdentifier> businessIdentifierRowMapper() {
+        BeanPropertyRowMapper<BusinessIdentifier> rowMapper = new BeanPropertyRowMapper<>(BusinessIdentifier.class);
+        rowMapper.setPrimitivesDefaultedForNullValue(true);
+
+        return rowMapper;
+    }
+
+    private class CustomerRowMapper extends BeanPropertyRowMapper<Customer> {
+
+        private CustomerRowMapper() {
+            super(Customer.class);
+        }
+
+        @Override
+        protected Object getColumnValue(ResultSet rs, int index, PropertyDescriptor pd) throws SQLException {
+            if(pd.getName().equals("status"))
+                return CustomerStatus.byCode(rs.getInt("customerstatusidfk"));
+            return super.getColumnValue(rs, index, pd);
+        }
     }
 }

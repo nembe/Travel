@@ -3,16 +3,20 @@ package nl.yellowbrick.data.dao.impl;
 import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.database.DbHelper;
 import nl.yellowbrick.data.domain.Customer;
+import nl.yellowbrick.data.domain.TransponderCard;
+import nl.yellowbrick.data.domain.UserAccountType;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.Map;
 
+import static nl.yellowbrick.data.domain.UserAccountType.RESTRICTED_SUBACCOUNT;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
@@ -47,5 +51,64 @@ public class SystemUserJdbcDaoTest extends BaseSpringTestCase {
             assertThat(res.get("token").toString(), not(isEmptyOrNullString()));
             assertThat(((Timestamp)res.get("token_date")).getTime(), equalTo(valdityTime.getTime()));
         });
+    }
+
+    @Test
+    public void creates_app_user() {
+        TransponderCard card = testCard();
+
+        systemUserDao.createAppUser(card, "user", "pass", RESTRICTED_SUBACCOUNT);
+
+        db.accept((t) -> {
+            Map<String, Object> rec = fetchLatestUser(t);
+
+            assertThat(rec.get("systemuserid"), notNullValue());
+            assertThat(rec.get("username"), is("user"));
+            assertThat(rec.get("password"), is("pass"));
+            assertThat(rec.get("mutator"), is("TEST MUTATOR"));
+            assertThat(rec.get("account_type").toString(), equalTo(String.valueOf(RESTRICTED_SUBACCOUNT.value())));
+            assertThat(Long.valueOf(rec.get("customeridfk").toString()), is(card.getCustomerId()));
+            assertThat(Long.valueOf(rec.get("transpondercardidfk").toString()), is(card.getId()));
+        });
+    }
+
+    @Test
+    public void deletes_user_by_card_id() {
+        db.accept(t -> {
+            assertThat(t.update("update systemuser set transpondercardidfk = 123"), greaterThan(0));
+
+            systemUserDao.deleteAppUserByCardId(123);
+
+            assertThat(userCount(t), is(0));
+        });
+    }
+
+    @Test
+    public void checks_existence_of_user_associated_with_card() {
+        assertThat(systemUserDao.existsAppUserForCard(123), is(false));
+
+        // create some user ...
+        systemUserDao.createAppUser(testCard(), "user", "pass", UserAccountType.APPLOGIN);
+
+        // and re-assert
+        assertThat(systemUserDao.existsAppUserForCard(123), is(true));
+    }
+
+    private TransponderCard testCard() {
+        TransponderCard card = new TransponderCard();
+        card.setId(123l);
+        card.setCustomerId(456l);
+
+        return card;
+    }
+
+    private Map<String, Object> fetchLatestUser(JdbcTemplate template) {
+         return template.queryForMap("select * from " +
+                 "(select * from systemuser order by systemuserid desc) " +
+                 "where rownum = 1");
+    }
+
+    private int userCount(JdbcTemplate template) {
+        return template.queryForObject("select count(*) from systemuser", Integer.class);
     }
 }

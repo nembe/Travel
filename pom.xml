@@ -20,6 +20,7 @@
     <modules>
         <module>modules/yellowbrick-data</module>
         <module>modules/yellowbrick-account-activation</module>
+        <module>modules/travelcard-account-import</module>
         <module>modules/yellowbrick-admin</module>
     </modules>
 
@@ -38,6 +39,7 @@
         <javax.mail.version>1.4.7</javax.mail.version>
         <javax.activation.version>1.1.1</javax.activation.version>
         <hsqldb.version>2.3.2</hsqldb.version>
+        <fasterxml.version>2.5.1</fasterxml.version>
     </properties>
 
 </project>

@@ -55,7 +55,7 @@ public class AccountActivationTask {
 
     private List<Customer> newlyRegisteredCustomers() {
         return customerDao.findAllPendingActivation().stream()
-                .filter((customer) -> customer.getCustomerStatusIdfk() == CustomerStatus.REGISTERED.code())
+                .filter((customer) -> customer.getStatus() == CustomerStatus.REGISTERED)
                 .collect(Collectors.toList());
     }
 

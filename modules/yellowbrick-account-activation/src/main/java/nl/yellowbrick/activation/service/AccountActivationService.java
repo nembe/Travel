@@ -47,7 +47,7 @@ public class AccountActivationService {
             log.info("Saved validated membership for customer ID " + customer.getCustomerId());
 
             cardOrderDao.validateCardOrders(customer, TRANSPONDER_CARD, QPARK_CARD);
-            cardAssignmentService.assignToCustomer(customer);
+            cardAssignmentService.assignAllOrderedByCustomer(customer);
             emailNotificationService.notifyAccountAccepted(customer);
 
             log.info("Finished activation of customer ID " + customer.getCustomerId());

@@ -7,8 +7,28 @@ INSERT INTO PRODUCT_GROUP VALUES (
              'YBBEHEER:agsterj',
              NULL,
              10,
-             NULL,
+             TO_DATE ('09/03/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
              NULL);
+
+INSERT INTO PRODUCT_GROUP VALUES (
+             2,
+             'ABN',
+             '0',
+             'YBBEHEER:max@prod',
+             NULL,
+             8,
+             TO_DATE ('09/02/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             TO_DATE ('09/02/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
+
+INSERT INTO PRODUCT_GROUP VALUES (
+             3,
+             'TRAVELCARD',
+             '1',
+             'YBBEHEER:martijn',
+             NULL,
+             8,
+             TO_DATE ('09/03/2012 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             TO_DATE ('09/03/2015 00:00:00', 'MM/DD/YYYY HH24:MI:SS'));
 
 INSERT INTO PRODUCT_SUBGROUP VALUES (
              2,
@@ -17,7 +37,8 @@ INSERT INTO PRODUCT_SUBGROUP VALUES (
              'N',
              'SYSTEM',
              null,
-             'Y');
+             'Y',
+             'default');
 
 INSERT INTO PRODUCT_SUBGROUP VALUES (
              1,
@@ -26,7 +47,8 @@ INSERT INTO PRODUCT_SUBGROUP VALUES (
              'Y',
              'SYSTEM',
              TO_DATE ('06/01/2012 00:46:39', 'MM/DD/YYYY HH24:MI:SS'),
-             'N');
+             'N',
+             'default');
 
 INSERT INTO PRICEMODEL VALUES (
              81,
@@ -349,6 +371,7 @@ INSERT INTO TBLCONFIG VALUES ('TXM', 'GEMEENTE_EXPORT_CSV_PATH', 'C:\\pecoma\\Ge
 INSERT INTO TBLCONFIG VALUES ('TXM', 'REPORT_PATH', 'C:/Pecoma/reports/transacties/', NULL, 'TXM');
 INSERT INTO TBLCONFIG VALUES ('TXM', 'reply_address', 'info@yellowbrick.nl', NULL, 'Taxameter Settings');
 INSERT INTO TBLCONFIG VALUES ('TXM', 'use_old_mail_impl', NULL, NULL, 'Taxameter Settings');
+INSERT INTO TBLCONFIG VALUES ('YB', 'DEFAULT_LOCALE', 'nl_NL', NULL, 'Internationaal');
 
 INSERT INTO CARDORDER VALUES (
              72031,
@@ -434,6 +457,8 @@ INSERT INTO SYSTEMUSER VALUES (
              NULL,
              NULL,
              0,
+             NULL,
+             NULL,
              NULL,
              NULL,
              NULL);
@@ -529,3 +554,35 @@ INSERT INTO TBLADMINISTRATOR VALUES (
              NULL,
              99,
              NULL);
+
+INSERT INTO TRAVELCARD_WHITELIST_IMPORT VALUES (
+             'tc111111111',
+             'AA-BB-CC',
+             1,
+             TO_DATE ('02/25/2015 11:26:26', 'MM/DD/YYYY HH24:MI:SS'),
+             'N');
+
+INSERT INTO TRANSPONDERCARD VALUES (
+             222005,
+             '278577',
+             398744,
+             1,
+             NULL,
+             '39-LB-40',
+             'NL',
+             NULL,
+             'ADMIN:ron',
+             TO_DATE ('12/14/2014 19:04:22', 'MM/DD/YYYY HH24:MI:SS'));
+
+INSERT INTO ANNOTATION_DEFINITION VALUES (
+             ANNOTATION_DEFINITION_SEQ.NEXTVAL,
+             4776,
+             'TRK',
+             'Travelcard nummer',
+             'TCIMPORT',
+             TO_DATE ('02/26/2015 22:06:22', 'MM/DD/YYYY HH24:MI:SS'),
+             '1',
+             '1',
+             '0',
+             '0',
+             0);

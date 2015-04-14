@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -34,13 +33,12 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/provisioning/accounts")
-public class AccountProvisioningController {
+@RequestMapping("/provisioning/accounts/{id}")
+public class AccountProvisioningFormController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AccountProvisioningController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AccountProvisioningListController.class);
     private static final String FORM_ERRORS = BindingResult.MODEL_KEY_PREFIX + "form";
 
     // collaborators
@@ -60,13 +58,6 @@ public class AccountProvisioningController {
     @Autowired private ConversionService conversionService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String pendingValidation(Model model) {
-        model.addAttribute("customers", customersPendingManualValidation());
-
-        return "provisioning/accounts/index";
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "{id}")
     public String validate(ModelMap model, @PathVariable("id") int id, Locale locale) {
         Customer customer = customerById(id);
         CustomerAddress address = addressForCustomer(id);
@@ -125,7 +116,7 @@ public class AccountProvisioningController {
         }
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"validatePersonalAccount"})
+    @RequestMapping(method = RequestMethod.POST, params = {"validatePersonalAccount"})
     public String saveValidatedPersonalAccount(
             @PathVariable("id") int id,
             @ModelAttribute("form") PersonalAccountProvisioningForm form,
@@ -159,7 +150,7 @@ public class AccountProvisioningController {
         return "redirect:/provisioning/accounts";
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "{id}", params = {"validateBusinessAccount"})
+    @RequestMapping(method = RequestMethod.POST, params = {"validateBusinessAccount"})
     public String saveValidatedBusinessAccount(
             @PathVariable("id") int id,
             @ModelAttribute("form") BusinessAccountProvisioningForm form,
@@ -205,14 +196,9 @@ public class AccountProvisioningController {
         return "redirect:/provisioning/accounts";
     }
 
-    private List<Customer> customersPendingManualValidation() {
-        return customerDao.findAllPendingActivation().stream()
-                .filter((customer) -> customer.getCustomerStatusIdfk() == CustomerStatus.ACTIVATION_FAILED.code())
-                .collect(Collectors.toList());
-    }
-
     private Customer customerById(int customerId) {
-        return customersPendingManualValidation().stream()
+        return customerDao.findAllPendingActivation()
+                .stream()
                 .filter((cust) -> cust.getCustomerId() == customerId)
                 .findFirst()
                 .orElseThrow(ResourceNotFoundException::new);

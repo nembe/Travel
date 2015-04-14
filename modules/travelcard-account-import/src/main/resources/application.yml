@@ -1,0 +1,56 @@
+datasource:
+  driverClassName: oracle.jdbc.OracleDriver
+  url: jdbc:oracle:thin:@yb-oradev:1521:orcl
+  username: dev_nl_brickparking
+  password: dev_nl_brickparking
+
+tc:
+  import:
+    dir: '/tmp/inbound'
+    doneDir: '/tmp/inbound/done'
+    delay: 5000
+    csvDelimiter: ','
+    mainAccountId: 20210
+
+mail:
+  host: 127.0.0.1
+
+mutator: TCIMPORT
+adminEmail: rui.salgado@kabisa.nl
+
+---
+
+spring:
+  profiles: acceptance
+
+datasource:
+  driverClassName: oracle.jdbc.OracleDriver
+  url: >
+        jdbc:oracle:thin:@(DESCRIPTION = (FAILOVER = ON)(LOAD_BALANCE = ON)(ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.1.4)(PORT = 1521))
+        (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.1.4)(PORT = 1521))
+        (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = telepay)(FAILOVER_MODE=(TYPE=select)(METHOD=basic))))
+  username: telepay
+  password: telepay
+
+tc:
+  import:
+    dir: 'inbound'
+    doneDir: 'done'
+    delay: 5000
+    csvDelimiter: ','
+    mainAccountId: 20210
+
+mail:
+  host: ybmail
+
+adminEmail: development@brickparking.com
+
+logging:
+  file: log/importer.log
+
+---
+
+spring:
+  profiles: production
+
+adminEmail: beheer@brickparking.com

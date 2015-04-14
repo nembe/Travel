@@ -9,10 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -27,14 +25,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class AuthenticationControllerTest extends BaseMvcTestCase {
 
-    @Autowired WebApplicationContext wac;
     @Autowired FilterChainProxy springSecurityFilterChain;
     @Autowired AuthenticationController controller;
 
-    MockMvc mockMvc;
     MockHttpSession mockHttpSession;
 
     @Before
+    @Override
     public void setUp() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
                 .addFilter(springSecurityFilterChain) // make sure security filter is in place for this test

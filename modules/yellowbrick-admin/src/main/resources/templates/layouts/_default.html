@@ -43,8 +43,10 @@
                 <ul class="side-submenu">
                     <h2> product groups </h2>
                     <li class="menu-back-button"><a href="#">back</a></li>
-                    <li><a href="#">one</a></li>
-                    <li><a href="#">two</a></li>
+                    <li th:each="pg : ${allProductGroups}">
+                        <a th:href="@{'/productgroups/' + ${pg.description.toLowerCase()}}"
+                           th:text="${pg.description}">PRODUCTGROUP DESCRIPTION</a>
+                    </li>
                 </ul>
             </li>
             <li class="municipalities" bw:activeforctx="/municipalities">
@@ -70,8 +72,9 @@
                 <ul class="side-submenu">
                     <h2> provisioning </h2>
                     <li class="menu-back-button"><a href="#">back</a></li>
-                    <li><a href="#">one</a></li>
-                    <li><a href="#">two</a></li>
+                    <li><a th:href="@{/provisioning/cards}">CARD ORDER VALIDATION</a></li>
+                    <li><a th:href="@{/provisioning/exports}">CARD ORDER EXPORT</a></li>
+                    <li><a th:href="@{/provisioning/accounts}">ACCOUNT VALIDATION</a></li>
                 </ul>
             </li>
         </ul>

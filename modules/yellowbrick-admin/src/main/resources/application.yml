@@ -17,6 +17,15 @@ ldap:
   userDn: CN=ldap_user,CN=Users,DC=waysis,DC=local
   password: ldap_user
 
+orderexport:
+  path: /tmp
+  # schedule card order export per product group
+  # numeric key corresponds to product group id
+  schedule:
+    1: 0 0 6 1/1 * ?
+    2: 0 0 6 1/1 * ?
+    3: 0 0 6 1/1 * ?
+
 mutator: ADMIN
 
 ---
