@@ -70,11 +70,9 @@ a, a:active, a:hover, a:visited {
       border-left-width: 4px;
       padding-left: 20px;
       line-height: 50px;
-      box-shadow: inset 0 -1px rgba(100,100,100,0.1);
 
     }
     li:first-child{
-        box-shadow: inset 0 -1px rgba(100,100,100,0.1), inset 0 1px rgba(100,100,100,0.1);
     }
 
     li:hover > .side-submenu {
@@ -163,6 +161,7 @@ a, a:active, a:hover, a:visited {
     position: absolute;
     bottom: 0;
     width: inherit;
+    width:100%;
 
     li {
       bottom: 0;
@@ -251,9 +250,18 @@ a, a:active, a:hover, a:visited {
 
 .menu-back-button {
   padding-left: 0px;
-  background: rgba(0,0,0,0.1);
+  text-align: right;
+  background: rgba(255,255,255,0.8);
   font-size: 0.8em;
   font-weight: bold;
+  padding-right: 30px;
+
+  a {
+    height:29px;
+    line-height: 29px;
+  }
+
+
 }
 
 table {
@@ -348,21 +356,6 @@ table td {
 #side-menu ul li .active{
   transition: 0.5s;
   left: 0;
-
-  &:after{
-    height: 100%;
-    width: 8%;
-    background-color: black;
-    opacity: 0.1;
-    right: -25px;
-    position: absolute;
-    content: " ";
-    z-index: -1;
-    top: 0;
-    filter: blur(9px);
-    -webkit-filter: blur(9px);
-    -moz-filter: blur(9px);
-
-  }
 }
+
 
