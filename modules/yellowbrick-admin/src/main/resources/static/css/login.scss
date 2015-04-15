@@ -1,7 +1,5 @@
 @import 'colors';
 
-$bg-color: #F6F7F9;
-
 #login-wrapper {
   width: 500px;
   margin: 150px auto;
@@ -10,7 +8,7 @@ $bg-color: #F6F7F9;
 #login {
   width: 100%;
   min-height: 600px;
-  background-color: $bg-color;
+  background-color: #F6F7F9;
   text-align: center;
   padding: 15px 25px;
 

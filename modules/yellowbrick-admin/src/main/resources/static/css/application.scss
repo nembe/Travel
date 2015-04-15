@@ -53,7 +53,7 @@ a, a:active, a:hover, a:visited {
 #side-menu {
   height: 100%;
   width: $side-menu-width;
-  background-color: $bg-color;
+  background-color: $background-color;
   position: fixed;
   float: left;
   font-size: 15px;
@@ -293,6 +293,11 @@ table td {
   $border-color: #5F8D1D;
   $bg-color: #90EE90;
 
+  &.warning {
+    $border-color: #E74144;
+    $bg-color: #FFB393;
+  }
+
   .flash-inner {
     display: inline-block;
     margin: 15px auto;
@@ -310,7 +315,7 @@ table td {
 }
 .btn{
   width: 100%;
-  background-color: $bg-color;
+  background-color: #90EE90;
   height: 30.5px;
   border-bottom: 4px solid rgba(0,0,0,0.1);
   font-family: 'Open Sans', sans-serif;
