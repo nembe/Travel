@@ -41,7 +41,7 @@ public class NonTestAccountValidatorTest extends BaseSpringTestCase {
     @Test
     public void handles_nulls() {
         // just make some field null
-        customer.setAccountCity(null);
+        customer.setFirstName(null);
 
         invokeValidator();
         assertThat(errors.getAllErrors(), empty());
@@ -65,15 +65,15 @@ public class NonTestAccountValidatorTest extends BaseSpringTestCase {
 
     @Test
     public void is_case_insensitive() {
-        customer.setAccountCity("MUMBLETEST");
+        customer.setFirstName("MUMBLETEST");
 
         invokeValidator();
-        assertTrue(errors.hasFieldErrors("accountCity"));
+        assertTrue(errors.hasFieldErrors("firstName"));
 
-        customer.setAccountCity("TESTMUMBLE");
+        customer.setFirstName("TESTMUMBLE");
 
         invokeValidator();
-        assertTrue(errors.hasFieldErrors("accountCity"));
+        assertTrue(errors.hasFieldErrors("firstName"));
     }
 
     private void invokeValidator() {

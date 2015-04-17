@@ -6,7 +6,6 @@ import java.util.Date;
 
 public class Customer {
 
-    private String accountCity = "";
     private String accountHolderName = "";
     private String accountNr = "";
     private String accountType = "";
@@ -50,10 +49,6 @@ public class Customer {
         int billingAgent = Long.valueOf(this.getBillingAgentId()).intValue();
 
         return PaymentMethod.forCode(billingAgent);
-    }
-
-    public String getAccountCity() {
-        return accountCity;
     }
 
     public String getAccountHolderName() {
@@ -204,10 +199,6 @@ public class Customer {
 
     public boolean isBusinessCustomer() {
         return business.equals("Y");
-    }
-
-    public void setAccountCity(String accountCity) {
-        this.accountCity = (accountCity != null) ? accountCity : "";
     }
 
     public void setAccountHolderName(String accountHolderName) {
