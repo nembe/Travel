@@ -329,5 +329,18 @@ table td {
     opacity: 0.7;
   }
 }
-
+// ICONS //
+.i-error:before{
+  background: url("../images/error-icon.svg");
+  height: 50px;
+  width: 50px;
+  content: " ";
+  position: absolute;
+  float: left;
+  background-size: contain;
+  color: white;
+  background-repeat: no-repeat;
+  padding: 25px;
+  opacity: 0.1;
+}
 
