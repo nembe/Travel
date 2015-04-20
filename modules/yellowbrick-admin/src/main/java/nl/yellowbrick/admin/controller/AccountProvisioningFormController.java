@@ -9,6 +9,9 @@ import nl.yellowbrick.admin.form.FormData;
 import nl.yellowbrick.admin.form.PersonalAccountProvisioningForm;
 import nl.yellowbrick.admin.service.RateTranslationService;
 import nl.yellowbrick.admin.util.MessageHelper;
+import nl.yellowbrick.admin.validation.BusinessAccountProvisioningFormValidator;
+import nl.yellowbrick.admin.validation.PersonalAccountProvisioningFormValidator;
+import nl.yellowbrick.admin.validation.ValidatorChain;
 import nl.yellowbrick.data.dao.*;
 import nl.yellowbrick.data.domain.*;
 import org.slf4j.Logger;
@@ -21,12 +24,11 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -56,6 +58,13 @@ public class AccountProvisioningFormController {
 
     // formatters
     @Autowired private ConversionService conversionService;
+
+    @InitBinder("form")
+    private void setValidators(WebDataBinder binder) {
+        binder.addValidators(ValidatorChain.of(
+                new PersonalAccountProvisioningFormValidator(), new BusinessAccountProvisioningFormValidator()
+        ));
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public String validate(ModelMap model, @PathVariable("id") int id, Locale locale) {
@@ -119,7 +128,7 @@ public class AccountProvisioningFormController {
     @RequestMapping(method = RequestMethod.POST, params = {"validatePersonalAccount"})
     public String saveValidatedPersonalAccount(
             @PathVariable("id") int id,
-            @ModelAttribute("form") PersonalAccountProvisioningForm form,
+            @ModelAttribute("form") @Valid PersonalAccountProvisioningForm form,
             BindingResult bindingResult,
             ModelMap model,
             Locale locale,
@@ -153,7 +162,7 @@ public class AccountProvisioningFormController {
     @RequestMapping(method = RequestMethod.POST, params = {"validateBusinessAccount"})
     public String saveValidatedBusinessAccount(
             @PathVariable("id") int id,
-            @ModelAttribute("form") BusinessAccountProvisioningForm form,
+            @ModelAttribute("form") @Valid BusinessAccountProvisioningForm form,
             BindingResult bindingResult,
             ModelMap model,
             Locale locale,

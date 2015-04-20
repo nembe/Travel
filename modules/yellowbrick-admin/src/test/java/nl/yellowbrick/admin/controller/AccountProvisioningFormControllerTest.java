@@ -293,8 +293,16 @@ public class AccountProvisioningFormControllerTest extends BaseMvcTestCase {
 
     private MockHttpServletRequestBuilder postPersonalAccountProvisioningForm() throws Exception {
         return post("/provisioning/accounts/" + PRIVATE_CUSTOMER_ID)
+                .param("firstName", "John")
+                .param("lastName", "Doe")
                 .param("email", "some.other.email@test.com")
+                .param("gender", "M")
+                .param("initials", "Mr")
+                .param("phoneNr", "0123456789")
                 .param("street", "middle of nowhere")
+                .param("houseNr", "1")
+                .param("postalCode", "12345")
+                .param("city", "Weert")
                 .param("numberOfPPlusCards", "2")
                 .param("dateOfBirth", "07-09-1985")
                 .param("validatePersonalAccount", "Submit");
@@ -303,10 +311,16 @@ public class AccountProvisioningFormControllerTest extends BaseMvcTestCase {
     private MockHttpServletRequestBuilder postBusinessAccountProvisioningForm() throws Exception  {
         return post("/provisioning/accounts/" + BUSINESS_CUSTOMER_ID)
                 .param("businessName", "ACME inc")
+                .param("firstName", "John")
+                .param("lastName", "Doe")
                 .param("email", "ceo@business.com")
+                .param("gender", "M")
+                .param("initials", "Mr")
+                .param("phoneNr", "0123456789")
                 .param("street", "North Orange")
                 .param("houseNr", "1209")
                 .param("city", "Delaware")
+                .param("postalCode", "12345")
                 .param("billingAddressStreet", "Evergreen Terrace")
                 .param("billingAddressHouseNr", "742")
                 .param("billingAddressCity", "Springfield")
