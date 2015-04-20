@@ -385,4 +385,13 @@ table td {
       color: white;
     }
   }
+  .product-groups{
+    p{
+      color: $product-groups-color;
+    }
+    a.active{
+      background-color: $product-groups-color;
+      color: white;
+    }
+  }
 }

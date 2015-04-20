@@ -33,11 +33,16 @@
             </li>
             <li class="product-groups" >
                 <a href="#">PRODUCT GROUPS</a>
-                <ul class="side-submenu" bw:activeforctx="/product-groups">
+                <ul class="side-submenu" bw:activeforctx="/productgroups">
                     <h2> product groups </h2>
+                    <p th:text="${title}">FRAGMENT'S TITLE</p>
                     <li class="menu-back-button"><a href="#">back</a></li>
-                    <li><a href="#">one</a></li>
-                    <li><a href="#">two</a></li>
+                    <li th:each="pg : ${allProductGroups}"
+                        th:with="ctx='/productgroups/' + ${pg.description.toLowerCase()}">
+                        <a bw:activeforctx="${ctx}"
+                           th:href="@{${ctx}}"
+                           th:text="${pg.description}">PRODUCTGROUP DESCRIPTION</a>
+                    </li>
                 </ul>
             </li>
             <li class="municipalities" >
@@ -65,8 +70,9 @@
                     <h2> provisioning </h2>
                     <p th:text="${title}">FRAGMENT'S TITLE</p>
                     <li class="menu-back-button"><a href="#">back</a></li>
-                    <li ><a bw:activeforctx="/provisioning/cards" th:href="@{/provisioning/cards}" >CARD ORDER VALIDATION</a></li>
-                    <li ><a bw:activeforctx="/provisioning/accounts" th:href="@{/provisioning/accounts}" >ACCOUNT VALIDATION</a></li>
+                    <li><a bw:activeforctx="/provisioning/accounts" th:href="@{/provisioning/accounts}" >ACCOUNT VALIDATION</a></li>
+                    <li><a bw:activeforctx="/provisioning/cards" th:href="@{/provisioning/cards}" >ORDER VALIDATION</a></li>
+                    <li><a bw:activeforctx="/provisioning/exports" th:href="@{/provisioning/exports}" >ORDER EXPORT</a></li>
                 </ul>
             </li>
         </ul>
@@ -93,17 +99,6 @@
             </li>
         </ul>
     </div>
-    <script type="text/javascript">
-    $('#side-menu > ul > li').click(function() {
-        $(this).children('ul').addClass('active');
-    });
-    $('.menu-back-button').click(function(e) {
-         e.stopPropagation();
-        $(this).parent('.side-submenu').removeClass('active');
-
-    });
-
-    </script>
 
     <div id="main">
         <div layout:fragment="content"></div>
