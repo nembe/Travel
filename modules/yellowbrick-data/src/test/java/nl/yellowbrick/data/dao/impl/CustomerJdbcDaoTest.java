@@ -57,7 +57,6 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
             return Timestamp.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
         };
 
-        assertThat(c.getAccountCity(), equalTo("Amsterdam"));
         assertThat(c.getAccountHolderName(), equalTo("M.C.  Slomp"));
         assertThat(c.getAccountNr(), equalTo("539161179"));
         assertThat(c.getAccountType(), equalTo(""));

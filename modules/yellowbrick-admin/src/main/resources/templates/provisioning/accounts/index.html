@@ -45,10 +45,10 @@
                 </thead>
                 <tbody>
                     <tr th:each="cust : ${customers}">
-                        <td th:text="${cust.applicationDate}"></td>
-                        <td th:text="${cust.businessCustomer ? 'business' : 'personal'}"></td>
-                        <td th:text="${cust.fullName}"></td>
-                        <td th:text="${cust.accountCity}"></td>
+                        <td th:text="${cust.registrationTime}"></td>
+                        <td th:text="${cust.customerType}"></td>
+                        <td th:text="${cust.clientName}"></td>
+                        <td th:text="${cust.location}"></td>
                         <td th:text="${cust.productGroup}"></td>
                         <td th:text="${cust.status}"></td>
                         <td>
