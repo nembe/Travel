@@ -153,10 +153,7 @@ public class AccountProvisioningFormController {
         addressDao.savePrivateCustomerAddress(id, address);
 
         // and activate customer
-        accountActivationService.activateCustomerAccount(customer, priceModel);
-
-        MessageHelper.flash(ra, "account.validated");
-        return "redirect:/provisioning/accounts";
+        return activateAccountAndRedirect(customer, priceModel, ra);
     }
 
     @RequestMapping(method = RequestMethod.POST, params = {"validateBusinessAccount"})
@@ -199,9 +196,17 @@ public class AccountProvisioningFormController {
         form.getBusinessIdentifiers().forEach(customerDao::updateBusinessIdentifier);
 
         // and activate customer
-        accountActivationService.activateCustomerAccount(customer, priceModel);
+        return activateAccountAndRedirect(customer, priceModel, ra);
+    }
 
-        MessageHelper.flash(ra, "account.validated");
+    private String activateAccountAndRedirect(Customer customer, PriceModel priceModel, RedirectAttributes ra) {
+        try {
+            accountActivationService.activateCustomerAccount(customer, priceModel);
+            MessageHelper.flash(ra, "account.validated");
+        } catch(Exception e) {
+            LOG.error("error activating customer id " + customer.getCustomerId(), e);
+            MessageHelper.flashWarning(ra, "account.unknownValidationError", e.getMessage());
+        }
         return "redirect:/provisioning/accounts";
     }
 
