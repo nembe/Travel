@@ -63,9 +63,10 @@
                 <ul class="side-submenu" bw:activeforctx="/provisioning">
                 <i class="icon provisioning"></i>
                     <h2> provisioning </h2>
+                    <p th:text="${title}">FRAGMENT'S TITLE</p>
                     <li class="menu-back-button"><a href="#">back</a></li>
-                    <li><a href="#">one</a></li>
-                    <li><a href="#">two</a></li>
+                    <li ><a bw:activeforctx="/provisioning/cards" th:href="@{/provisioning/cards}" >CARD ORDER VALIDATION</a></li>
+                    <li ><a bw:activeforctx="/provisioning/accounts" th:href="@{/provisioning/accounts}" >ACCOUNT VALIDATION</a></li>
                 </ul>
             </li>
         </ul>
@@ -101,6 +102,7 @@
         $(this).parent('.side-submenu').removeClass('active');
 
     });
+
     </script>
 
     <div id="main">

@@ -25,7 +25,6 @@ h2 {
 h3 {
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-top:30px;
   font-family: 'Open Sans', sans-serif;
   font-weight: 600;
 }
@@ -68,8 +67,12 @@ a, a:active, a:hover, a:visited {
     li {
       border-left-style: solid;
       border-left-width: 4px;
-      padding-left: 20px;
       line-height: 50px;
+
+      a{
+        padding-left: 20px;
+
+      }
 
     }
     li:first-child{
@@ -93,24 +96,32 @@ a, a:active, a:hover, a:visited {
       left: -90%;
       z-index: 9;
       width: 90%;
-      border-right: 1px solid rgba(0,0,0,0.2);
       transition: 0.5s;
+
 
       .side-submenu{
         top: 0;
 
       }
 
+      p {
+        padding-left: 15px;
+        position: relative;
+        top: -35px;
+        text-transform: uppercase;
+
+      }
+
       h2 {
         font-size: 1.2em;
-        padding: 25px 0 25px 15px;
+        padding: 25px 0 0px 15px;
         margin: 0;
       }
 
       li {
         border-left: 0px;
 
-        &:hover {
+        &:hover, &:active{
           background-color:rgba(0,0,0,0.1);
 
         }
@@ -357,5 +368,21 @@ table td {
   transition: 0.5s;
   left: 0;
 }
-
-
+.side-submenu.active{
+  -webkit-box-shadow: 21px 61px 160px -53px rgba(0,0,0,0.30);
+  -moz-box-shadow: 21px 61px 160px -53px rgba(0,0,0,0.30);
+  box-shadow: 21px 61px 160px -53px rgba(0,0,0,0.30);
+  transition: 0.5s;
+}
+//Colors for elements
+#side-menu{
+  .provisioning{
+    p{
+      color: $provisioning-color;
+    }
+    a.active{
+      background-color: $provisioning-color;
+      color: white;
+    }
+  }
+}
