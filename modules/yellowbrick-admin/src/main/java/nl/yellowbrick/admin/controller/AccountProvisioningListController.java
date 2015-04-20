@@ -1,9 +1,8 @@
 package nl.yellowbrick.admin.controller;
 
+import nl.yellowbrick.data.dao.CustomerAddressDao;
 import nl.yellowbrick.data.dao.CustomerDao;
-import nl.yellowbrick.data.domain.Customer;
-import nl.yellowbrick.data.domain.CustomerStatus;
-import nl.yellowbrick.data.domain.ProductGroup;
+import nl.yellowbrick.data.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,12 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static nl.yellowbrick.admin.util.CommonRequestParams.PRODUCT_GROUP_KEY;
 import static nl.yellowbrick.admin.util.CommonRequestParams.from;
@@ -27,6 +25,7 @@ import static nl.yellowbrick.admin.util.CommonRequestParams.from;
 public class AccountProvisioningListController {
 
     @Autowired private CustomerDao customerDao;
+    @Autowired private CustomerAddressDao customerAddressDao;
 
     @ModelAttribute("allStatuses")
     public Map<String, StatusFilter> statuses() {
@@ -45,10 +44,13 @@ public class AccountProvisioningListController {
 
         ProductGroup productGroup = from(requestParams).productGroupOrDefault(allProductGroups);
         StatusFilter statusFilter = requestedStatusFilterOrDefault(requestParams, allStatuses);
+        List<AccountListItem> customers = customersPendingActivation(productGroup, statusFilter)
+                .map(this::accountListItem)
+                .collect(Collectors.toList());
 
         model.addAttribute(PRODUCT_GROUP_KEY, productGroup);
         model.addAttribute("statusFilter", statusFilter);
-        model.addAttribute("customers", customersPendingActivation(productGroup, statusFilter));
+        model.addAttribute("customers", customers);
 
         return "provisioning/accounts/index";
     }
@@ -61,11 +63,10 @@ public class AccountProvisioningListController {
         return allStatuses.getOrDefault(requestParams.get("statusFilter"), StatusFilter.ANY);
     }
 
-    private List<Customer> customersPendingActivation(ProductGroup productGroup, StatusFilter statusFilter) {
+    private Stream<Customer> customersPendingActivation(ProductGroup productGroup, StatusFilter statusFilter) {
         return customerDao.findAllPendingActivation().stream()
                 .filter(customer -> customer.getProductGroupId() == productGroup.getId())
-                .filter(statusFilter.filter)
-                .collect(Collectors.toList());
+                .filter(statusFilter.filter);
     }
 
     private enum StatusFilter {
@@ -77,6 +78,47 @@ public class AccountProvisioningListController {
 
         StatusFilter(Predicate<Customer> filter) {
             this.filter = filter;
+        }
+    }
+
+    private AccountListItem accountListItem(Customer cust) {
+        Optional<CustomerAddress> address = customerAddressDao.findByCustomerId(cust.getCustomerId(), AddressType.MAIN);
+
+        return address.isPresent()
+                ? new AccountListItem(cust, address.get())
+                : new AccountListItem(cust);
+    }
+
+    private class AccountListItem {
+
+        private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        public final String customerId;
+        public final String registrationTime;
+        public final String customerType;
+        public final String clientName;
+        public final String location;
+        public final String productGroup;
+        public final String status;
+
+        private AccountListItem(Customer customer) {
+            this(customer, "");
+        }
+
+        private AccountListItem(Customer customer, CustomerAddress address) {
+            this(customer, address.getCity());
+        }
+
+        private AccountListItem(Customer customer, String location) {
+            this.customerId = String.valueOf(customer.getCustomerId());
+            this.registrationTime = customer.getApplicationDate() != null
+                    ? dateFormat.format(customer.getApplicationDate())
+                    : "";
+            this.customerType = customer.isBusinessCustomer() ? "business" : "personal";
+            this.clientName = customer.getFullName();
+            this.productGroup = customer.getProductGroup();
+            this.status = customer.getStatus().name();
+            this.location = location;
         }
     }
 }

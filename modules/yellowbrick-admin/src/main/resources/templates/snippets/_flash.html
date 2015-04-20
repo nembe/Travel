@@ -4,9 +4,10 @@
 </head>
 <body>
 
-    <div id="flash" th:if="${message}" th:fragment="flash">
+    <div id="flash" th:if="${flashNotice} or ${flashWarning}" th:class="${flashWarning}? warning" th:fragment="flash">
         <div class="flash-inner">
-            <span th:text="${message}">Flash message goes here</span>
+            <span th:text="${flashNotice}" th:if="${flashNotice}">Flash message goes here</span>
+            <span th:text="${flashWarning}" th:if="${flashWarning}">Flash message goes here</span>
             <button type="button" class="close" data-target="#flash">&times;</button>
         </div>
     </div>

@@ -26,6 +26,8 @@ import java.sql.Date;
 
 import static nl.yellowbrick.admin.matchers.HtmlMatchers.hasAttr;
 import static nl.yellowbrick.admin.matchers.HtmlMatchers.isField;
+import static nl.yellowbrick.admin.util.MessageHelper.NOTICE_KEY;
+import static nl.yellowbrick.admin.util.MessageHelper.WARNING_KEY;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.argThat;
@@ -33,8 +35,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebAppConfiguration
 public class AccountProvisioningFormControllerTest extends BaseMvcTestCase {
@@ -291,10 +292,34 @@ public class AccountProvisioningFormControllerTest extends BaseMvcTestCase {
         verifyZeroInteractions(accountActivationService);
     }
 
+    @Test
+    public void shows_success_message_when_redirecting_away_from_form() throws Exception {
+        mockMvc.perform(postBusinessAccountProvisioningForm())
+                .andExpect(redirectedUrl("/provisioning/accounts"))
+                .andExpect(flash().attribute(NOTICE_KEY, "Customer account successfully validated"));
+    }
+
+    @Test
+    public void shows_error_message_when_redirecting_away_from_form() throws Exception {
+        doThrow(new RuntimeException("derp")).when(accountActivationService).activateCustomerAccount(any(), any());
+
+        mockMvc.perform(postBusinessAccountProvisioningForm())
+                .andExpect(redirectedUrl("/provisioning/accounts"))
+                .andExpect(flash().attribute(WARNING_KEY, "Error occurred during account activation: derp"));
+    }
+
     private MockHttpServletRequestBuilder postPersonalAccountProvisioningForm() throws Exception {
         return post("/provisioning/accounts/" + PRIVATE_CUSTOMER_ID)
+                .param("firstName", "John")
+                .param("lastName", "Doe")
                 .param("email", "some.other.email@test.com")
+                .param("gender", "M")
+                .param("initials", "Mr")
+                .param("phoneNr", "0123456789")
                 .param("street", "middle of nowhere")
+                .param("houseNr", "1")
+                .param("postalCode", "12345")
+                .param("city", "Weert")
                 .param("numberOfPPlusCards", "2")
                 .param("dateOfBirth", "07-09-1985")
                 .param("validatePersonalAccount", "Submit");
@@ -303,10 +328,16 @@ public class AccountProvisioningFormControllerTest extends BaseMvcTestCase {
     private MockHttpServletRequestBuilder postBusinessAccountProvisioningForm() throws Exception  {
         return post("/provisioning/accounts/" + BUSINESS_CUSTOMER_ID)
                 .param("businessName", "ACME inc")
+                .param("firstName", "John")
+                .param("lastName", "Doe")
                 .param("email", "ceo@business.com")
+                .param("gender", "M")
+                .param("initials", "Mr")
+                .param("phoneNr", "0123456789")
                 .param("street", "North Orange")
                 .param("houseNr", "1209")
                 .param("city", "Delaware")
+                .param("postalCode", "12345")
                 .param("billingAddressStreet", "Evergreen Terrace")
                 .param("billingAddressHouseNr", "742")
                 .param("billingAddressCity", "Springfield")

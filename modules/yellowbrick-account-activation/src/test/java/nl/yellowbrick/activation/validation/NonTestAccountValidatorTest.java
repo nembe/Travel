@@ -1,5 +1,6 @@
 package nl.yellowbrick.activation.validation;
 
+import com.google.common.collect.Lists;
 import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.Customer;
@@ -10,7 +11,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 
-import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -41,7 +42,7 @@ public class NonTestAccountValidatorTest extends BaseSpringTestCase {
     @Test
     public void handles_nulls() {
         // just make some field null
-        customer.setAccountCity(null);
+        customer.setFirstName(null);
 
         invokeValidator();
         assertThat(errors.getAllErrors(), empty());
@@ -64,16 +65,26 @@ public class NonTestAccountValidatorTest extends BaseSpringTestCase {
     }
 
     @Test
+    public void ignores_non_bean_properties_with_test_text() {
+        customer.setFirstName("John");
+        customer.setLastName("Doe test");
+
+        // fullName is not a bean property because it lacks a setter
+        assertThat(customer.getFullName(), endsWith("test"));
+
+        invokeValidator();
+        assertThat(errors.getFieldError("fullName"), nullValue());
+        assertThat(errors.getFieldError("lastName"), notNullValue());
+    }
+
+    @Test
     public void is_case_insensitive() {
-        customer.setAccountCity("MUMBLETEST");
+        Lists.newArrayList("MUMBLETEST", "TESTMUMBLE").forEach(name -> {
+            customer.setFirstName(name);
 
-        invokeValidator();
-        assertTrue(errors.hasFieldErrors("accountCity"));
-
-        customer.setAccountCity("TESTMUMBLE");
-
-        invokeValidator();
-        assertTrue(errors.hasFieldErrors("accountCity"));
+            invokeValidator();
+            assertTrue(errors.hasFieldErrors("firstName"));
+        });
     }
 
     private void invokeValidator() {

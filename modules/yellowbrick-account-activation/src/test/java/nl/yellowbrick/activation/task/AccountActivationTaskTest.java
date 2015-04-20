@@ -156,7 +156,7 @@ public class AccountActivationTaskTest {
     private class NoOpValidator extends AccountRegistrationValidator {
 
         @Override
-        protected void validate(Customer customer, Errors errors) {
+        protected void doValidate(Customer customer, Errors errors) {
         }
     }
 }
