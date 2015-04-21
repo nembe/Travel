@@ -74,8 +74,8 @@ public class AccountActivationTaskTest {
 
         accountActivationTask.validateAndActivateAccounts();
 
-        verify(activationService).activateCustomerAccount(customerA, priceModel);
-        verify(activationService).activateCustomerAccount(customerB, priceModel);
+        verify(activationService).activateCustomerAccount(same(customerA), eq(priceModel));
+        verify(activationService).activateCustomerAccount(same(customerB), eq(priceModel));
         verifyNoMoreInteractions(activationService);
     }
 
@@ -95,8 +95,8 @@ public class AccountActivationTaskTest {
         accountActivationTask.validateAndActivateAccounts();
 
         // they both are marked for review
-        verify(customerDao).markAsPendingHumanReview(eq(customerA));
-        verify(customerDao).markAsPendingHumanReview(eq(customerB));
+        verify(customerDao).markAsPendingHumanReview(same(customerA));
+        verify(customerDao).markAsPendingHumanReview(same(customerB));
         verifyZeroInteractions(activationService);
     }
 

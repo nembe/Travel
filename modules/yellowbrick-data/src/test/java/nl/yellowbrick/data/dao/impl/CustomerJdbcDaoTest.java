@@ -23,12 +23,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import static nl.yellowbrick.data.database.Functions.*;
+import static nl.yellowbrick.data.database.Functions.CALL_RECORDERS;
+import static nl.yellowbrick.data.database.Functions.FunctionCall;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNull.nullValue;
 
 public class CustomerJdbcDaoTest extends BaseSpringTestCase {
 
@@ -53,48 +52,7 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     public void fills_in_customer_bean() {
         Customer c = customerDao.findAllPendingActivation().get(1);
 
-        Function<LocalDateTime, Timestamp> toTs = (localDateTime) -> {
-            return Timestamp.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-        };
-
-        assertThat(c.getAccountHolderName(), equalTo("M.C.  Slomp"));
-        assertThat(c.getAccountNr(), equalTo("539161179"));
-        assertThat(c.getAccountType(), equalTo(""));
-        assertThat(c.getActionCode(), nullValue());
-        assertThat(c.getAgentName(), equalTo("automatische incasso per week"));
-        assertThat(c.getApplicationDate(), equalTo(toTs.apply(LocalDateTime.of(2007, 4, 8, 18, 26, 22))));
-        assertThat(c.getBillingAgentId(), equalTo(602l));
-        assertThat(c.getBusinessName(), equalTo(""));
-        assertThat(c.getBusinessTypeId(), equalTo(0l));
-        assertThat(c.getBusiness(), equalTo("N"));
-        assertThat(c.getCreditLimit(), equalTo(5000l));
-        assertThat(c.getCustomerId(), equalTo(4776l));
-        assertThat(c.getCustomerNr(), equalTo("203126"));
-        assertThat(c.getStatus(), equalTo(CustomerStatus.REGISTERED));
-        assertThat(c.getDateOfBirth(), nullValue());
-        assertThat(c.getEmail(), equalTo("bestaatniet@taxameter.nl"));
-        assertThat(c.getExitDate(), nullValue());
-        assertThat(c.getFax(), equalTo(""));
-        assertThat(c.getFirstCardLicensePlate(), is("39-LB-40"));
-        assertThat(c.getFirstCardMobile(), is("+31495430798"));
-        assertThat(c.getFirstName(), equalTo("Mathijn"));
-        assertThat(c.getGender(), equalTo("M"));
-        assertThat(c.getInfix(), equalTo(""));
-        assertThat(c.getInitials(), equalTo("M.C."));
-        assertThat(c.getLastName(), equalTo("Slomp"));
-        assertThat(c.getMemberDate(), equalTo(toTs.apply(LocalDateTime.of(2007, 4, 11, 8, 33, 37))));
-        assertThat(c.getNumberOfQCards(), equalTo(0));
-        assertThat(c.getNumberOfRTPCards(), equalTo(0));
-        assertThat(c.getNumberOfTCards(), equalTo(1));
-        assertThat(c.getParkadammerTotal(), equalTo(0));
-        assertThat(c.getPaymentMethod(), equalTo(""));
-        assertThat(c.getPhoneNr(), equalTo("0614992123"));
-        assertThat(c.getPincode(), equalTo("6858"));
-        assertThat(c.getProductGroup(), equalTo("YELLOWBRICK"));
-        assertThat(c.getProductGroupId(), equalTo(1));
-        assertThat(c.getInvoiceAttn(), equalTo("bar"));
-        assertThat(c.getInvoiceEmail(), equalTo("foo"));
-        assertThat(c.isExtraInvoiceAnnotations(), is(true));
+        assertThat(c, equalTo(testCustomer()));
     }
 
     @Test
@@ -262,6 +220,21 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(biSupplier.get().getValue(), equalTo("booyakasha"));
     }
 
+    @Test
+    public void finds_customer_by_id() {
+        Customer customer = customerDao.findById(4776).get();
+
+        assertThat(customer, equalTo(testCustomer()));
+    }
+
+    @Test
+    public void finds_customer_by_phone_number() {
+        List<Customer> customers = customerDao.findAllByMobile("+31641017015");
+
+        assertThat(customers, hasSize(1));
+        assertThat(customers.get(0), equalTo(testCustomer()));
+    }
+
     private int fetchCustomerStatus(long customerId) {
         return db.apply((template) -> {
             return template.queryForObject("SELECT customerstatusidfk FROM CUSTOMER WHERE customerid = ?",
@@ -271,8 +244,49 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     }
 
     private Customer testCustomer() {
+        Function<LocalDateTime, Timestamp> toTs = (localDateTime) -> {
+            return Timestamp.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        };
+
         Customer cust = new Customer();
+        cust.setAccountHolderName("M.C.  Slomp");
+        cust.setAccountNr("539161179");
+        cust.setAccountType("");
+        cust.setActionCode(null);
+        cust.setAgentName("automatische incasso per week");
+        cust.setApplicationDate(toTs.apply(LocalDateTime.of(2007, 4, 8, 18, 26, 22)));
+        cust.setBillingAgentId(602l);
+        cust.setBusinessName("");
+        cust.setBusinessTypeId(0l);
+        cust.setBusiness("N");
+        cust.setCreditLimit(5000l);
         cust.setCustomerId(4776);
+        cust.setCustomerNr("203126");
+        cust.setStatus(CustomerStatus.REGISTERED);
+        cust.setDateOfBirth(null);
+        cust.setEmail("bestaatniet@taxameter.nl");
+        cust.setExitDate(null);
+        cust.setFax("");
+        cust.setFirstCardLicensePlate("39-LB-40");
+        cust.setFirstCardMobile("+31495430798");
+        cust.setFirstName("Mathijn");
+        cust.setGender("M");
+        cust.setInfix("");
+        cust.setInitials("M.C.");
+        cust.setLastName("Slomp");
+        cust.setMemberDate(toTs.apply(LocalDateTime.of(2007, 4, 11, 8, 33, 37)));
+        cust.setNumberOfQCards(0);
+        cust.setNumberOfRTPCards(0);
+        cust.setNumberOfTCards(1);
+        cust.setParkadammerTotal(0);
+        cust.setPaymentMethod("");
+        cust.setPhoneNr("0614992123");
+        cust.setPincode("6858");
+        cust.setProductGroup("YELLOWBRICK");
+        cust.setProductGroupId(1);
+        cust.setInvoiceAttn("bar");
+        cust.setInvoiceEmail("foo");
+        cust.setExtraInvoiceAnnotations(true);
 
         return cust;
     }

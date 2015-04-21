@@ -586,3 +586,35 @@ INSERT INTO ANNOTATION_DEFINITION VALUES (
              '0',
              '0',
              0);
+
+INSERT INTO MOBILE VALUES (
+            'N',
+             1,
+             6716,
+             4776,
+             '+31614992123',
+             1.5,
+             5,
+             'MYB[KLANT:4776]',
+             NULL,
+             8143,
+             '0',
+             NULL,
+             '0',
+             '0');
+
+INSERT INTO MOBILE VALUES (
+             'N',
+             1,
+             6717,
+             4776,
+             '+31641017015',
+             1.5,
+             5,
+             'MYB[KLANT:4776]',
+             NULL,
+             NULL,
+             '0',
+             NULL,
+             '0',
+             '0');
