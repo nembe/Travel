@@ -574,6 +574,18 @@ INSERT INTO TRANSPONDERCARD VALUES (
              'ADMIN:ron',
              TO_DATE ('12/14/2014 19:04:22', 'MM/DD/YYYY HH24:MI:SS'));
 
+INSERT INTO TRANSPONDERCARD VALUES (
+             8143,
+             '108142',
+             4776,
+             1,
+             NULL,
+             'TE-ST-01',
+             'NL',
+             TO_DATE ('01/03/2015 18:10:40', 'MM/DD/YYYY HH24:MI:SS'),
+             'YBSOAP:203126',
+             NULL);
+
 INSERT INTO ANNOTATION_DEFINITION VALUES (
              ANNOTATION_DEFINITION_SEQ.NEXTVAL,
              4776,
