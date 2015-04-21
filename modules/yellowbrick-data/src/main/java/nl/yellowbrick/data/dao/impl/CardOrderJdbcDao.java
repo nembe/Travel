@@ -84,6 +84,14 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     }
 
     @Override
+    public List<CardOrder> findTransponderCardsForCustomer(Customer customer) {
+        return template.query("SELECT * FROM CARDORDER WHERE CUSTOMERID = ? AND UPPER(CARDTYPE) = UPPER(?)",
+                cardOrderRowMapper(),
+                customer.getCustomerId(),
+                CardType.TRANSPONDER_CARD.description());
+    }
+
+    @Override
     public void processTransponderCard(String cardNumber, Customer customer, boolean updateMobileWithCard) {
         processTransponderCardsCall.execute(
                 customer.getCustomerId(),
