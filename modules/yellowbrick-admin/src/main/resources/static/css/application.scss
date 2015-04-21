@@ -400,3 +400,46 @@ table td {
     }
   }
 }
+//icons (combine with other color comment)
+#side-menu{
+  ul{
+    li{
+      .icon{
+        position: relative;
+        padding: 15px;
+        top: 10px;
+        left: 14px;
+        margin-right: 5px;
+        fill: red;
+      }
+      .dash-con{
+        background: url('../images/icons/dashboard.svg');
+        background-repeat: no-repeat;
+      }
+      .cust-con{
+        background: url('../images/icons/customers.svg');
+        background-repeat: no-repeat;
+      }
+      .prod-con{
+        background: url('../images/icons/groups.svg');
+        background-repeat: no-repeat;
+      }
+      .muni-con{
+        background: url('../images/icons/municipalities.svg');
+        background-repeat: no-repeat;
+      }
+      .mark-con{
+        background: url('../images/icons/marketing.svg');
+        background-repeat: no-repeat;
+      }
+      .prov-con{
+        background: url('../images/icons/registrations.svg');
+        background-repeat: no-repeat;
+      }
+      .set-con{
+        background: url('../images/icons/settings.svg');
+        background-repeat: no-repeat;
+      }
+    }
+  }
+}
