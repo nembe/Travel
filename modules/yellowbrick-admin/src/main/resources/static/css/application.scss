@@ -14,22 +14,20 @@ html, body {
   font-size: $base-font-size;
   font-family: 'Source Sans Pro', sans-serif;
 }
+
 h2 {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-top:-5px;
   font-family:'Open Sans', sans-serif;
   font-weight: 600;
-
 }
 
 h3 {
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-top:30px;
   font-family: 'Open Sans', sans-serif;
   font-weight: 600;
-
 }
 
 a, a:active, a:hover, a:visited {
@@ -54,7 +52,7 @@ a, a:active, a:hover, a:visited {
 #side-menu {
   height: 100%;
   width: $side-menu-width;
-  background-color: $bg-color;
+  background-color: $background-color;
   position: fixed;
   float: left;
   font-size: 15px;
@@ -70,9 +68,15 @@ a, a:active, a:hover, a:visited {
     li {
       border-left-style: solid;
       border-left-width: 4px;
-      padding-left: 20px;
-      line-height: 45px;
-      margin-top: 2px;
+      line-height: 50px;
+
+      a{
+        padding-left: 20px;
+
+      }
+
+    }
+    li:first-child{
     }
 
     li:hover > .side-submenu {
@@ -85,36 +89,54 @@ a, a:active, a:hover, a:visited {
 
     .side-submenu {
       position: absolute;
+      color: $text-color;
       float: right;
-      left: 255px;
-      background-color: inherit;
-      width: $side-menu-width;
-      margin-top: -45px;
-      display: none;
-      box-shadow: 8px 7px 20px #666;
+      top: 60px;
+      height: 100%;
+      background-color: $background-color;
+      left: -90%;
       z-index: 9;
+      width: 90%;
+      transition: 0.5s;
+
+      .side-submenu{
+        top: 0;
+
+      }
+
+      p {
+        padding-left: 15px;
+        position: relative;
+        top: -35px;
+        text-transform: uppercase;
+
+      }
+
+      h2 {
+        font-size: 1.2em;
+        padding: 25px 0 0px 15px;
+        margin: 0;
+      }
 
       li {
         border-left: 0px;
 
-        &:hover {
+        &:hover, &:active{
           background-color:rgba(0,0,0,0.1);
+
         }
       }
     }
     .side-submenu a{
       text-transform: uppercase;
       display: block;
+      color: black;
     }
     @mixin active-highlight($color) {
       border-left-color: $color;
 
       &:hover, &.active {
         background-color: $color;
-
-        a {
-          color: #FFF;
-        }
       }
     }
 
@@ -150,6 +172,7 @@ a, a:active, a:hover, a:visited {
     position: absolute;
     bottom: 0;
     width: inherit;
+    width:100%;
 
     li {
       bottom: 0;
@@ -234,6 +257,19 @@ a, a:active, a:hover, a:visited {
   padding: 12px 10px;
 }
 
+.menu-back-button {
+  padding-left: 0px;
+  text-align: right;
+  background: rgba(255,255,255,0.8);
+  font-size: 0.8em;
+  font-weight: bold;
+  padding-right: 30px;
+
+  a {
+    height:29px;
+    line-height: 29px;
+  }
+}
 
 table {
   border-collapse: collapse;
@@ -287,6 +323,10 @@ table td {
   $border-color: #5F8D1D;
   $bg-color: #90EE90;
 
+  &.warning {
+    $border-color: #E74144;
+    $bg-color: #FFB393;
+  }
 
   .flash-inner {
     display: inline-block;
@@ -317,7 +357,7 @@ table td {
 }
 .btn{
   width: 100%;
-  background-color: $bg-color;
+  background-color: #90EE90;
   height: 30.5px;
   border-bottom: 4px solid rgba(0,0,0,0.1);
   font-family: 'Open Sans', sans-serif;
@@ -336,6 +376,7 @@ table td {
     opacity: 0.7;
   }
 }
+
 // ICONS //
 .i-error:before{
   background: url("../images/icon/error-icon.svg");
@@ -364,4 +405,36 @@ table td {
   padding: 25px;
   opacity: 0.1;
   margin: 9px;
+}
+
+#side-menu ul li .active{
+  transition: 0.5s;
+  left: 0;
+}
+.side-submenu.active{
+  -webkit-box-shadow: 21px 61px 160px -53px rgba(0,0,0,0.30);
+  -moz-box-shadow: 21px 61px 160px -53px rgba(0,0,0,0.30);
+  box-shadow: 21px 61px 160px -53px rgba(0,0,0,0.30);
+  transition: 0.5s;
+}
+//Colors for elements
+#side-menu{
+  .provisioning{
+    p{
+      color: $provisioning-color;
+    }
+    a.active{
+      background-color: $provisioning-color;
+      color: white;
+    }
+  }
+  .product-groups{
+    p{
+      color: $product-groups-color;
+    }
+    a.active{
+      background-color: $product-groups-color;
+      color: white;
+    }
+  }
 }

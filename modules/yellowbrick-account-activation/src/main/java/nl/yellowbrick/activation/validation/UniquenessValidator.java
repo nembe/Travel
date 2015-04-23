@@ -24,7 +24,7 @@ public class UniquenessValidator extends AccountRegistrationValidator {
     private CustomerDao customerDao;
 
     @Override
-    protected void validate(Customer customer, Errors errors) {
+    protected void doValidate(Customer customer, Errors errors) {
         if(existsByNameAndDob(customer)) {
             errors.reject("errors.duplicate");
         }
