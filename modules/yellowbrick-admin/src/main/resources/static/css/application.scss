@@ -1,4 +1,5 @@
 @import 'normalize.css';
+@import 'bourbon';
 @import 'colors';
 @import 'forms';
 @import 'provisioning/exports';
@@ -90,12 +91,8 @@ a, a:active, a:hover, a:visited {
       width: $side-menu-width;
       margin-top: -45px;
       display: none;
-      -moz-box-shadow: 4px 7px 20px #666;
-      -webkit-box-shadow: 4px 7px 20px #666;
       box-shadow: 8px 7px 20px #666;
       z-index: 9;
-
-
 
       li {
         border-left: 0px;
@@ -171,8 +168,6 @@ a, a:active, a:hover, a:visited {
       background-color: $settings-color;
       margin-top:-55px;
       display: none;
-      -moz-box-shadow: 4px 7px 20px #666;
-      -webkit-box-shadow: 4px 7px 20px #666;
       box-shadow: 4px 7px 20px #666;
       text-transform: uppercase;
       z-index: 9;
