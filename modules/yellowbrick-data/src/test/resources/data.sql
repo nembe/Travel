@@ -383,8 +383,7 @@ INSERT INTO CARDORDER VALUES (
              2,
              600,
              300,
-             'N',
-             NULL);
+             'N');
 
 INSERT INTO CARDORDER VALUES (
              72032,
@@ -396,8 +395,7 @@ INSERT INTO CARDORDER VALUES (
              2,
              500,
              200,
-             'Y',
-             '123456');
+             'Y');
 
 INSERT INTO CUSTOMER_REGISTRATION VALUES (4776, 'nl_NL', 'YBAANMELDEN:Struijk', NULL);
 
@@ -572,7 +570,8 @@ INSERT INTO TRANSPONDERCARD VALUES (
              'NL',
              NULL,
              'ADMIN:ron',
-             TO_DATE ('12/14/2014 19:04:22', 'MM/DD/YYYY HH24:MI:SS'));
+             TO_DATE ('12/14/2014 19:04:22', 'MM/DD/YYYY HH24:MI:SS'),
+             NULL);
 
 INSERT INTO TRANSPONDERCARD VALUES (
              8143,
@@ -584,7 +583,8 @@ INSERT INTO TRANSPONDERCARD VALUES (
              'NL',
              TO_DATE ('01/03/2015 18:10:40', 'MM/DD/YYYY HH24:MI:SS'),
              'YBSOAP:203126',
-             NULL);
+             NULL,
+             72032);
 
 INSERT INTO ANNOTATION_DEFINITION VALUES (
              ANNOTATION_DEFINITION_SEQ.NEXTVAL,

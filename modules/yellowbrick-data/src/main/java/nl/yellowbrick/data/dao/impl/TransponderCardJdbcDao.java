@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -84,6 +85,20 @@ public class TransponderCardJdbcDao implements TransponderCardDao {
         template.update(sql, CardStatus.ACTIVE.code(), customerId, mutator.get(), transponderCardId);
     }
 
+    @Override
+    public List<TransponderCard> findByOrderId(long orderId) {
+        String sql = "select * from transpondercard where orderidfk = ? order by transpondercardid asc";
+
+        return template.query(sql, rowMapper(), orderId);
+    }
+
+    @Override
+    public List<TransponderCard> findByCustomerId(long customerId) {
+        String sql = "select * from transpondercard where customeridfk = ? order by transpondercardid asc";
+
+        return template.query(sql, rowMapper(), customerId);
+    }
+
     private RowMapper<TransponderCard> rowMapper() {
         return (rs, rowNum) -> {
             TransponderCard card = new TransponderCard();
@@ -95,6 +110,7 @@ public class TransponderCardJdbcDao implements TransponderCardDao {
             card.setCountry(rs.getString("licenseplatecountry"));
             card.setMutator(rs.getString("mutator"));
             card.setMutationDate(rs.getTimestamp("mutation_date"));
+            card.setOrderId(rs.getLong("orderidfk"));
 
             return card;
         };

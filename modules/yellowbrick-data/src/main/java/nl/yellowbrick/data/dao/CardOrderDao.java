@@ -11,15 +11,11 @@ public interface CardOrderDao {
 
     void validateCardOrder(CardOrder cardOrder);
 
-    void validateCardOrders(Customer customer, CardType... cardTypes);
-
     List<String> nextTransponderCardNumbers(int productGroupId, int numberOfCards, Optional<String> lastUsedCardNumber);
 
     List<CardOrder> findForCustomer(Customer customer, CardOrderStatus orderStatus, CardType cardType);
 
-    List<CardOrder> findTransponderCardsForCustomer(Customer customer);
-
-    void processTransponderCard(String cardNumber, Customer customer, boolean updateMobileWithCard);
+    void processTransponderCard(String cardNumber, Customer customer, CardOrder order, boolean updateMobileWithCard);
 
     List<CardOrder> findByStatusAndType(CardOrderStatus status, CardType cardType);
 
@@ -30,8 +26,6 @@ public interface CardOrderDao {
     Optional<CardOrder> findById(long id);
 
     void delete(long id);
-
-    void updateCardNumber(long cardOrderId, String cardNumber);
 
     void updateOrderStatus(long cardOrderId, CardOrderStatus status);
 

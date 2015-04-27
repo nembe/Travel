@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 @WebAppConfiguration
 public class CustomerDetailsControllerTest extends BaseMvcTestCase {
 
-    private static final String CARD_NUMBER = "123456";
+    private static final String CARD_NUMBER = "108142";
 
     @Test
     public void shows_card_order_info() throws Exception {

@@ -12,6 +12,7 @@ public class TransponderCard {
     private String country;
     private String mutator;
     private Date mutationDate;
+    private long orderId;
 
     public long getId() {
         return id;
@@ -77,6 +78,14 @@ public class TransponderCard {
         this.mutationDate = mutationDate;
     }
 
+    public long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(long orderId) {
+        this.orderId = orderId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -86,6 +95,7 @@ public class TransponderCard {
 
         if (customerId != that.customerId) return false;
         if (id != that.id) return false;
+        if (orderId != that.orderId) return false;
         if (cardNumber != null ? !cardNumber.equals(that.cardNumber) : that.cardNumber != null) return false;
         if (country != null ? !country.equals(that.country) : that.country != null) return false;
         if (licenseplate != null ? !licenseplate.equals(that.licenseplate) : that.licenseplate != null) return false;
@@ -106,6 +116,7 @@ public class TransponderCard {
         result = 31 * result + (country != null ? country.hashCode() : 0);
         result = 31 * result + (mutator != null ? mutator.hashCode() : 0);
         result = 31 * result + (mutationDate != null ? mutationDate.hashCode() : 0);
+        result = 31 * result + (int) (orderId ^ (orderId >>> 32));
         return result;
     }
 }

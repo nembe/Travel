@@ -59,9 +59,9 @@
             <div class="section">
                 <h2>Transponder cards</h2>
 
-                <p th:if="${#lists.isEmpty(tCardOrders)}">User has no transponder cards</p>
+                <p th:if="${#lists.isEmpty(cards)}">User has no transponder cards</p>
 
-                <table th:unless="${#lists.isEmpty(tCardOrders)}">
+                <table th:unless="${#lists.isEmpty(cards)}">
                     <thead>
                         <tr>
                             <th>Card number</th>
@@ -69,10 +69,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="order : ${tCardOrders}">
-                            <td th:text="${order.cardNumber}"></td>
-                            <td th:if="${order.export}"><input type="checkbox" disabled="disabled" checked="checked"/></td>
-                            <td th:unless="${order.export}"><input type="checkbox" disabled="disabled"/></td>
+                        <tr th:each="card : ${cards}">
+                            <td th:text="${card.cardNumber}"></td>
+                            <td th:if="${card.exported}"><input type="checkbox" disabled="disabled" checked="checked"/></td>
+                            <td th:unless="${card.exported}"><input type="checkbox" disabled="disabled"/></td>
                         </tr>
                     </tbody>
                 </table>
