@@ -1,6 +1,5 @@
 package nl.yellowbrick.admin.service;
 
-import nl.yellowbrick.activation.service.CardAssignmentService;
 import nl.yellowbrick.admin.domain.CardOrderExportRecord;
 import nl.yellowbrick.admin.domain.CardOrderExportTarget;
 import nl.yellowbrick.admin.exceptions.InconsistentDataException;
@@ -11,7 +10,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -24,23 +29,12 @@ public class CardOrderExportService {
     // TODO eventually externalize this
     private static final String COUNTRY = "Nederland";
 
-    @Autowired
-    private CardOrderDao cardOrderDao;
-
-    @Autowired
-    private CustomerDao customerDao;
-
-    @Autowired
-    private CustomerAddressDao customerAddressDao;
-
-    @Autowired
-    private CardAssignmentService cardAssignmentService;
-
-    @Autowired
-    private ConfigDao configDao;
-
-    @Autowired
-    private CardOrderCsvExporter csvExporter;
+    @Autowired private CardOrderDao cardOrderDao;
+    @Autowired private CustomerDao customerDao;
+    @Autowired private CustomerAddressDao customerAddressDao;
+    @Autowired private ConfigDao configDao;
+    @Autowired private CardOrderCsvExporter csvExporter;
+    @Autowired private TransponderCardDao transponderCardDao;
 
     public void exportForProductGroup(ProductGroup productGroup) {
         List<CardOrder> orders = cardOrderDao.findPendingExport(productGroup);
@@ -52,7 +46,7 @@ public class CardOrderExportService {
         }
 
         orders.stream()
-                .map(order -> createExportRecord(order, productGroup))
+                .flatMap(order -> createExportRecords(order, productGroup))
                 .collect(groupingBy(CardOrderExportRecord::target, toList()))
                 .forEach((target, exports) -> exportRecords(target, productGroup, exports));
     }
@@ -66,15 +60,10 @@ public class CardOrderExportService {
 
     }
 
-    private CardOrderExportRecord createExportRecord(CardOrder order, ProductGroup productGroup) {
+    private Stream<CardOrderExportRecord> createExportRecords(CardOrder order, ProductGroup productGroup) {
         Customer customer = customerDao
                 .findById(order.getCustomerId())
                 .orElseThrow(() -> new InconsistentDataException("couldn't find customer with id: " + order.getCustomerId()));
-
-        // assign qpark code if needed
-        String qparkCode = order.getCardType().equals(CardType.QPARK_CARD)
-                ? cardAssignmentService.assignQcardNumber(order)
-                : "";
 
         // try to get business address, fallback to main address
         CustomerAddress address = customerAddressDao.findByCustomerId(customer.getCustomerId(), AddressType.BILLING)
@@ -83,13 +72,27 @@ public class CardOrderExportService {
         Config defaultLocale = configDao.findSectionField(ConfigSection.YB, "DEFAULT_LOCALE")
                 .orElseThrow(() -> new InconsistentDataException("couldn't determine default locale"));
 
-        return new CardOrderExportRecord.Builder(order)
-                .productGroup(productGroup)
-                .customer(customer)
-                .address(address)
-                .locale(defaultLocale.getValue())
-                .country(COUNTRY)
-                .qparkCode(qparkCode)
-                .build();
+        // assign qpark code if needed
+        Supplier<String> nextQparkCode = order.getCardType().equals(CardType.QPARK_CARD)
+                ? () -> cardOrderDao.nextQCardNumber(customer.getCustomerId())
+                : () -> null;
+
+        // retrieve related transpondercards
+        Queue<TransponderCard> cardQueue = new LinkedList<>(transponderCardDao.findByOrderId(order.getId()));
+        Supplier<String> nextTCardNumber = order.getCardType().equals(CardType.TRANSPONDER_CARD)
+                ? () -> Optional.ofNullable(cardQueue.poll()).map(TransponderCard::getCardNumber).orElse(null)
+                : () -> null;
+
+        return IntStream.rangeClosed(1, order.getAmount()).mapToObj(idx -> {
+            return new CardOrderExportRecord.Builder(order)
+                    .productGroup(productGroup)
+                    .customer(customer)
+                    .address(address)
+                    .locale(defaultLocale.getValue())
+                    .country(COUNTRY)
+                    .transponderCardNumber(nextTCardNumber.get())
+                    .qparkCode(nextQparkCode.get())
+                    .build();
+        });
     }
 }
