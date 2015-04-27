@@ -1,6 +1,5 @@
 package nl.yellowbrick.activation.service;
 
-import com.google.common.base.Strings;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.CardOrder;
@@ -14,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Component
 public class CardAssignmentService {
@@ -37,7 +38,7 @@ public class CardAssignmentService {
 
         log.info("Assigning {} transponder cards", order.getAmount());
 
-        boolean updateMobileWithCard = !Strings.isNullOrEmpty(customer.getFirstCardMobile());
+        boolean updateMobileWithCard = hasInitialCardData(customer);
         List<String> cardNumbers = cardOrderDao.nextTransponderCardNumbers(
                 customer.getProductGroupId(),
                 order.getAmount(),
@@ -55,5 +56,9 @@ public class CardAssignmentService {
             // set the updateMobileWithCard flag only the first time around
             updateMobileWithCard = false;
         }
+    }
+
+    private boolean hasInitialCardData(Customer customer) {
+        return !isNullOrEmpty(customer.getFirstCardMobile()) || !isNullOrEmpty(customer.getFirstCardLicensePlate());
     }
 }
