@@ -413,32 +413,28 @@ table td {
         fill: red;
       }
       .dash-con{
-        background: url('../images/icons/dashboard.svg');
-        background-repeat: no-repeat;
+        background: url('../images/icons/dashboard.svg') no-repeat;
       }
       .cust-con{
-        background: url('../images/icons/customers.svg');
-        background-repeat: no-repeat;
+        background: url('../images/icons/customers.svg') no-repeat;
       }
       .prod-con{
-        background: url('../images/icons/groups.svg');
-        background-repeat: no-repeat;
+        background: url('../images/icons/groups.svg') no-repeat;
       }
       .muni-con{
-        background: url('../images/icons/municipalities.svg');
-        background-repeat: no-repeat;
+        background: url('../images/icons/municipalities.svg') no-repeat;
       }
       .mark-con{
-        background: url('../images/icons/marketing.svg');
-        background-repeat: no-repeat;
+        background: url('../images/icons/marketing.svg') no-repeat;
       }
       .prov-con{
-        background: url('../images/icons/registrations.svg');
-        background-repeat: no-repeat;
+        background: url('../images/icons/registrations.svg') no-repeat;
       }
       .set-con{
-        background: url('../images/icons/settings.svg');
-        background-repeat: no-repeat;
+        background: url('../images/icons/settings.svg') no-repeat;
+      }
+      .cardpro-con{
+        background: url('../images/icons/settings.svg') no-repeat;
       }
     }
   }
