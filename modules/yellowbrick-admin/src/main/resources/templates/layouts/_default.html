@@ -38,10 +38,22 @@
                     <p th:text="${title}">FRAGMENT'S TITLE</p>
                     <li class="menu-back-button"><a href="#">back</a></li>
                     <li th:each="pg : ${allProductGroups}"
-                        th:with="ctx='/productgroups/' + ${pg.description.toLowerCase()}">
-                        <a bw:activeforctx="${ctx}"
-                           th:href="@{${ctx}}"
-                           th:text="${pg.description}">PRODUCTGROUP DESCRIPTION</a>
+                    th:with="ctx='/productgroups/' + ${pg.description.toLowerCase()}">
+                    <a bw:activeforctx="${ctx}"
+                       th:href="@{${ctx}}"
+                       th:text="${pg.description}">PRODUCTGROUP DESCRIPTION</a>
+
+                       <ul class="side-submenu"  bw:activeforctx="${ctx}" >
+                            <h2> product groups </h2>
+                            <p th:text="${productGroup.description}">FRAGMENT'S TITLE</p>
+                            <li class="menu-back-button"><a href="#">back</a></li>
+                            <li th:each="subgroup : ${subgroups}">
+                                <a th:href="@{${subgroup.path}}"
+                                   bw:activeforctx="${subgroup.path}"
+                                   th:text="${subgroup.text}">SUBGROUP</a>
+                            </li>
+                       </ul>
+
                     </li>
                 </ul>
             </li>
@@ -105,3 +117,10 @@
     </div>
 </body>
 </html>
+<script type="text/javascript">
+        $('#side-menu > ul > li > ul > li > a').click(function(){
+            $(this).siblings('.side-submenu').addClass('active');
+            console.log("YATA!")
+        });
+
+</script>
