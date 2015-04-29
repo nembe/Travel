@@ -32,7 +32,11 @@ public class CustomerDetailsController {
 
         List<CardListItem> cards = transponderCardDao.findByCustomerId(customer.getCustomerId())
                 .stream()
-                .map(card -> new CardListItem(card, cardOrderDao.findById(card.getOrderId())))
+                .map(card -> {
+                    return card.getOrderId() != null
+                            ? new CardListItem(card, cardOrderDao.findById(card.getOrderId()))
+                            : new CardListItem(card);
+                })
                 .collect(Collectors.toList());
 
         model.put("cust", customer);
@@ -48,7 +52,11 @@ public class CustomerDetailsController {
 
         private CardListItem(TransponderCard card, Optional<CardOrder> order) {
             this.cardNumber = card.getCardNumber();
-            this.exported = order.map(CardOrder::isExport).orElse(false);
+            this.exported = order.map(CardOrder::isExport).orElse(true);
+        }
+
+        private CardListItem(TransponderCard card) {
+            this(card, Optional.empty());
         }
     }
 }

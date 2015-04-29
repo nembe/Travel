@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
+import static nl.yellowbrick.data.dao.impl.ResultSetUtil.*;
+
 @Component
 public class TransponderCardJdbcDao implements TransponderCardDao {
 
@@ -110,7 +112,7 @@ public class TransponderCardJdbcDao implements TransponderCardDao {
             card.setCountry(rs.getString("licenseplatecountry"));
             card.setMutator(rs.getString("mutator"));
             card.setMutationDate(rs.getTimestamp("mutation_date"));
-            card.setOrderId(rs.getLong("orderidfk"));
+            card.setOrderId(getLongOrNull(rs, "orderidfk"));
 
             return card;
         };

@@ -12,7 +12,7 @@ public class TransponderCard {
     private String country;
     private String mutator;
     private Date mutationDate;
-    private long orderId;
+    private Long orderId;
 
     public long getId() {
         return id;
@@ -78,11 +78,11 @@ public class TransponderCard {
         this.mutationDate = mutationDate;
     }
 
-    public long getOrderId() {
+    public Long getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(long orderId) {
+    public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
 
@@ -95,12 +95,12 @@ public class TransponderCard {
 
         if (customerId != that.customerId) return false;
         if (id != that.id) return false;
-        if (orderId != that.orderId) return false;
         if (cardNumber != null ? !cardNumber.equals(that.cardNumber) : that.cardNumber != null) return false;
         if (country != null ? !country.equals(that.country) : that.country != null) return false;
         if (licenseplate != null ? !licenseplate.equals(that.licenseplate) : that.licenseplate != null) return false;
         if (mutationDate != null ? !mutationDate.equals(that.mutationDate) : that.mutationDate != null) return false;
         if (mutator != null ? !mutator.equals(that.mutator) : that.mutator != null) return false;
+        if (orderId != null ? !orderId.equals(that.orderId) : that.orderId != null) return false;
         if (status != that.status) return false;
 
         return true;
@@ -116,7 +116,7 @@ public class TransponderCard {
         result = 31 * result + (country != null ? country.hashCode() : 0);
         result = 31 * result + (mutator != null ? mutator.hashCode() : 0);
         result = 31 * result + (mutationDate != null ? mutationDate.hashCode() : 0);
-        result = 31 * result + (int) (orderId ^ (orderId >>> 32));
+        result = 31 * result + (orderId != null ? orderId.hashCode() : 0);
         return result;
     }
 }
