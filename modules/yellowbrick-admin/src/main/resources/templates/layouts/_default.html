@@ -45,7 +45,7 @@
 
                        <ul class="side-submenu"  bw:activeforctx="${ctx}" >
                             <h2> product groups </h2>
-                            <p th:text="${productGroup.description}">FRAGMENT'S TITLE</p>
+                            <!--<p th:text="${productGroup.description}">GIVES ERROR WHEN ON VALIDATION--> <p>FRAGMENT'S TITLE</p>
                             <li class="menu-back-button"><a href="#">back</a></li>
                             <li th:each="subgroup : ${subgroups}">
                                 <a th:href="@{${subgroup.path}}"
@@ -117,10 +117,4 @@
     </div>
 </body>
 </html>
-<script type="text/javascript">
-        $('#side-menu > ul > li > ul > li > a').click(function(){
-            $(this).siblings('.side-submenu').addClass('active');
-            console.log("YATA!")
-        });
 
-</script>

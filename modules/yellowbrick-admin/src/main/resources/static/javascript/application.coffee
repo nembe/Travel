@@ -9,3 +9,6 @@ $ ->
   $('.menu-back-button').click (e) ->
     e.stopPropagation()
     $(this).parent('.side-submenu').removeClass('active')
+
+	$('#side-menu > ul > li > ul > li > a').click ->
+		$(this).siblings('.side-submenu').addClass('active')
