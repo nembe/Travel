@@ -1,5 +1,6 @@
 @import 'normalize.css';
 @import 'bourbon';
+@import 'neat/neat';
 @import 'colors';
 @import 'forms';
 @import 'provisioning/exports';
@@ -380,8 +381,8 @@ table td {
 // ICONS //
 .i-error:before{
   background: url("../images/icon/error-icon.svg");
-  height: 50px;
-  width: 50px;
+  height: 80px;
+  width: 80px;
   content: " ";
   position: absolute;
   float: left;

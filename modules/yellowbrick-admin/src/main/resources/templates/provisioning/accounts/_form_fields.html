@@ -5,10 +5,12 @@
 <body>
     <div th:fragment="gender" class="field">
         <span class="field-label">Gender</span>
-        <input type="radio" th:field="*{gender}" th:value="M" />
-        <label th:for="${#ids.prev('gender')}">Mr.</label>
-        <input type="radio" th:field="*{gender}" th:value="F" />
-        <label th:for="${#ids.prev('gender')}">Mrs.</label>
+        <span class="radioButtons">
+            <input type="radio" th:field="*{gender}" th:value="M" />
+            <label th:for="${#ids.prev('gender')}">Mr.</label>
+            <input type="radio" th:field="*{gender}" th:value="F" />
+            <label th:for="${#ids.prev('gender')}">Mrs.</label>
+        </span>
     </div>
 
     <div th:fragment="initials" class="field">
@@ -143,18 +145,22 @@
 
     <div th:fragment="billingAddressSameAsMailingAddress" class="field">
         <span class="field-label">Billing address is the same as establishment address</span>
-        <input type="radio" th:field="*{billingAddressSameAsMailingAddress}" th:value="true" />
-        <label th:for="${#ids.prev('billingAddressSameAsMailingAddress')}">Yes</label>
-        <input type="radio" th:field="*{billingAddressSameAsMailingAddress}" th:value="false" />
-        <label th:for="${#ids.prev('billingAddressSameAsMailingAddress')}">No</label>
+        <span class="radioButtons">
+            <input type="radio" th:field="*{billingAddressSameAsMailingAddress}" th:value="true" />
+            <label th:for="${#ids.prev('billingAddressSameAsMailingAddress')}">Yes</label>
+            <input type="radio" th:field="*{billingAddressSameAsMailingAddress}" th:value="false" />
+            <label th:for="${#ids.prev('billingAddressSameAsMailingAddress')}">No</label>
+        </span>
     </div>
 
     <div th:fragment="billingAddressIsPoBox" class="field billingAddress">
         <span class="field-label">Billing address is a PO box address</span>
-        <input type="radio" th:field="*{billingAddressIsPoBox}" th:value="true" />
-        <label th:for="${#ids.prev('billingAddressIsPoBox')}">Yes</label>
-        <input type="radio" th:field="*{billingAddressIsPoBox}" th:value="false" />
-        <label th:for="${#ids.prev('billingAddressIsPoBox')}">No</label>
+        <span class="radioButtons">
+            <input type="radio" th:field="*{billingAddressIsPoBox}" th:value="true" />
+            <label th:for="${#ids.prev('billingAddressIsPoBox')}">Yes</label>
+            <input type="radio" th:field="*{billingAddressIsPoBox}" th:value="false" />
+            <label th:for="${#ids.prev('billingAddressIsPoBox')}">No</label>
+        </span>
     </div>
 
     <div th:fragment="billingAddressPoBox" class="field billingAddress">

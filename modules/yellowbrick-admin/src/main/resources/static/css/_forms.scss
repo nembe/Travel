@@ -1,4 +1,5 @@
 @import 'colors';
+@import 'neat/neat';
 
 .section {
   background-color: $background-color;
@@ -21,6 +22,7 @@
 .field-label {
   display: inline-block;
   width: 200px;
+
 }
 
 input.field-error {
@@ -31,7 +33,6 @@ span.field-error {
   color: #f00;
   display: block;
   text-align: right;
-  padding-right: 84px;
 }
 
 .global-errors {
@@ -59,16 +60,16 @@ input {
 
 }
 input[type='text'] {
-  width: 220px;
-  height: 30px;
+  width: 300px;
+  height: 50px;
 }
 .row-33 {
-  width: 33%;
-  float: left;
+  @include span-columns(4);
+
 }
 .row-50 {
-  width: 50%;
-  float: left;
+  @include span-columns(6);
+
 }
 input[type=radio]{
   display: inline-block;
