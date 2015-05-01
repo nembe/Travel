@@ -1,0 +1,83 @@
+<!DOCTYPE HTML>
+<html layout:decorator="layouts/_default">
+<head>
+    <title th:text="${cust.getFullName()}">Customer</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="main-body">
+            <div class="section">
+
+                <h2>General data</h2>
+
+                <div class="field">
+                    <span class="field-label">Gender</span>
+                    <span th:text="${cust.gender}"></span>
+                </div>
+
+                <div class="field">
+                    <span class="field-label">Initials</span>
+                    <span th:text="${cust.initials}"></span>
+                </div>
+
+                <div class="field">
+                    <span class="field-label">First name</span>
+                    <span th:text="${cust.firstName}"></span>
+                </div>
+
+                <div class="field">
+                    <span class="field-label">Last name</span>
+                    <span th:text="${cust.lastName}"></span>
+                </div>
+
+                <div class="field">
+                    <span class="field-label">Date of Birth</span>
+                    <span th:text="${cust.dateOfBirth}"></span>
+                </div>
+
+                <div class="field">
+                    <span class="field-label">Email</span>
+                    <span th:text="${cust.email}"></span>
+                </div>
+
+                <div class="field">
+                    <span class="field-label">Phone number</span>
+                    <span th:text="${cust.phoneNr}"></span>
+                </div>
+
+                <div class="field">
+                    <span class="field-label">Product group</span>
+                    <span th:text="${cust.productGroup}"></span>
+                </div>
+
+                <div class="field">
+                    <span class="field-label">Status</span>
+                    <span th:text="${cust.status}"></span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Transponder cards</h2>
+
+                <p th:if="${#lists.isEmpty(cards)}">User has no transponder cards</p>
+
+                <table th:unless="${#lists.isEmpty(cards)}">
+                    <thead>
+                        <tr>
+                            <th>Card number</th>
+                            <th>Has physical counterpart</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="card : ${cards}">
+                            <td th:text="${card.cardNumber}"></td>
+                            <td th:if="${card.exported}"><input type="checkbox" disabled="disabled" checked="checked"/></td>
+                            <td th:unless="${card.exported}"><input type="checkbox" disabled="disabled"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,5 +1,6 @@
 package nl.yellowbrick.activation.task;
 
+import nl.yellowbrick.activation.service.CardAssignmentService;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import org.junit.Before;
@@ -16,6 +17,7 @@ public class CardOrderValidationTaskTest {
     CardOrderValidationTask cardOrderValidationTask;
 
     CardOrderDao cardOrderDao;
+    CardAssignmentService cardAssignmentService;
 
     CardOrder order;
     CardOrder nonPhysicalOrder;
@@ -35,7 +37,9 @@ public class CardOrderValidationTaskTest {
         when(cardOrderDao.findByStatusAndType(INSERTED, TRANSPONDER_CARD))
                 .thenReturn(Arrays.asList(order, nonPhysicalOrder));
 
-        cardOrderValidationTask = new CardOrderValidationTask(cardOrderDao);
+        cardAssignmentService = mock(CardAssignmentService.class);
+
+        cardOrderValidationTask = new CardOrderValidationTask(cardOrderDao, cardAssignmentService);
     }
 
     @Test
@@ -44,6 +48,7 @@ public class CardOrderValidationTaskTest {
 
         verify(cardOrderDao, times(1)).validateCardOrder(any());
         verify(cardOrderDao).validateCardOrder(nonPhysicalOrder);
+        verify(cardAssignmentService).assignTransponderCard(nonPhysicalOrder);
     }
 
     @Test
@@ -52,5 +57,6 @@ public class CardOrderValidationTaskTest {
 
         verify(cardOrderDao, times(1)).validateCardOrder(any());
         verify(cardOrderDao).validateCardOrder(order);
+        verify(cardAssignmentService).assignTransponderCard(order);
     }
 }

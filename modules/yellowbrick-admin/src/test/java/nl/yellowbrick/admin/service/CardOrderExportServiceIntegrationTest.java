@@ -25,9 +25,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
@@ -73,7 +71,7 @@ public class CardOrderExportServiceIntegrationTest extends BaseMvcTestCase {
         CardOrder order = cardOrderDao.findByStatusAndType(CardOrderStatus.EXPORTED, CardType.TRANSPONDER_CARD).get(0);
 
         assertThat(export.getName(), endsWith("_YELLOWBRICK_Transponderkaart.csv"));
-        assertThat(readFile(export), equalTo(sampleTransponderCardExport()));
+        assertThat(readFile(export), containsString(sampleTransponderCardExport()));
         assertThat(order.getId(), is(TRANSPONDERCARD_ORDER_ID));
     }
 
@@ -152,6 +150,7 @@ public class CardOrderExportServiceIntegrationTest extends BaseMvcTestCase {
     private CardOrder sampleOrder(CardType cardType) {
         CardOrder order = new CardOrder();
         order.setCardType(cardType);
+        order.setAmount(1);
         order.setCustomerId(4776);
         order.setBriefCode("bc");
 

@@ -70,3 +70,8 @@ input[type=radio]{
   background: rgb(224,224,224);
   &:checked{}
 }
+
+.clear {
+  clear: both;
+  padding: 10px 3px;
+}

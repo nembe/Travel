@@ -3,6 +3,7 @@ package nl.yellowbrick.activation.service;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.dao.MembershipDao;
+import nl.yellowbrick.data.domain.CardOrderStatus;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.Membership;
 import nl.yellowbrick.data.domain.PriceModel;
@@ -46,8 +47,12 @@ public class AccountActivationService {
 
             log.info("Saved validated membership for customer ID " + customer.getCustomerId());
 
-            cardOrderDao.validateCardOrders(customer, TRANSPONDER_CARD, QPARK_CARD);
-            cardAssignmentService.assignAllOrderedByCustomer(customer);
+            cardOrderDao.findForCustomer(customer, CardOrderStatus.INSERTED, QPARK_CARD).forEach(cardOrderDao::validateCardOrder);
+            cardOrderDao.findForCustomer(customer, CardOrderStatus.INSERTED, TRANSPONDER_CARD).forEach(order -> {
+                cardOrderDao.validateCardOrder(order);
+                cardAssignmentService.assignTransponderCard(order);
+            });
+
             emailNotificationService.notifyAccountAccepted(customer);
 
             log.info("Finished activation of customer ID " + customer.getCustomerId());

@@ -2,6 +2,7 @@ package nl.yellowbrick.data.dao;
 
 import nl.yellowbrick.data.domain.TransponderCard;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface TransponderCardDao {
@@ -17,4 +18,8 @@ public interface TransponderCardDao {
     void cancelCard(long transponderCardId);
 
     void activateCard(long transponderCardId, long customerId);
+
+    List<TransponderCard> findByOrderId(long orderId);
+
+    List<TransponderCard> findByCustomerId(long customerId);
 }
