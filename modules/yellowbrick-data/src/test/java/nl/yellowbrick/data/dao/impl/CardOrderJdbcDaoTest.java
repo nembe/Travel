@@ -166,7 +166,6 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         orderA.setBriefCode("2");
         orderA.setAmount(2);
         orderA.setPricePerCard(600);
-        orderA.setSurcharge(300);
         orderA.setExport(false);
         
         CardOrder orderB = new CardOrder();
@@ -178,7 +177,6 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         orderB.setBriefCode("1");
         orderB.setAmount(2);
         orderB.setPricePerCard(500);
-        orderB.setSurcharge(200);
         orderB.setExport(true);
 
         List<CardOrder> cardOrders = cardOrderDao.findForCustomer(customer, INSERTED, QPARK_CARD);

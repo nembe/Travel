@@ -14,7 +14,6 @@ public class CardOrder {
     private String briefCode;
     private int amount;
     private double pricePerCard;
-    private double surcharge;
     private boolean export;
 
     public long getId() {
@@ -81,14 +80,6 @@ public class CardOrder {
         this.pricePerCard = pricePerCard;
     }
 
-    public double getSurcharge() {
-        return surcharge;
-    }
-
-    public void setSurcharge(double surcharge) {
-        this.surcharge = surcharge;
-    }
-
     public boolean isExport() {
         return export;
     }
@@ -109,7 +100,6 @@ public class CardOrder {
         if (export != cardOrder.export) return false;
         if (id != cardOrder.id) return false;
         if (Double.compare(cardOrder.pricePerCard, pricePerCard) != 0) return false;
-        if (Double.compare(cardOrder.surcharge, surcharge) != 0) return false;
         if (briefCode != null ? !briefCode.equals(cardOrder.briefCode) : cardOrder.briefCode != null) return false;
         if (cardType != cardOrder.cardType) return false;
         if (date != null ? !date.equals(cardOrder.date) : cardOrder.date != null) return false;
@@ -131,7 +121,6 @@ public class CardOrder {
         result = 31 * result + amount;
         temp = Double.doubleToLongBits(pricePerCard);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(surcharge);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
@@ -147,7 +136,6 @@ public class CardOrder {
                 .add("briefCode", briefCode)
                 .add("amount", amount)
                 .add("pricePerCard", pricePerCard)
-                .add("surcharge", surcharge)
                 .add("export", export)
                 .toString();
     }

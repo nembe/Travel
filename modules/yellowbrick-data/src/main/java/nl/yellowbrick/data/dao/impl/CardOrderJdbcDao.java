@@ -175,7 +175,6 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                 co.setBriefCode(rs.getString("BRIEFCODE"));
                 co.setAmount(rs.getInt("AMOUNT"));
                 co.setPricePerCard(rs.getDouble("PRICEPERCARD"));
-                co.setSurcharge(rs.getDouble("SURCHARGE"));
                 co.setExport("Y".equals(rs.getString("EXPORT")));
 
                 return co;

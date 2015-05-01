@@ -7,7 +7,6 @@ public class CardOrderValidationForm {
 
     private int amount;
     private double pricePerCard;
-    private double surcharge;
     private boolean export;
 
     public CardOrderValidationForm() {
@@ -16,7 +15,6 @@ public class CardOrderValidationForm {
     public CardOrderValidationForm(CardOrder cardOrder) {
         this.amount = cardOrder.getAmount();
         this.pricePerCard = cardOrder.getPricePerCard() / 100;
-        this.surcharge = cardOrder.getSurcharge() / 100;
         this.export = cardOrder.isExport();
     }
 
@@ -37,17 +35,6 @@ public class CardOrderValidationForm {
 
     public void setPricePerCard(double pricePerCard) {
         this.pricePerCard = pricePerCard;
-    }
-
-    public double getSurcharge() {
-        return surcharge;
-    }
-    public double getSurchargeCents() {
-        return surcharge * 100;
-    }
-
-    public void setSurcharge(double surcharge) {
-        this.surcharge = surcharge;
     }
 
     public boolean isExport() {

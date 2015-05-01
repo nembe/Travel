@@ -382,7 +382,6 @@ INSERT INTO CARDORDER VALUES (
              '2',
              2,
              600,
-             300,
              'N');
 
 INSERT INTO CARDORDER VALUES (
@@ -394,7 +393,6 @@ INSERT INTO CARDORDER VALUES (
              '1',
              2,
              500,
-             200,
              'Y');
 
 INSERT INTO CUSTOMER_REGISTRATION VALUES (4776, 'nl_NL', 'YBAANMELDEN:Struijk', NULL);
