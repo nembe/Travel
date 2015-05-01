@@ -2,11 +2,11 @@
 <!-- Generator: Adobe Illustrator 18.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 412 412" enable-background="new 0 0 412 412" xml:space="preserve">
+	 viewBox="0 0 841.9 595.3" enable-background="new 0 0 841.9 595.3" xml:space="preserve">
 <g>
-	<path d="M374.1,50.3H0V94h374.1V50.3z M367.5,86H9.5V58.3h358V86z"/>
-	<path d="M0,361.7h374.1V318H0V361.7z M9.5,326h358v27.7H9.5V326z"/>
-	<path d="M319,250.8l33.9,19.7L412,206l-59.2-64.4l-33.5,22l21,19.7H0v43.7h342.5L319,250.8z M9.5,218.9v-27.7h352.3l-10.3-9.9
-		l-17.8-16.7L353,152l49.6,54l-49.8,54.4l-19.4-11.3l20.6-20.9l0.6-0.6l8.9-8.6H9.5z"/>
+	<path fill="#B9C1D0" d="M663.8,72.7H123.3v63.1h540.5V72.7z M654.3,124.3H137v-40h517.3V124.3z"/>
+	<path fill="#B9C1D0" d="M123.3,522.6h540.5v-63.1H123.3V522.6z M137,471h517.3v40H137V471z"/>
+	<path fill="#B9C1D0" d="M584.2,362.4l49,28.5l85.4-93.2l-85.5-93l-48.4,31.8l30.3,28.5H123.3V328h494.9L584.2,362.4z M137,316.3
+		v-40h509L631.2,262l-25.7-24.1l27.9-18.2l71.7,78l-72,78.6l-28-16.3l29.8-30.2l0.9-0.9l12.9-12.4H137V316.3z"/>
 </g>
 </svg>
