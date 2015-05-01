@@ -87,7 +87,7 @@ public class CardOrderExportServiceIntegrationTest extends BaseMvcTestCase {
         File export = latestFileFromOutputDir(pg);
 
         assertThat(export.getName(), endsWith("_TESTPG_QCARD.csv"));
-        assertThat(readFile(export), equalTo(sampleQCardExport()));
+        assertThat(stripTrackTwoCode(readFile(export)), equalTo(stripTrackTwoCode(sampleQCardExport())));
     }
 
     @Test
@@ -121,6 +121,10 @@ public class CardOrderExportServiceIntegrationTest extends BaseMvcTestCase {
 
         assertThat(export.getName(), endsWith("_TESTPG_Transponderkaart.csv"));
         assertThat(Files.readLines(export, Charsets.UTF_8), hasSize(4)); // 3 records and the columns header
+    }
+
+    private static String stripTrackTwoCode(String s) {
+        return s.replaceAll("\\$\\$.*\\$\\$", "");
     }
 
     private ProductGroup internalProductGroup() {
