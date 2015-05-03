@@ -14,38 +14,39 @@
         <a id="logo" th:href="@{/}"></a>
         <ul>
             <li class="dashboard">
-                <a href="#">DASHBOARD</a>
+                <a class="menu-fw" href="#">DASHBOARD</a>
                 <ul class="side-submenu" bw:activeforctx="/dashboard/">
-                    <h2> dashboard </h2>
+                    <h2>dashboard</h2>
                     <li class="menu-back-button"><a href="#">back</a></li>
                     <li><a href="#">one</a></li>
                     <li><a href="#">two</a></li>
                 </ul>
             </li>
-            <li class="customers" >
-                <a href="#">CUSTOMERS</a>
+            <li class="customers">
+                <a class="menu-fw" href="#">CUSTOMERS</a>
                 <ul class="side-submenu" bw:activeforctx="/customers/">
-                    <h2> customers </h2>
+                    <h2>customers</h2>
                     <li class="menu-back-button"><a href="#">back</a></li>
                     <li><a href="#">one</a></li>
                     <li><a href="#">two</a></li>
                 </ul>
             </li>
-            <li class="product-groups" >
-                <a href="#">PRODUCT GROUPS</a>
+            <li class="product-groups">
+                <a class="menu-fw" href="#">PRODUCT GROUPS</a>
                 <ul class="side-submenu" bw:activeforctx="/productgroups/">
-                    <h2> product groups </h2>
+                    <h2>product groups</h2>
                     <p th:text="${title}">FRAGMENT'S TITLE</p>
                     <li class="menu-back-button"><a href="#">back</a></li>
                     <li th:each="pg : ${allProductGroups}"
-                    th:with="ctx='/productgroups/' + ${pg.description.toLowerCase()}">
-                    <a bw:activeforctx="${ctx}"
-                       th:href="@{${ctx}}"
-                       th:text="${pg.description}">PRODUCTGROUP DESCRIPTION</a>
+                        th:with="ctx='/productgroups/' + ${pg.description.toLowerCase()}">
+                        <a class="menu-fw"
+                           bw:activeforctx="${ctx}"
+                           th:href="@{${ctx}}"
+                           th:text="${pg.description}">PRODUCTGROUP DESCRIPTION</a>
 
-                       <ul class="side-submenu"  bw:activeforctx="${ctx}" >
-                            <h2> product groups </h2>
-                            <!--<p th:text="${productGroup.description}">GIVES ERROR WHEN ON VALIDATION--> <p>FRAGMENT'S TITLE</p>
+                       <ul class="side-submenu" bw:activeforctx="${ctx}">
+                            <h2>product groups</h2>
+                            <p th:text="${pg.description}">FRAGMENT'S TITLE</p>
                             <li class="menu-back-button"><a href="#">back</a></li>
                             <li th:each="subgroup : ${subgroups}">
                                 <a th:href="@{${subgroup.path}}"
@@ -58,28 +59,27 @@
                 </ul>
             </li>
             <li class="municipalities" >
-                <a href="#">MUNICIPALITIES</a>
+                <a class="menu-fw" href="#">MUNICIPALITIES</a>
                 <ul class="side-submenu" bw:activeforctx="/municipalities/">
-                    <h2> municipalities </h2>
+                    <h2>municipalities</h2>
                     <li class="menu-back-button"><a href="#">back</a></li>
                     <li><a href="#">one</a></li>
                     <li><a href="#">two</a></li>
                 </ul>
             </li>
             <li class="action-codes">
-                <a href="#">ACTION CODES</a>
+                <a class="menu-fw" href="#">ACTION CODES</a>
                 <ul class="side-submenu" bw:activeforctx="/action-codes/">
-                    <h2> action codes </h2>
+                    <h2>action codes</h2>
                     <li class="menu-back-button"><a href="#">back</a></li>
                     <li><a href="#">one</a></li>
                     <li><a href="#">two</a></li>
                 </ul>
             </li>
             <li class="provisioning">
-                <a th:href="@{/provisioning/accounts}">PROVISIONING</a>
+                <a class="menu-fw" th:href="@{/provisioning/accounts}">PROVISIONING</a>
                 <ul class="side-submenu" bw:activeforctx="/provisioning/">
-                <i class="icon provisioning"></i>
-                    <h2> provisioning </h2>
+                    <h2>provisioning</h2>
                     <p th:text="${title}">FRAGMENT'S TITLE</p>
                     <li class="menu-back-button"><a href="#">back</a></li>
                     <li><a bw:activeforctx="/provisioning/accounts" th:href="@{/provisioning/accounts}" >ACCOUNT VALIDATION</a></li>
@@ -91,15 +91,13 @@
 
         <ul class="baseline">
             <li class="settings" >
-                <a href="#">SETTINGS</a>
+                <a class="menu-fw" href="#">SETTINGS</a>
                 <ul class="side-submenu-settings">
-                    <i class="settings"></i>
                     <li>
                         <form id="logout-btn" th:action="@{/logout}" method="post">
                             <input type="submit" value="Sign out"/>
                             <span th:inline="text">[[${#httpServletRequest.remoteUser}]]</span>
                         </form>
-
                     </li>
                    <li>
                         <a href="#">one</a>
