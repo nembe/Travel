@@ -48,20 +48,18 @@ public class CardProvisioningFormControllerTest extends BaseMvcTestCase {
         assertThat(fields.select("[name=export][checked]").val(), is("false"));
         assertThat(fields.select("[name=amount] option[selected]").val(), is("2"));
         assertThat(fields.select("[name=pricepercard]").val(), is("6.0"));
-        assertThat(fields.select("[name=surcharge]").val(), is("3.0"));
     }
 
     @Test
     public void shows_form_binding_errors() throws Exception {
         MvcResult res = mockMvc.perform(post(ORDER_URL)
-                        .param("pricePerCard", "5.0") // correct entry
-                        .param("surcharge", "not an integer") // wrong type. should have binding error
+                        .param("pricePerCard", "not an integer") // wrong type. should have binding error
                         .param("validateCardOrder", "Submit")
         ).andReturn();
 
         Document html = parseHtml(res);
 
-        assertThat(html.select("[name=surcharge] + .field-error").text(), not(isEmptyOrNullString()));
+        assertThat(html.select("[name=pricePerCard] + .field-error").text(), not(isEmptyOrNullString()));
     }
 
     @Test
@@ -70,8 +68,7 @@ public class CardProvisioningFormControllerTest extends BaseMvcTestCase {
 
         verify(cardOrderDao).validateCardOrder(argThat(allOf(
                 hasProperty("id", is(ORDER_ID)),
-                hasProperty("pricePerCard", is(1.23 * 100)),
-                hasProperty("surcharge", is(4.56 * 100))
+                hasProperty("pricePerCard", is(1.23 * 100))
         )));
     }
 
@@ -102,7 +99,6 @@ public class CardProvisioningFormControllerTest extends BaseMvcTestCase {
     private MvcResult doCorrectValidateRequest() throws Exception {
         return mockMvc.perform(post(ORDER_URL)
                         .param("pricePerCard", "1.23")
-                        .param("surcharge", "4.56")
                         .param("validateCardOrder", "Submit")
         ).andReturn();
     }

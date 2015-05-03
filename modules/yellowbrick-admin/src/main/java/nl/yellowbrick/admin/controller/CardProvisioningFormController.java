@@ -66,7 +66,6 @@ public class CardProvisioningFormController {
 
         CardOrder order = order(id);
         order.setPricePerCard(form.getPricePerCardCents());
-        order.setSurcharge(form.getSurchargeCents());
 
         cardOrderDao.validateCardOrder(order);
 
