@@ -24,7 +24,9 @@ var displayError = function(err) {
 
 gulp.task('sass', function() {
     gulp.src(paths.scss)
-        .pipe(sass())
+        .pipe(sass({
+            includePaths: require('node-neat').includePaths
+        }))
         .on('error', displayError)
         .pipe(gulp.dest(paths.target + '/css'));
 });

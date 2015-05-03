@@ -1,4 +1,6 @@
 @import 'normalize.css';
+@import 'bourbon';
+@import 'neat';
 @import 'colors';
 @import 'forms';
 @import 'provisioning/exports';
@@ -98,7 +100,6 @@ a, a:active, a:hover, a:visited {
       width: 90%;
       transition: 0.5s;
 
-
       .side-submenu{
         top: 0;
 
@@ -191,8 +192,6 @@ a, a:active, a:hover, a:visited {
       background-color: $settings-color;
       margin-top:-55px;
       display: none;
-      -moz-box-shadow: 4px 7px 20px #666;
-      -webkit-box-shadow: 4px 7px 20px #666;
       box-shadow: 4px 7px 20px #666;
       text-transform: uppercase;
       z-index: 9;
@@ -271,8 +270,6 @@ a, a:active, a:hover, a:visited {
     height:29px;
     line-height: 29px;
   }
-
-
 }
 
 table {
@@ -323,8 +320,7 @@ table td {
 }
 
 #flash {
-  text-align: center;
-
+  text-align: left;
   $border-color: #5F8D1D;
   $bg-color: #90EE90;
 
@@ -335,17 +331,29 @@ table td {
 
   .flash-inner {
     display: inline-block;
-    margin: 15px auto;
     background-color: $bg-color;
-    border: 4px solid $border-color;
-    padding: 5px 15px;
+    width: 100%;
+    padding: 40px 0px;
+    margin-bottom: 18px;
+    position: static;
+    overflow: hidden;
+    span{
+      margin-left:50px;
+    }
   }
 
   button.close {
     border: 0;
-    background-color: $border-color;
+    background-color: rgba(0,0,0,0.1);
     color: white;
     margin-left: 15px;
+    float: right;
+    margin-top: -20px;
+    right: 10px;
+    height: 58px;
+    width: 50px;
+    font-size: 25px;
+    position: absolute;
   }
 }
 .btn{
@@ -369,6 +377,37 @@ table td {
     opacity: 0.7;
   }
 }
+
+// ICONS //
+.i-error:before{
+  background: url("../images/icon/error-icon.svg");
+  height: 80px;
+  width: 80px;
+  content: " ";
+  position: absolute;
+  float: left;
+  background-size: contain;
+  color: white;
+  background-repeat: no-repeat;
+  padding: 25px;
+  opacity: 0.1;
+}
+
+#flash:before{
+  background: url("../images/icon/rock-out.svg");
+  height: 30px;
+  width: 30px;
+  content: " ";
+  position: absolute;
+  float: left;
+  background-size: contain;
+  color: white;
+  background-repeat: no-repeat;
+  padding: 25px;
+  opacity: 0.1;
+  margin: 9px;
+}
+
 #side-menu ul li .active{
   transition: 0.5s;
   left: 0;

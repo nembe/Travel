@@ -6,7 +6,7 @@
   margin-bottom: 18px;
   position: static;
   overflow: hidden;
-  z-index: 8;
+  z-index: -1;
 }
 
 .field {
@@ -21,6 +21,7 @@
 .field-label {
   display: inline-block;
   width: 200px;
+
 }
 
 input.field-error {
@@ -29,13 +30,22 @@ input.field-error {
 
 span.field-error {
   color: #f00;
-  position: relative;
-  right: -210px;
+  display: block;
+  text-align: right;
 }
 
 .global-errors {
-  color: #f00;
-}
+    background-color: #c44117;
+    color: white;
+    position: relative;
+    top: 0px;
+
+    .content-error{
+      margin-left: 50px;
+      margin-top: -10px;
+    }
+  }
+
 
 input[type='submit'] + input[type='submit'] {
   margin-left: 10px;
@@ -49,16 +59,16 @@ input {
 
 }
 input[type='text'] {
-  width: 220px;
-  height: 30px;
+  width: 300px;
+  height: 50px;
 }
 .row-33 {
-  width: 33%;
-  float: left;
+  @include span-columns(4);
+
 }
 .row-50 {
-  width: 50%;
-  float: left;
+  @include span-columns(6);
+
 }
 input[type=radio]{
   display: inline-block;
