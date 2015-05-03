@@ -11,11 +11,15 @@ public interface CustomerDao {
 
     Optional<Customer> findById(long id);
 
+    Optional<Customer> findByCustomerNr(String customerNr);
+
     List<Customer> findAllPendingActivation();
 
     List<Customer> findAllByFuzzyNameAndDateOfBirth(String firstName, String lastName, Date dateOfBirth);
 
     List<Customer> findAllByEmail(String email);
+
+    List<Customer> findAllByMobile(String mobile);
 
     void markAsPendingHumanReview(Customer customer);
 

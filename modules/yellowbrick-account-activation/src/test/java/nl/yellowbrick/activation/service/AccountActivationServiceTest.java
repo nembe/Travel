@@ -1,18 +1,18 @@
 package nl.yellowbrick.activation.service;
 
+import com.google.common.collect.Lists;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.dao.MembershipDao;
-import nl.yellowbrick.data.domain.CardType;
-import nl.yellowbrick.data.domain.Customer;
-import nl.yellowbrick.data.domain.Membership;
-import nl.yellowbrick.data.domain.PriceModel;
+import nl.yellowbrick.data.domain.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import static nl.yellowbrick.data.domain.CardOrderStatus.*;
+import static nl.yellowbrick.data.domain.CardType.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
@@ -31,6 +31,9 @@ public class AccountActivationServiceTest {
     Customer customer;
     PriceModel priceModel;
 
+    CardOrder tCardOrder;
+    CardOrder qparkCardOrder;
+
     @Before
     public void setUp() {
         customer = new Customer();
@@ -39,7 +42,18 @@ public class AccountActivationServiceTest {
 
         priceModel = new PriceModel();
 
+        tCardOrder = new CardOrder();
+        tCardOrder.setCardType(TRANSPONDER_CARD);
+
+        qparkCardOrder = new CardOrder();
+        qparkCardOrder.setCardType(QPARK_CARD);
+
         MockitoAnnotations.initMocks(this);
+
+        when(cardOrderDao.findForCustomer(customer, INSERTED, TRANSPONDER_CARD))
+                .thenReturn(Lists.newArrayList(tCardOrder));
+        when(cardOrderDao.findForCustomer(customer, INSERTED, QPARK_CARD))
+                .thenReturn(Lists.newArrayList(qparkCardOrder));
     }
 
     @Test
@@ -55,11 +69,16 @@ public class AccountActivationServiceTest {
         mockCollaborations();
         activationService.activateCustomerAccount(customer, priceModel);
 
-        InOrder inOrder = Mockito.inOrder(cardOrderDao, cardAssignmentService);
+        // saves specialtarif
+        verify(cardOrderDao).saveSpecialTarifIfApplicable(eq(customer));
 
-        inOrder.verify(cardOrderDao).saveSpecialTarifIfApplicable(eq(customer));
-        inOrder.verify(cardOrderDao).validateCardOrders(customer, CardType.TRANSPONDER_CARD, CardType.QPARK_CARD);
-        inOrder.verify(cardAssignmentService).assignAllOrderedByCustomer(customer);
+        // validates card orders
+        verify(cardOrderDao).validateCardOrder(tCardOrder);
+        verify(cardOrderDao).validateCardOrder(qparkCardOrder);
+
+        // assigns transponder cards
+        verify(cardAssignmentService).assignTransponderCard(tCardOrder);
+        verifyNoMoreInteractions(cardAssignmentService);
     }
 
     @Test

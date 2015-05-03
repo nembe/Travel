@@ -91,9 +91,9 @@ public class Functions {
         });
     }
 
-    public static void processTransponderCards(int customerId, String cardNr, String mutator, int updateMobileWithCard) {
+    public static void processTransponderCards(int customerId, int orderId, String cardNr, String mutator, int updateMobileWithCard) {
         CALL_RECORDERS.forEach((recorder) -> {
-            Object[] args = { customerId, cardNr, mutator, updateMobileWithCard };
+            Object[] args = { customerId, orderId, cardNr, mutator, updateMobileWithCard };
 
             recorder.accept(new FunctionCall("PROCESS_TRANSPONDERCARDS", args));
         });

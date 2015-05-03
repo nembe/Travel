@@ -382,9 +382,7 @@ INSERT INTO CARDORDER VALUES (
              '2',
              2,
              600,
-             300,
-             'N',
-             NULL);
+             'N');
 
 INSERT INTO CARDORDER VALUES (
              72032,
@@ -395,9 +393,7 @@ INSERT INTO CARDORDER VALUES (
              '1',
              2,
              500,
-             200,
-             'Y',
-             '123456');
+             'Y');
 
 INSERT INTO CUSTOMER_REGISTRATION VALUES (4776, 'nl_NL', 'YBAANMELDEN:Struijk', NULL);
 
@@ -572,7 +568,21 @@ INSERT INTO TRANSPONDERCARD VALUES (
              'NL',
              NULL,
              'ADMIN:ron',
-             TO_DATE ('12/14/2014 19:04:22', 'MM/DD/YYYY HH24:MI:SS'));
+             TO_DATE ('12/14/2014 19:04:22', 'MM/DD/YYYY HH24:MI:SS'),
+             NULL);
+
+INSERT INTO TRANSPONDERCARD VALUES (
+             8143,
+             '108142',
+             4776,
+             1,
+             NULL,
+             'TE-ST-01',
+             'NL',
+             TO_DATE ('01/03/2015 18:10:40', 'MM/DD/YYYY HH24:MI:SS'),
+             'YBSOAP:203126',
+             NULL,
+             72032);
 
 INSERT INTO ANNOTATION_DEFINITION VALUES (
              ANNOTATION_DEFINITION_SEQ.NEXTVAL,
@@ -586,3 +596,35 @@ INSERT INTO ANNOTATION_DEFINITION VALUES (
              '0',
              '0',
              0);
+
+INSERT INTO MOBILE VALUES (
+            'N',
+             1,
+             6716,
+             4776,
+             '+31614992123',
+             1.5,
+             5,
+             'MYB[KLANT:4776]',
+             NULL,
+             8143,
+             '0',
+             NULL,
+             '0',
+             '0');
+
+INSERT INTO MOBILE VALUES (
+             'N',
+             1,
+             6717,
+             4776,
+             '+31641017015',
+             1.5,
+             5,
+             'MYB[KLANT:4776]',
+             NULL,
+             NULL,
+             '0',
+             NULL,
+             '0',
+             '0');

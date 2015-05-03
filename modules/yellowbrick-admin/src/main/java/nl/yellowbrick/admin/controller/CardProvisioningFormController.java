@@ -1,5 +1,6 @@
 package nl.yellowbrick.admin.controller;
 
+import nl.yellowbrick.activation.service.CardAssignmentService;
 import nl.yellowbrick.admin.exceptions.InconsistentDataException;
 import nl.yellowbrick.admin.exceptions.ResourceNotFoundException;
 import nl.yellowbrick.admin.form.CardOrderValidationForm;
@@ -7,6 +8,7 @@ import nl.yellowbrick.admin.util.MessageHelper;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.CardOrder;
+import nl.yellowbrick.data.domain.CardType;
 import nl.yellowbrick.data.domain.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,6 +31,9 @@ public class CardProvisioningFormController {
 
     @Autowired
     private CustomerDao customerDao;
+
+    @Autowired
+    private CardAssignmentService cardAssignmentService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String showValidationForm(ModelMap model, @PathVariable("id") int id) {
@@ -61,9 +66,11 @@ public class CardProvisioningFormController {
 
         CardOrder order = order(id);
         order.setPricePerCard(form.getPricePerCardCents());
-        order.setSurcharge(form.getSurchargeCents());
 
         cardOrderDao.validateCardOrder(order);
+
+        if(order.getCardType().equals(CardType.TRANSPONDER_CARD))
+            cardAssignmentService.assignTransponderCard(order);
 
         model.clear();
         MessageHelper.flash(ra, "cardorder.validated");

@@ -58,11 +58,6 @@
                     <span class="field-error" th:if="${#fields.hasErrors('pricePerCard')}" th:errors="*{pricePerCard}"></span>
                 </div>
 
-                <div class="field">
-                    <label for="surcharge" class="field-label">Surcharge</label>
-                    <input type="text" th:field="*{surcharge}" th:errorclass="field-error"/>
-                    <span class="field-error" th:if="${#fields.hasErrors('surcharge')}" th:errors="*{surcharge}"></span>
-                </div>
             </div>
 
             <div class="section">
