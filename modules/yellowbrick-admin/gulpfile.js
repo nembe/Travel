@@ -25,7 +25,7 @@ var displayError = function(err) {
 gulp.task('sass', function() {
     gulp.src(paths.scss)
         .pipe(sass({
-            includePaths: require('node-bourbon').includePaths
+            includePaths: require('node-neat').includePaths
         }))
         .on('error', displayError)
         .pipe(gulp.dest(paths.target + '/css'));
