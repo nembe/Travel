@@ -16,7 +16,7 @@ public abstract class ClassValidator<T> implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return clazz.equals(supportedClass);
+        return clazz.isAssignableFrom(supportedClass);
     }
 
     @Override
