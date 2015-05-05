@@ -320,10 +320,6 @@ public class Customer {
         this.parkadammerTotal = parkadammerTotal;
     }
 
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = (paymentMethod != null) ? paymentMethod : "";
-    }
-
     public void setPhoneNr(String phoneNr) {
         this.phoneNr = (phoneNr != null) ? phoneNr : "";
     }
