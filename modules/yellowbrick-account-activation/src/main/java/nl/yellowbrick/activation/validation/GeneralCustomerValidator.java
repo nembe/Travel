@@ -1,6 +1,7 @@
 package nl.yellowbrick.activation.validation;
 
 import com.google.common.base.Strings;
+import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.dao.MarketingActionDao;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.MarketingAction;
@@ -19,6 +20,9 @@ public class GeneralCustomerValidator extends AccountRegistrationValidator {
     @Autowired
     private MarketingActionDao marketingActionDao;
 
+    @Autowired
+    private CustomerDao customerDao;
+
     @Override
     protected void doValidate(Customer customer, Errors errors) {
         if(customer.getDateOfBirth() == null) {
@@ -26,13 +30,27 @@ public class GeneralCustomerValidator extends AccountRegistrationValidator {
             return;
         }
 
-        if(youngerThanSixteen(customer.getDateOfBirth())) {
+        if(youngerThanSixteen(customer.getDateOfBirth()))
             errors.rejectValue("dateOfBirth", "errors.too.young");
-        }
 
-        if(!Strings.isNullOrEmpty(customer.getActionCode()) && !validActionCode(customer.getActionCode())) {
+        if(!Strings.isNullOrEmpty(customer.getActionCode()) && !validActionCode(customer.getActionCode()))
             errors.rejectValue("actionCode", "errors.invalid.action.code");
-        }
+
+        if(registeredWithKnownMobile(customer))
+            errors.rejectValue("firstCardMobile", "errors.duplicate");
+    }
+
+    private boolean registeredWithKnownMobile(Customer customer) {
+        if(customer.getFirstCardMobile() == null)
+            return false;
+
+        String mobile = customer.getFirstCardMobile().replaceAll("\\s", "");
+
+        return customerDao.findAllByMobile(mobile)
+                .stream()
+                .filter(it -> it.getCustomerId() != customer.getCustomerId())
+                .findAny()
+                .isPresent();
     }
 
     private boolean validActionCode(String actionCode) {

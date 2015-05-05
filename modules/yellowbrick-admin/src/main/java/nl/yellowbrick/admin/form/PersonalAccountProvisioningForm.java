@@ -29,9 +29,10 @@ public class PersonalAccountProvisioningForm implements FormData {
     private String city;
     private String country;
 
-    // singnup details
+    // signup details
     private int numberOfTransponderCards;
     private int numberOfPPlusCards;
+    private String firstCardMobile;
 
     // 0-arg constructor for javabeans compliance
     public PersonalAccountProvisioningForm() {
@@ -56,6 +57,7 @@ public class PersonalAccountProvisioningForm implements FormData {
 
         setNumberOfTransponderCards(customer.getNumberOfTCards());
         setNumberOfPPlusCards(customer.getNumberOfQCards());
+        setFirstCardMobile(customer.getFirstCardMobile());
     }
 
     public String getGender() {
@@ -184,5 +186,13 @@ public class PersonalAccountProvisioningForm implements FormData {
 
     public void setNumberOfPPlusCards(int numberOfPPlusCards) {
         this.numberOfPPlusCards = numberOfPPlusCards;
+    }
+
+    public String getFirstCardMobile() {
+        return firstCardMobile;
+    }
+
+    public void setFirstCardMobile(String firstCardMobile) {
+        this.firstCardMobile = firstCardMobile;
     }
 }

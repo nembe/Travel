@@ -15,10 +15,13 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
 public class GeneralCustomerValidatorTest extends BaseSpringTestCase {
+
+    private static final String KNOWN_MOBILE = "+31614992123";
 
     @Autowired
     GeneralCustomerValidator customerValidator;
@@ -67,6 +70,14 @@ public class GeneralCustomerValidatorTest extends BaseSpringTestCase {
         assertThat(errors.getFieldError("actionCode").getCode(), equalTo("errors.invalid.action.code"));
     }
 
+    @Test
+    public void checks_whether_first_mobile_is_already_known() {
+        customer.setFirstCardMobile(KNOWN_MOBILE);
+
+        invokeValidator();
+
+        assertThat(errors.getFieldError("firstCardMobile").getCode(), is("errors.duplicate"));
+    }
 
     private Customer validCustomer() {
         Customer cust = new Customer();
