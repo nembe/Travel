@@ -36,7 +36,7 @@ public class DirectDebitDetailsJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void finds_direct_debit_details_by_sepa_number() {
-        List<DirectDebitDetails> detailsList = dao.findBySepaNumber("NL39 RABO 0300 0652 64");
+        List<DirectDebitDetails> detailsList = dao.findBySepaNumber("NL39RABO0300065264");
 
         assertThat(detailsList, hasSize(1));
         assertThat(detailsList.get(0), equalTo(expectedDetails()));

@@ -25,9 +25,11 @@ public class DirectDebitDetailsJdbcDao implements DirectDebitDetailsDao {
 
     @Override
     public List<DirectDebitDetails> findBySepaNumber(String sepaNumber) {
-        String sql = "SELECT * FROM PAYMENT_DIRECT_DEBIT_DETAILS WHERE SEPANUMBER = ?";
+        String sql = "SELECT * FROM PAYMENT_DIRECT_DEBIT_DETAILS WHERE UPPER(REPLACE(SEPANUMBER, ' ')) = ?";
 
-        return template.query(sql, beanRowMapper(), sepaNumber);
+        String sanitizedSepaNumber = sepaNumber.replaceAll("\\s", "").toUpperCase();
+
+        return template.query(sql, beanRowMapper(), sanitizedSepaNumber);
     }
 
     private RowMapper<DirectDebitDetails> beanRowMapper() {
