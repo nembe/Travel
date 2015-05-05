@@ -107,6 +107,14 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
     }
 
     @Test
+    public void fetches_customers_by_fuzzy_match_on_name() {
+        assertThat(customerDao.findAllByFuzzyName("Rinze", "Opstal"), not(empty()));
+        assertThat(customerDao.findAllByFuzzyName("rInZe", "oPsTaL"), not(empty()));
+        assertThat(customerDao.findAllByFuzzyName("Rinze ", "   Opstal"), not(empty()));
+        assertThat(customerDao.findAllByFuzzyName("Something", "Other"), empty());
+    }
+
+    @Test
     public void fetches_customers_by_email() {
         assertThat(customerDao.findAllByEmail("bestaatniet@taxameter.nl"), hasSize(3));
         assertThat(customerDao.findAllByEmail("something@other.com"), empty());

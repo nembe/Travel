@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.dao.MarketingActionDao;
 import nl.yellowbrick.data.domain.Customer;
+import nl.yellowbrick.data.domain.CustomerStatus;
 import nl.yellowbrick.data.domain.MarketingAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,10 +13,17 @@ import org.springframework.validation.Errors;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.function.Predicate;
+
+import static nl.yellowbrick.data.domain.CustomerStatus.*;
 
 @Component
 public class GeneralCustomerValidator extends AccountRegistrationValidator {
+
+    private static final List<CustomerStatus> VALID_STATUSES = Arrays.asList(ACTIVATION_FAILED, REGISTERED, ACTIVE);
 
     @Autowired
     private MarketingActionDao marketingActionDao;
@@ -28,6 +36,23 @@ public class GeneralCustomerValidator extends AccountRegistrationValidator {
         validateAge(customer, errors);
         validateActionCode(customer, errors);
         validateRegistrationMobile(customer, errors);
+        validateUniquenessAgainstClosedAccounts(customer, errors);
+    }
+
+    private void validateUniquenessAgainstClosedAccounts(Customer customer, Errors errors) {
+        Predicate<Customer> hasInvalidStatus = it -> !VALID_STATUSES.contains(it.getStatus());
+
+        customerDao.findAllByFuzzyName(customer.getFirstName(), customer.getLastName())
+                .stream()
+                .filter(hasInvalidStatus)
+                .findAny()
+                .ifPresent(it -> errors.reject("errors.name.matches.closed"));
+
+        customerDao.findAllByEmail(customer.getEmail())
+                .stream()
+                .filter(hasInvalidStatus)
+                .findAny()
+                .ifPresent(it -> errors.rejectValue("email", "errors.matches.closed"));
     }
 
     private void validateRegistrationMobile(Customer customer, Errors errors) {

@@ -17,6 +17,8 @@ public interface CustomerDao {
 
     List<Customer> findAllByFuzzyNameAndDateOfBirth(String firstName, String lastName, Date dateOfBirth);
 
+    List<Customer> findAllByFuzzyName(String firstName, String lastName);
+
     List<Customer> findAllByEmail(String email);
 
     List<Customer> findAllByMobile(String mobile);
