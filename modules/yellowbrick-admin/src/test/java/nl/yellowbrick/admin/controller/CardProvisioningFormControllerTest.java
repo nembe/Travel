@@ -1,10 +1,12 @@
 package nl.yellowbrick.admin.controller;
 
 
+import com.google.common.net.HttpHeaders;
 import nl.yellowbrick.activation.service.CardAssignmentService;
 import nl.yellowbrick.admin.BaseMvcTestCase;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
+import nl.yellowbrick.data.domain.CardOrderStatus;
 import nl.yellowbrick.data.domain.CardType;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -12,6 +14,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -94,6 +97,19 @@ public class CardProvisioningFormControllerTest extends BaseMvcTestCase {
         verify(cardOrderDao).delete(ORDER_ID);
 
         assertThat(result.getResponse().getHeader("Location"), is("/provisioning/cards"));
+    }
+
+    @Test
+    public void redirects_back_to_cards_list_if_order_status_not_inserted() throws Exception {
+        CardOrder order = cardOrderDao.findById(ORDER_ID).get();
+        order.setStatus(CardOrderStatus.ACCEPTED);
+
+        when(cardOrderDao.findById(ORDER_ID)).thenReturn(Optional.of(order));
+
+        MockHttpServletResponse response = mvcGet(ORDER_URL).getResponse();
+
+        assertThat(response.getStatus(), is(302));
+        assertThat(response.getHeader(HttpHeaders.LOCATION), is("/provisioning/cards"));
     }
 
     private MvcResult doCorrectValidateRequest() throws Exception {

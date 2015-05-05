@@ -36,14 +36,16 @@ public class CardProvisioningFormController {
     private CardAssignmentService cardAssignmentService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String showValidationForm(ModelMap model, @PathVariable("id") int id) {
+    public String showValidationForm(ModelMap model,
+                                     @PathVariable("id") int id,
+                                     RedirectAttributes ra) {
         CardOrder cardOrder = order(id);
 
-        if(!cardOrder.getStatus().equals(INSERTED))
-            throw new InconsistentDataException(String.format(
-                    "Expected card order %s to be %s but is %s",
-                    cardOrder.getId(), INSERTED, cardOrder.getStatus().name()
-            ));
+        if(!cardOrder.getStatus().equals(INSERTED)) {
+            MessageHelper.flashWarning(ra, "cardorder.already.processed", cardOrder.getStatus().name());
+
+            return "redirect:/provisioning/cards";
+        }
 
         model.addAttribute("order", cardOrder);
         model.addAttribute("customer", customerForOrder(cardOrder));
@@ -62,7 +64,7 @@ public class CardProvisioningFormController {
                                     RedirectAttributes ra) {
 
         if(bindingResult.hasErrors())
-            return showValidationForm(model, id);
+            return showValidationForm(model, id, ra);
 
         CardOrder order = order(id);
         order.setPricePerCard(form.getPricePerCardCents());
