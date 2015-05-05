@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html layout:decorator="layouts/_default">
+<html layout:decorator="layouts/_default" th:with="productGroupTitle=${productGroup.description}">
 <head>
     <title th:text="${productGroup.description}">Product Group Description</title>
 </head>

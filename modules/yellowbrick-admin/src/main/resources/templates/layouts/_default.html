@@ -29,7 +29,7 @@
                 <a class="menu-fw" href="#">PRODUCT GROUPS</a>
                 <ul class="side-submenu" bw:activeforctx="/productgroups/">
                     <h2>product groups</h2>
-                    <p th:text="${title}">FRAGMENT'S TITLE</p>
+                    <p th:text="${productGroupTitle}">FRAGMENT'S TITLE</p>
                     <li class="menu-back-button"><a href="#">back</a></li>
                     <li th:each="pg : ${allProductGroups}"
                         th:with="ctx='/productgroups/' + ${pg.description.toLowerCase()}">
@@ -40,7 +40,7 @@
 
                        <ul class="side-submenu" bw:activeforctx="${ctx}">
                             <h2>product groups</h2>
-                            <p th:text="${pg.description}">FRAGMENT'S TITLE</p>
+                            <p th:text="${productGroupTitle}">FRAGMENT'S TITLE</p>
                             <li class="menu-back-button"><a href="#">back</a></li>
                             <li th:each="subgroup : ${subgroups}">
                                 <a th:href="@{${subgroup.path}}"
@@ -74,7 +74,7 @@
                 <a class="menu-fw" th:href="@{/provisioning/accounts}">PROVISIONING</a>
                 <ul class="side-submenu" bw:activeforctx="/provisioning/">
                     <h2>provisioning</h2>
-                    <p th:text="${title}">FRAGMENT'S TITLE</p>
+                    <p th:text="${provisioningTitle}">FRAGMENT'S TITLE</p>
                     <li class="menu-back-button"><a href="#">back</a></li>
                     <li><a bw:activeforctx="/provisioning/accounts" th:href="@{/provisioning/accounts}" >ACCOUNT VALIDATION</a></li>
                     <li><a bw:activeforctx="/provisioning/cards" th:href="@{/provisioning/cards}" >ORDER VALIDATION</a></li>
