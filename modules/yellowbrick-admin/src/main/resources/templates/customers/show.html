@@ -32,7 +32,7 @@
 
                 <div class="field">
                     <span class="field-label">Date of Birth</span>
-                    <span th:text="${cust.dateOfBirth}"></span>
+                    <span th:text="${dateFormat.apply(cust.dateOfBirth)}"></span>
                 </div>
 
                 <div class="field">

@@ -10,21 +10,33 @@ import nl.yellowbrick.data.domain.TransponderCard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/customers/{id}")
 public class CustomerDetailsController {
 
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
+
     @Autowired CustomerDao customerDao;
     @Autowired TransponderCardDao transponderCardDao;
     @Autowired CardOrderDao cardOrderDao;
+
+    @ModelAttribute("dateFormat")
+    private Function<Date, String> dateFormat() {
+        return date -> date != null ? DATE_FORMAT.format(date) : "";
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public String show(ModelMap model, @PathVariable("id") Long id) {
