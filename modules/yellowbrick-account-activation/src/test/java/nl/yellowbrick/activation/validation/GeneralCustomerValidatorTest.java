@@ -5,7 +5,6 @@ import nl.yellowbrick.data.domain.Customer;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 
@@ -31,7 +30,7 @@ public class GeneralCustomerValidatorTest extends BaseSpringTestCase {
     @Before
     public void setUp() {
         customer = validCustomer();
-        errors = new BindException(customer, "customer");
+        errors = new UnboundErrors(customer, "customer");
     }
 
     @Test

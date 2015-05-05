@@ -6,7 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-public class PersonalAccountProvisioningForm implements FormData {
+public class PersonalAccountProvisioningForm {
 
     // personal details
     private String gender;
@@ -32,6 +32,10 @@ public class PersonalAccountProvisioningForm implements FormData {
     // singnup details
     private int numberOfTransponderCards;
     private int numberOfPPlusCards;
+
+    // Payment details
+    private String iban;
+    private String ccname;
 
     // 0-arg constructor for javabeans compliance
     public PersonalAccountProvisioningForm() {
@@ -184,5 +188,21 @@ public class PersonalAccountProvisioningForm implements FormData {
 
     public void setNumberOfPPlusCards(int numberOfPPlusCards) {
         this.numberOfPPlusCards = numberOfPPlusCards;
+    }
+
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
+    }
+
+    public String getCcname() {
+        return ccname;
+    }
+
+    public void setCcname(String ccname) {
+        this.ccname = ccname;
     }
 }
