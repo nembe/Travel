@@ -14,13 +14,14 @@ public class BankingInfoValidator extends AccountRegistrationValidator {
 
     private static final String IBAN_FIELD = "iban";
     private static final String CC_FIELD = "ccname";
+    private static final String PAYMENT_METHOD_FIELD = "paymentMethod";
 
     @Autowired
     private BillingDetailsDao billingDetailsDao;
 
     @Override
     protected void doValidate(Customer customer, Errors errors) {
-        switch(customer.getPaymentMethodType()) {
+        switch(customer.getPaymentMethod()) {
             case DIRECT_DEBIT:
                 verifyDirectDebitDetails(customer, errors);
                 break;
@@ -30,7 +31,14 @@ public class BankingInfoValidator extends AccountRegistrationValidator {
             case VISA:
                 verifyCreditCardDetails(customer, errors);
                 break;
+            case INVOICED:
+                warnAboutPaymentTerms(errors);
+                break;
         }
+    }
+
+    private void warnAboutPaymentTerms(Errors errors) {
+        errors.rejectValue(PAYMENT_METHOD_FIELD, "errors.invoiced.setPaymentTerms");
     }
 
     private void verifyCreditCardDetails(Customer customer, Errors errors) {

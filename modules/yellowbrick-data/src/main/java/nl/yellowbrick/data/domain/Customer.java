@@ -35,7 +35,6 @@ public class Customer {
     private int numberOfRTPCards = 0;
     private int numberOfTCards = 0;
     private int parkadammerTotal = 0;
-    private String paymentMethod = "";
     private String phoneNr = "";
     private String pincode = "";
     private String productGroup = "";
@@ -45,7 +44,7 @@ public class Customer {
     private String invoiceEmail = "";
     private boolean extraInvoiceAnnotations = false;
 
-    public PaymentMethod getPaymentMethodType() {
+    public PaymentMethod getPaymentMethod() {
         int billingAgent = Long.valueOf(this.getBillingAgentId()).intValue();
 
         return PaymentMethod.forCode(billingAgent);
@@ -174,10 +173,6 @@ public class Customer {
 
     public int getParkadammerTotal() {
         return parkadammerTotal;
-    }
-
-    public String getPaymentMethod() {
-        return paymentMethod;
     }
 
     public String getPhoneNr() {
@@ -413,8 +408,6 @@ public class Customer {
             return false;
         if (lastName != null ? !lastName.equals(customer.lastName) : customer.lastName != null) return false;
         if (memberDate != null ? !memberDate.equals(customer.memberDate) : customer.memberDate != null) return false;
-        if (paymentMethod != null ? !paymentMethod.equals(customer.paymentMethod) : customer.paymentMethod != null)
-            return false;
         if (phoneNr != null ? !phoneNr.equals(customer.phoneNr) : customer.phoneNr != null) return false;
         if (pincode != null ? !pincode.equals(customer.pincode) : customer.pincode != null) return false;
         if (productGroup != null ? !productGroup.equals(customer.productGroup) : customer.productGroup != null)
@@ -455,7 +448,6 @@ public class Customer {
         result = 31 * result + numberOfRTPCards;
         result = 31 * result + numberOfTCards;
         result = 31 * result + parkadammerTotal;
-        result = 31 * result + (paymentMethod != null ? paymentMethod.hashCode() : 0);
         result = 31 * result + (phoneNr != null ? phoneNr.hashCode() : 0);
         result = 31 * result + (pincode != null ? pincode.hashCode() : 0);
         result = 31 * result + (productGroup != null ? productGroup.hashCode() : 0);
