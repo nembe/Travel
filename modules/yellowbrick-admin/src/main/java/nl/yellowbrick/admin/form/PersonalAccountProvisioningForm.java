@@ -2,6 +2,7 @@ package nl.yellowbrick.admin.form;
 
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
+import nl.yellowbrick.data.domain.PaymentMethod;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -36,6 +37,7 @@ public class PersonalAccountProvisioningForm {
     // Payment details
     private String iban;
     private String ccname;
+    private PaymentMethod paymentMethod;
 
     // 0-arg constructor for javabeans compliance
     public PersonalAccountProvisioningForm() {
@@ -60,6 +62,8 @@ public class PersonalAccountProvisioningForm {
 
         setNumberOfTransponderCards(customer.getNumberOfTCards());
         setNumberOfPPlusCards(customer.getNumberOfQCards());
+
+        setPaymentMethod(customer.getPaymentMethod());
     }
 
     public String getGender() {
@@ -204,5 +208,13 @@ public class PersonalAccountProvisioningForm {
 
     public void setCcname(String ccname) {
         this.ccname = ccname;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }

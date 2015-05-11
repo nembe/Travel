@@ -97,7 +97,7 @@ public class AccountProvisioningFormControllerTest extends BaseMvcTestCase {
 
         MvcResult res = mockMvc.perform(get(BASE + PRIVATE_CUSTOMER_ID)).andReturn();
 
-        assertThat(res.getResponse().getContentAsString(), containsString("Visa"));
+        assertThat(res.getResponse().getContentAsString(), containsString("VISA"));
     }
 
     @Test

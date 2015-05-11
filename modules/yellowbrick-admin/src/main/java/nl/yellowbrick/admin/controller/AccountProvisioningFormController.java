@@ -109,7 +109,7 @@ public class AccountProvisioningFormController {
     }
 
     private void addPaymentData(PersonalAccountProvisioningForm form, Customer customer) {
-        PaymentMethod payMethod = customer.getPaymentMethodType();
+        PaymentMethod payMethod = customer.getPaymentMethod();
 
         if(payMethod.equals(PaymentMethod.DIRECT_DEBIT)) {
             billingDetailsDao.findDirectDebitDetailsForCustomer(customer.getCustomerId()).ifPresent((details) -> {
