@@ -107,9 +107,6 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                         .toInstant()
         );
 
-        BeanPropertyRowMapper<Customer> rowMapper = new BeanPropertyRowMapper<>(Customer.class);
-        rowMapper.setPrimitivesDefaultedForNullValue(true);
-
         String query = buildQuery(
                 BASE_CUSTOMER_QUERY,
                 "WHERE TRUNC(c.dateofbirth) = ?",
@@ -124,8 +121,21 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     }
 
     @Override
+    public List<Customer> findAllByFuzzyName(String firstName, String lastName) {
+        String query = buildQuery(
+                BASE_CUSTOMER_QUERY,
+                "WHERE TRIM(LOWER(c.firstname)) = ?",
+                "AND TRIM(LOWER(c.lastname)) = ?"
+        );
+
+        return template.query(query, customerRowMapper(),
+                firstName.toLowerCase().trim(),
+                lastName.toLowerCase().trim());
+    }
+
+    @Override
     public List<Customer> findAllByEmail(String email) {
-        String sql = buildQuery(BASE_CUSTOMER_QUERY, "WHERE c.email = ?");
+        String sql = buildQuery(BASE_CUSTOMER_QUERY, "WHERE c.email = ? AND ROWNUM < 100");
 
         return template.query(sql, customerRowMapper(), email);
     }

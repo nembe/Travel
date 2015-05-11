@@ -220,12 +220,13 @@
 
     <div th:fragment="firstCardLicensePlate" class="field">
         <span class="field-label">Plate number for 1st transponder card</span>
-        <span class="field-value" th:text="${customer.firstCardLicensePlate} ?: #{not.specified}"></span>
+        <span class="field-value" th:text="${customer.firstCardLicensePlate}"></span>
     </div>
 
     <div th:fragment="firstCardMobile" class="field">
-        <span class="field-label">Mobile phone number for 1st transponder card</span>
-        <span class="field-value" th:text="${customer.firstCardMobile} ?: #{not.specified}"></span>
+        <label for="firstCardMobile" class="field-label">Mobile phone number for 1st transponder card</label>
+        <input disabled="disabled" type="text" th:field="*{firstCardMobile}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('firstCardMobile')}" th:errors="*{firstCardMobile}"></span>
     </div>
 
 </body>

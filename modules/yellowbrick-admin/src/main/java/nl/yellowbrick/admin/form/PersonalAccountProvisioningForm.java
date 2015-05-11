@@ -30,9 +30,10 @@ public class PersonalAccountProvisioningForm {
     private String city;
     private String country;
 
-    // singnup details
+    // signup details
     private int numberOfTransponderCards;
     private int numberOfPPlusCards;
+    private String firstCardMobile;
 
     // Payment details
     private String iban;
@@ -62,6 +63,7 @@ public class PersonalAccountProvisioningForm {
 
         setNumberOfTransponderCards(customer.getNumberOfTCards());
         setNumberOfPPlusCards(customer.getNumberOfQCards());
+        setFirstCardMobile(customer.getFirstCardMobile());
 
         setPaymentMethod(customer.getPaymentMethod());
     }
@@ -192,6 +194,14 @@ public class PersonalAccountProvisioningForm {
 
     public void setNumberOfPPlusCards(int numberOfPPlusCards) {
         this.numberOfPPlusCards = numberOfPPlusCards;
+    }
+
+    public String getFirstCardMobile() {
+        return firstCardMobile;
+    }
+
+    public void setFirstCardMobile(String firstCardMobile) {
+        this.firstCardMobile = firstCardMobile;
     }
 
     public String getIban() {
