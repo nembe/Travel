@@ -279,7 +279,6 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         cust.setNumberOfRTPCards(0);
         cust.setNumberOfTCards(1);
         cust.setParkadammerTotal(0);
-        cust.setPaymentMethod("");
         cust.setPhoneNr("0614992123");
         cust.setPincode("6858");
         cust.setProductGroup("YELLOWBRICK");

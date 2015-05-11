@@ -7,8 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -24,19 +23,25 @@ public class DirectDebitDetailsJdbcDao implements DirectDebitDetailsDao {
         return template.query(sql, beanRowMapper(), customerId).stream().findFirst();
     }
 
+    @Override
+    public List<DirectDebitDetails> findBySepaNumber(String sepaNumber) {
+        String sql = "SELECT * FROM PAYMENT_DIRECT_DEBIT_DETAILS WHERE UPPER(REPLACE(SEPANUMBER, ' ')) = ?";
+
+        String sanitizedSepaNumber = sepaNumber.replaceAll("\\s", "").toUpperCase();
+
+        return template.query(sql, beanRowMapper(), sanitizedSepaNumber);
+    }
+
     private RowMapper<DirectDebitDetails> beanRowMapper() {
-        return new RowMapper<DirectDebitDetails>() {
-            @Override
-            public DirectDebitDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
-                DirectDebitDetails details = new DirectDebitDetails();
+        return (rs, rowNum) -> {
+            DirectDebitDetails details = new DirectDebitDetails();
 
-                details.setId(rs.getLong("ID"));
-                details.setSepaNumber(rs.getString("SEPANUMBER"));
-                details.setBic(rs.getString("BIC"));
-                details.setVerified(rs.getString("VERIFIED").equals("Y"));
+            details.setId(rs.getLong("ID"));
+            details.setSepaNumber(rs.getString("SEPANUMBER"));
+            details.setBic(rs.getString("BIC"));
+            details.setVerified(rs.getString("VERIFIED").equals("Y"));
 
-                return details;
-            }
+            return details;
         };
     }
 }

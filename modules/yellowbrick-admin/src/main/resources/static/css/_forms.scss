@@ -18,10 +18,18 @@
   display: inline-block;
 }
 
+.field input[disabled] {
+  background-color: $background-color;
+  padding: 0;
+
+  &.field-error {
+    padding: 5px 10px;
+  }
+}
+
 .field-label {
   display: inline-block;
   width: 200px;
-
 }
 
 input.field-error {

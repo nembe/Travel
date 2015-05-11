@@ -112,12 +112,13 @@
         <span class="field-value" th:text="${customer.agentName}"></span>
     </div>
 
-    <div th:fragment="accountNumber" th:if="${iban}" class="field">
+    <div th:fragment="accountNumber" class="field">
         <span class="field-label">Account number</span>
-        <span class="field-value" th:text="${iban}"></span>
+        <input disabled="disabled" type="text" th:field="*{iban}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('iban')}" th:errors="*{iban}"></span>
     </div>
 
-    <div th:fragment="accountHolderName" th:if="${iban}" class="field" >
+    <div th:fragment="accountHolderName" class="field" >
         <span class="field-label">Account holder name</span>
         <span class="field-value" th:text="${customer.accountHolderName}"></span>
     </div>
