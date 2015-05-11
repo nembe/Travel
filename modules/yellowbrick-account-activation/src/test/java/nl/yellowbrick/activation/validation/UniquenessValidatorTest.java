@@ -39,7 +39,7 @@ public class UniquenessValidatorTest extends BaseSpringTestCase {
         MockitoAnnotations.initMocks(this);
 
         customer = customer();
-        errors = new BindException(customer, "customer");
+        errors = new UnboundErrors(customer, "customer");
     }
 
     @Test

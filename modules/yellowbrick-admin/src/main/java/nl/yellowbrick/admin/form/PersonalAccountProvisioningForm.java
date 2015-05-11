@@ -2,11 +2,12 @@ package nl.yellowbrick.admin.form;
 
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
+import nl.yellowbrick.data.domain.PaymentMethod;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-public class PersonalAccountProvisioningForm implements FormData {
+public class PersonalAccountProvisioningForm {
 
     // personal details
     private String gender;
@@ -34,6 +35,11 @@ public class PersonalAccountProvisioningForm implements FormData {
     private int numberOfPPlusCards;
     private String firstCardMobile;
 
+    // Payment details
+    private String iban;
+    private String ccname;
+    private PaymentMethod paymentMethod;
+
     // 0-arg constructor for javabeans compliance
     public PersonalAccountProvisioningForm() {
     }
@@ -58,6 +64,8 @@ public class PersonalAccountProvisioningForm implements FormData {
         setNumberOfTransponderCards(customer.getNumberOfTCards());
         setNumberOfPPlusCards(customer.getNumberOfQCards());
         setFirstCardMobile(customer.getFirstCardMobile());
+
+        setPaymentMethod(customer.getPaymentMethod());
     }
 
     public String getGender() {
@@ -194,5 +202,29 @@ public class PersonalAccountProvisioningForm implements FormData {
 
     public void setFirstCardMobile(String firstCardMobile) {
         this.firstCardMobile = firstCardMobile;
+    }
+
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
+    }
+
+    public String getCcname() {
+        return ccname;
+    }
+
+    public void setCcname(String ccname) {
+        this.ccname = ccname;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }

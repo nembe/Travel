@@ -4,7 +4,7 @@ import nl.yellowbrick.activation.service.AccountActivationService;
 import nl.yellowbrick.admin.BaseMvcTestCase;
 import nl.yellowbrick.data.dao.CustomerAddressDao;
 import nl.yellowbrick.data.dao.CustomerDao;
-import nl.yellowbrick.data.dao.DirectDebitDetailsDao;
+import nl.yellowbrick.data.dao.BillingDetailsDao;
 import nl.yellowbrick.data.database.DbHelper;
 import nl.yellowbrick.data.domain.AddressType;
 import nl.yellowbrick.data.domain.BusinessIdentifier;
@@ -52,7 +52,7 @@ public class AccountProvisioningFormControllerTest extends BaseMvcTestCase {
     // spy on collaborators
     @Autowired @Spy CustomerDao customerDao;
     @Autowired @Spy CustomerAddressDao addressDao;
-    @Autowired @Spy DirectDebitDetailsDao directDebitDetailsDao;
+    @Autowired @Spy BillingDetailsDao billingDetailsDao;
     @Autowired @Mock AccountActivationService accountActivationService;
 
     // test helpers
@@ -97,7 +97,7 @@ public class AccountProvisioningFormControllerTest extends BaseMvcTestCase {
 
         MvcResult res = mockMvc.perform(get(BASE + PRIVATE_CUSTOMER_ID)).andReturn();
 
-        assertThat(res.getResponse().getContentAsString(), containsString("Visa"));
+        assertThat(res.getResponse().getContentAsString(), containsString("VISA"));
     }
 
     @Test
