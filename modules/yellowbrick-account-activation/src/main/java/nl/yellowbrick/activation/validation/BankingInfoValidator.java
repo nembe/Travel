@@ -1,6 +1,6 @@
 package nl.yellowbrick.activation.validation;
 
-import nl.yellowbrick.data.dao.DirectDebitDetailsDao;
+import nl.yellowbrick.data.dao.BillingDetailsDao;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.DirectDebitDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +13,10 @@ import java.util.Optional;
 public class BankingInfoValidator extends AccountRegistrationValidator {
 
     private static final String IBAN_FIELD = "iban";
+    private static final String CC_FIELD = "ccname";
 
     @Autowired
-    private DirectDebitDetailsDao directDebitDetailsDao;
+    private BillingDetailsDao billingDetailsDao;
 
     @Override
     protected void doValidate(Customer customer, Errors errors) {
@@ -33,11 +34,12 @@ public class BankingInfoValidator extends AccountRegistrationValidator {
     }
 
     private void verifyCreditCardDetails(Customer customer, Errors errors) {
-        // TODO implement
+        if(!billingDetailsDao.existsCreditCardReferenceForCustomer(customer.getCustomerId()))
+            errors.rejectValue(CC_FIELD, "errors.missing");
     }
 
     private void verifyDirectDebitDetails(Customer customer, Errors errors) {
-        Optional<DirectDebitDetails> directDebitInfo = directDebitDetailsDao.findForCustomer(customer.getCustomerId());
+        Optional<DirectDebitDetails> directDebitInfo = billingDetailsDao.findDirectDebitDetailsForCustomer(customer.getCustomerId());
 
         if(directDebitInfo.isPresent())
             validateUniqueSepaNumber(directDebitInfo.get(), errors);
@@ -46,7 +48,7 @@ public class BankingInfoValidator extends AccountRegistrationValidator {
     }
 
     private void validateUniqueSepaNumber(DirectDebitDetails details, Errors errors) {
-        directDebitDetailsDao.findBySepaNumber(details.getSepaNumber())
+        billingDetailsDao.findDirectDebitDetailsBySepaNumber(details.getSepaNumber())
                 .stream()
                 .filter(it -> !it.equals(details))
                 .findAny()

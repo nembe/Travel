@@ -360,3 +360,14 @@ CREATE TABLE MOBILE
    CONFIRM_ZONE          CHAR (1) DEFAULT 0,
    TCARD_SWITCHABLE      CHAR (1) DEFAULT 0
 )
+
+-- this is a synonym in the real database
+CREATE TABLE BILLING_TABLE_1
+(
+   REF_VALUE             VARCHAR2 (200),
+   HVALUE                VARCHAR2 (200),
+   EVALUE                VARCHAR2 (200),
+   ID                    NUMBER (10) DEFAULT -1,
+   TIMESTAMP_VALUE       TIMESTAMP (6) DEFAULT SYSDATE,
+   TELEPAY_CUSTOMER_ID   NUMBER (10)
+)

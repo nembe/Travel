@@ -2,7 +2,7 @@ package nl.yellowbrick.activation.validation;
 
 import com.google.common.collect.Lists;
 import nl.yellowbrick.data.BaseSpringTestCase;
-import nl.yellowbrick.data.dao.DirectDebitDetailsDao;
+import nl.yellowbrick.data.dao.BillingDetailsDao;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.DirectDebitDetails;
 import nl.yellowbrick.data.domain.PaymentMethod;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 public class BankingInfoValidatorTest extends BaseSpringTestCase {
 
     @InjectMocks BankingInfoValidator validator;
-    @Mock DirectDebitDetailsDao directDebitDetailsDao;
+    @Mock BillingDetailsDao billingDetailsDao;
 
     Customer customer;
     Errors errors;
@@ -89,11 +89,11 @@ public class BankingInfoValidatorTest extends BaseSpringTestCase {
     }
 
     private void stubDirectDebitDetailsByCustomer(Optional<DirectDebitDetails> details) {
-        when(directDebitDetailsDao.findForCustomer(anyLong())).thenReturn(details);
+        when(billingDetailsDao.findDirectDebitDetailsForCustomer(anyLong())).thenReturn(details);
     }
 
     private void stubDirectDebitDetailsBySepaNumber(DirectDebitDetails... details) {
-        when(directDebitDetailsDao.findBySepaNumber(anyString())).thenReturn(Lists.newArrayList(details));
+        when(billingDetailsDao.findDirectDebitDetailsBySepaNumber(anyString())).thenReturn(Lists.newArrayList(details));
     }
 
     private void stubPaymentMethod(PaymentMethod paymentMethod) {
@@ -111,7 +111,7 @@ public class BankingInfoValidatorTest extends BaseSpringTestCase {
 
     @SafeVarargs
     private final <T> T randomFrom(T... options) {
-        int randomizedIndex = new Random(options.length).nextInt();
+        int randomizedIndex = new Random().nextInt(options.length);
 
         return options[randomizedIndex];
     }
