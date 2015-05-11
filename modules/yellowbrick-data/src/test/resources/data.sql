@@ -628,3 +628,11 @@ INSERT INTO MOBILE VALUES (
              NULL,
              '0',
              '0');
+
+INSERT INTO BILLING_TABLE_1 VALUES (
+             '581b0760-b962-e411-b898-001422187e37',
+             'MwmIJMO7VLi2fbGpE51b8CD4zrU=',
+             '1704',
+             18922,
+             TO_DATE ('11/02/2014 18:55:44', 'MM/DD/YYYY HH24:MI:SS'),
+             394744);

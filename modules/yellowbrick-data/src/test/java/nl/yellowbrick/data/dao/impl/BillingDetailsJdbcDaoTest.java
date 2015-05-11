@@ -12,31 +12,32 @@ import java.util.Optional;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
-public class DirectDebitDetailsJdbcDaoTest extends BaseSpringTestCase {
+public class BillingDetailsJdbcDaoTest extends BaseSpringTestCase {
 
     private static final long CUSTOMER_ID_WITH_DATA = 394744;
     private static final long CUSTOMER_ID_WITHOUT_DATA = 12345;
 
     @Autowired
-    DirectDebitDetailsJdbcDao dao;
+    BillingDetailsJdbcDao dao;
 
     @Autowired
     DbHelper db;
 
     @Test
     public void finds_direct_debit_details_by_customer_id() {
-        DirectDebitDetails details = dao.findForCustomer(CUSTOMER_ID_WITH_DATA).get();
+        DirectDebitDetails details = dao.findDirectDebitDetailsForCustomer(CUSTOMER_ID_WITH_DATA).get();
 
         assertThat(details, equalTo(expectedDetails()));
-
-        assertThat(dao.findForCustomer(CUSTOMER_ID_WITHOUT_DATA), equalTo(Optional.empty()));
+        assertThat(dao.findDirectDebitDetailsForCustomer(CUSTOMER_ID_WITHOUT_DATA), equalTo(Optional.empty()));
     }
 
     @Test
     public void finds_direct_debit_details_by_sepa_number() {
-        List<DirectDebitDetails> detailsList = dao.findBySepaNumber("NL39RABO0300065264");
+        List<DirectDebitDetails> detailsList = dao.findDirectDebitDetailsBySepaNumber("NL39RABO0300065264");
 
         assertThat(detailsList, hasSize(1));
         assertThat(detailsList.get(0), equalTo(expectedDetails()));
@@ -45,10 +46,16 @@ public class DirectDebitDetailsJdbcDaoTest extends BaseSpringTestCase {
     @Test
     public void stores_verified_flag_as_y_or_n() {
         db.accept((t) -> t.update("UPDATE PAYMENT_DIRECT_DEBIT_DETAILS SET VERIFIED = 'N'"));
-        assertThat(dao.findForCustomer(394744).get().isVerified(), is(false));
+        assertThat(dao.findDirectDebitDetailsForCustomer(394744).get().isVerified(), is(false));
 
         db.accept((t) -> t.update("UPDATE PAYMENT_DIRECT_DEBIT_DETAILS SET VERIFIED = 'Y'"));
-        assertThat(dao.findForCustomer(394744).get().isVerified(), is(true));
+        assertThat(dao.findDirectDebitDetailsForCustomer(394744).get().isVerified(), is(true));
+    }
+
+    @Test
+    public void checks_for_existence_of_credit_card_reference() {
+        assertTrue(dao.existsCreditCardReferenceForCustomer(CUSTOMER_ID_WITH_DATA));
+        assertFalse(dao.existsCreditCardReferenceForCustomer(CUSTOMER_ID_WITHOUT_DATA));
     }
 
     private DirectDebitDetails expectedDetails() {

@@ -46,7 +46,7 @@ public class AccountProvisioningFormController {
     @Autowired private CustomerAddressDao addressDao;
     @Autowired private PriceModelDao priceModelDao;
     @Autowired private MarketingActionDao marketingActionDao;
-    @Autowired private DirectDebitDetailsDao directDebitDetailsDao;
+    @Autowired private BillingDetailsDao billingDetailsDao;
     @Autowired private SubscriptionDao subscriptionDao;
     @Autowired private AccountActivationService accountActivationService;
     @Autowired private RateTranslationService rateTranslationService;
@@ -112,7 +112,7 @@ public class AccountProvisioningFormController {
         PaymentMethod payMethod = customer.getPaymentMethodType();
 
         if(payMethod.equals(PaymentMethod.DIRECT_DEBIT)) {
-            directDebitDetailsDao.findForCustomer(customer.getCustomerId()).ifPresent((details) -> {
+            billingDetailsDao.findDirectDebitDetailsForCustomer(customer.getCustomerId()).ifPresent((details) -> {
                 form.setIban(details.getSepaNumber());
             });
         }
