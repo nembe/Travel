@@ -28,6 +28,7 @@ import static nl.yellowbrick.data.domain.CustomerStatus.*;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -96,11 +97,13 @@ public class GeneralCustomerValidatorTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void rejects_customers_with_name_matching_that_of_closed_account() {
+    public void rejects_customers_with_name_matching_that_of_multiple_closed_accounts() {
         customer.setFirstName("John");
         customer.setLastName("Doe");
 
-        when(customerDao.findAllByFuzzyName("John", "Doe")).thenReturn(Arrays.asList(customerWithClosedAccount()));
+        when(customerDao.findAllByFuzzyName("John", "Doe")).thenReturn(
+                Arrays.asList(customerWithClosedAccount(), customerWithClosedAccount())
+        );
 
         invokeValidator();
 
@@ -108,13 +111,19 @@ public class GeneralCustomerValidatorTest extends BaseSpringTestCase {
     }
 
     @Test
-    public void rejects_customers_with_email_matching_that_of_closed_account() {
+    public void rejects_customers_with_email_matching_that_of_multiple_closed_accounts() {
         customer.setEmail("john@thedoes.com");
 
-        when(customerDao.findAllByEmail("john@thedoes.com")).thenReturn(Arrays.asList(customerWithClosedAccount()));
+        when(customerDao.findAllByEmail("john@thedoes.com")).thenReturn(
+                Arrays.asList(customerWithClosedAccount()), // at first return a single account
+                Arrays.asList(customerWithClosedAccount(), customerWithClosedAccount()) // then a couple
+        );
 
         invokeValidator();
+        assertFalse(errors.hasFieldErrors("email")); // a single match should not be flagged
 
+        invokeValidator();
+        // multiple matches should be flagged
         assertThat(errors.getFieldError("email").getCode(), is("errors.matches.closed"));
     }
 

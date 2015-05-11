@@ -42,17 +42,21 @@ public class GeneralCustomerValidator extends AccountRegistrationValidator {
     private void validateUniquenessAgainstClosedAccounts(Customer customer, Errors errors) {
         Predicate<Customer> hasInvalidStatus = it -> !VALID_STATUSES.contains(it.getStatus());
 
-        customerDao.findAllByFuzzyName(customer.getFirstName(), customer.getLastName())
+        long matchesByFuzzyName = customerDao.findAllByFuzzyName(customer.getFirstName(), customer.getLastName())
                 .stream()
                 .filter(hasInvalidStatus)
-                .findAny()
-                .ifPresent(it -> errors.reject("errors.name.matches.closed"));
+                .count();
 
-        customerDao.findAllByEmail(customer.getEmail())
+        if(matchesByFuzzyName > 1)
+            errors.reject("errors.name.matches.closed");
+
+        long matchesByEmail = customerDao.findAllByEmail(customer.getEmail())
                 .stream()
                 .filter(hasInvalidStatus)
-                .findAny()
-                .ifPresent(it -> errors.rejectValue("email", "errors.matches.closed"));
+                .count();
+
+        if(matchesByEmail > 1)
+            errors.rejectValue("email", "errors.matches.closed");
     }
 
     private void validateRegistrationMobile(Customer customer, Errors errors) {
