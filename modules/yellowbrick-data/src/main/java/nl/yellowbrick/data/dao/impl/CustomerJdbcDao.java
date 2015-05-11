@@ -240,6 +240,11 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
         template.update(sql, bi.getValue(), mutator.get(), bi.getId());
     }
 
+    @Override
+    public List<String> getMobileNumbers(long customerId) {
+        return template.queryForList("SELECT MOBILENR FROM MOBILE WHERE CUSTOMERIDFK = ?", String.class, customerId);
+    }
+
     private void compileJdbcCalls() {
         saveCustomerCall = new SimpleJdbcCall(template)
                 .withCatalogName(PACKAGE)

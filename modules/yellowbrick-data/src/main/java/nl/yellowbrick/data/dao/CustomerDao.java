@@ -36,4 +36,6 @@ public interface CustomerDao {
     List<BusinessIdentifier> getBusinessIdentifiers(long customerId);
 
     void updateBusinessIdentifier(BusinessIdentifier businessIdentifier);
+
+    List<String> getMobileNumbers(long customerId);
 }

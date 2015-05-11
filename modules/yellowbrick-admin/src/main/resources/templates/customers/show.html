@@ -41,8 +41,10 @@
                 </div>
 
                 <div class="field">
-                    <span class="field-label">Phone number</span>
-                    <span th:text="${cust.phoneNr}"></span>
+                    <span class="field-label">Phone numbers</span>
+                    <ul th:unless="${#lists.isEmpty(mobiles)}">
+                        <li th:each="mobile : ${mobiles}" th:text="${mobile}"></li>
+                    </ul>
                 </div>
 
                 <div class="field">

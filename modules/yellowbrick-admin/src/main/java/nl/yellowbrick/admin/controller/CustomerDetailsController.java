@@ -51,8 +51,11 @@ public class CustomerDetailsController {
                 })
                 .collect(Collectors.toList());
 
+        List<String> mobileNumbers = customerDao.getMobileNumbers(id);
+
         model.put("cust", customer);
         model.put("cards", cards);
+        model.put("mobiles", mobileNumbers);
 
         return "customers/show";
     }
