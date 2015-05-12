@@ -1,6 +1,8 @@
 package nl.yellowbrick.admin.controller;
 
 import nl.yellowbrick.activation.service.CardAssignmentService;
+import nl.yellowbrick.activation.service.CardOrderValidationService;
+import nl.yellowbrick.activation.validation.UnboundErrors;
 import nl.yellowbrick.admin.exceptions.InconsistentDataException;
 import nl.yellowbrick.admin.exceptions.ResourceNotFoundException;
 import nl.yellowbrick.admin.form.CardOrderValidationForm;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +29,8 @@ import static nl.yellowbrick.data.domain.CardOrderStatus.INSERTED;
 @RequestMapping("/provisioning/cards/{id}")
 public class CardProvisioningFormController {
 
+    private static final String FORM_ERRORS = BindingResult.MODEL_KEY_PREFIX + "form";
+
     @Autowired
     private CardOrderDao cardOrderDao;
 
@@ -34,6 +39,9 @@ public class CardProvisioningFormController {
 
     @Autowired
     private CardAssignmentService cardAssignmentService;
+
+    @Autowired
+    private CardOrderValidationService validationService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String showValidationForm(ModelMap model,
@@ -52,6 +60,17 @@ public class CardProvisioningFormController {
 
         if(!model.containsAttribute("form"))
             model.addAttribute("form", new CardOrderValidationForm(cardOrder));
+
+        // make sure the errors-backing object is a form (and not the cardOrder)
+        // since thymeleaf uses the errors-backing object to fill-in fields when
+        // errors are present
+        Errors errors = model.containsAttribute(FORM_ERRORS)
+                ? (BindingResult) model.get(FORM_ERRORS)
+                : new UnboundErrors(new CardOrderValidationForm(cardOrder), "form");
+
+        // add any errors from the validation service
+        errors.addAllErrors(validationService.validate(cardOrder, "form"));
+        model.addAttribute(FORM_ERRORS, errors);
 
         return "provisioning/cards/validate_order";
     }
