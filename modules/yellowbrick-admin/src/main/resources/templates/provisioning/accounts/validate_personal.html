@@ -7,14 +7,16 @@
 <body>
     <div layout:fragment="content-inner">
         <form th:object="${form}" th:action="@{#}" method="post">
-        <div th:if="${#fields.hasErrors('global')}" class="global-errors section i-error">
-            <div class="content-error">
-                <h3>Validation errors</h3>
-                <ul>
-                    <li th:each="err : ${#fields.errors('global')}" th:text="${err}"></li>
-                </ul>
+
+            <div th:if="${#fields.hasErrors('global')}" class="global-errors section i-error">
+                <div class="content-error">
+                    <h3>Validation errors</h3>
+                    <ul>
+                        <li th:each="err : ${#fields.errors('global')}" th:text="${err}"></li>
+                    </ul>
+                </div>
             </div>
-        </div>
+
             <div class="section">
 
 

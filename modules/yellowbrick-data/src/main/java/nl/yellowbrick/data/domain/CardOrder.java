@@ -16,6 +16,10 @@ public class CardOrder {
     private double pricePerCard;
     private boolean export;
 
+    public double totalCost() {
+        return pricePerCard * amount;
+    }
+
     public long getId() {
         return id;
     }

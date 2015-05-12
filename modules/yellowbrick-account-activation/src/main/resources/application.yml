@@ -12,6 +12,11 @@ tasks:
 mail:
   host: 127.0.0.1
 
+ordervalidation:
+  thresholds:
+    priceEurocent: 5000
+    amount: 20
+
 mutator: BATCH v. ${project.version}
 
 ---
