@@ -1,10 +1,13 @@
 package nl.yellowbrick.activation.task;
 
 import nl.yellowbrick.activation.service.CardAssignmentService;
+import nl.yellowbrick.activation.service.CardOrderValidationService;
+import nl.yellowbrick.activation.validation.UnboundErrors;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.validation.Errors;
 
 import java.util.Arrays;
 
@@ -18,6 +21,7 @@ public class CardOrderValidationTaskTest {
 
     CardOrderDao cardOrderDao;
     CardAssignmentService cardAssignmentService;
+    CardOrderValidationService validationService;
 
     CardOrder order;
     CardOrder nonPhysicalOrder;
@@ -38,12 +42,27 @@ public class CardOrderValidationTaskTest {
                 .thenReturn(Arrays.asList(order, nonPhysicalOrder));
 
         cardAssignmentService = mock(CardAssignmentService.class);
+        validationService = mock(CardOrderValidationService.class);
 
-        cardOrderValidationTask = new CardOrderValidationTask(cardOrderDao, cardAssignmentService);
+        cardOrderValidationTask = new CardOrderValidationTask(cardOrderDao, cardAssignmentService, validationService);
+    }
+
+    @Test
+    public void skips_orders_that_have_errors() {
+        when(validationService.validate(any())).thenReturn(someError());
+
+        // try to validate all kinds of orders
+        cardOrderValidationTask.validatePendingNonPhysicalCardOrders();
+        cardOrderValidationTask.validatePendingPhysicalCardOrders();
+
+        verify(cardOrderDao, never()).validateCardOrder(any());
+        verifyZeroInteractions(cardAssignmentService);
     }
 
     @Test
     public void validates_non_physical_card_orders() {
+        when(validationService.validate(any())).thenReturn(emptyErrors());
+
         cardOrderValidationTask.validatePendingNonPhysicalCardOrders();
 
         verify(cardOrderDao, times(1)).validateCardOrder(any());
@@ -53,10 +72,23 @@ public class CardOrderValidationTaskTest {
 
     @Test
     public void validates_physical_card_orders() {
+        when(validationService.validate(any())).thenReturn(emptyErrors());
+
         cardOrderValidationTask.validatePendingPhysicalCardOrders();
 
         verify(cardOrderDao, times(1)).validateCardOrder(any());
         verify(cardOrderDao).validateCardOrder(order);
         verify(cardAssignmentService).assignTransponderCard(order);
+    }
+
+    private Errors emptyErrors() {
+        return new UnboundErrors(new Object());
+    }
+
+    private Errors someError() {
+        Errors errors = emptyErrors();
+        errors.reject("something");
+
+        return errors;
     }
 }
