@@ -17,6 +17,10 @@ ordervalidation:
     priceEurocent: 5000
     amount: 20
 
+customervalidation:
+  thresholds:
+    initialOrderAmount: 20
+
 mutator: BATCH v. ${project.version}
 
 ---

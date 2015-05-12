@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 
@@ -22,6 +23,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.function.BiConsumer;
 
 import static nl.yellowbrick.data.domain.CustomerStatus.*;
 import static org.hamcrest.Matchers.empty;
@@ -49,8 +51,8 @@ public class GeneralCustomerValidatorTest extends BaseSpringTestCase {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        customer = validCustomer();
-        errors = new UnboundErrors(customer, "customer");
+        resetCustomer();
+        resetErrors();
     }
 
     @Test
@@ -126,11 +128,30 @@ public class GeneralCustomerValidatorTest extends BaseSpringTestCase {
         assertThat(errors.getFieldError("email").getCode(), is("errors.matches.closed"));
     }
 
-    private Customer validCustomer() {
-        Customer cust = new Customer();
-        cust.setDateOfBirth(Date.from(sixteenYearsAgo));
+    @Test
+    public void rejects_orders_that_are_too_large() {
+        setValidatorOrderLimit(2);
 
-        return cust;
+        BiConsumer<Integer, Integer> example = (tCards, qCards) -> {
+            resetErrors();
+            customer.setNumberOfTCards(tCards);
+            customer.setNumberOfQCards(qCards);
+            invokeValidator();
+        };
+
+        example.accept(2, 1);
+        assertThat(errors.getGlobalError().getCode(), is("errors.customer.large.order"));
+
+        example.accept(1, 2);
+        assertThat(errors.getGlobalError().getCode(), is("errors.customer.large.order"));
+
+        example.accept(1, 1);
+        assertFalse(errors.hasErrors());
+    }
+
+    private void resetCustomer() {
+        customer = new Customer();
+        customer.setDateOfBirth(Date.from(sixteenYearsAgo));
     }
 
     private Customer customerWithClosedAccount() {
@@ -141,6 +162,14 @@ public class GeneralCustomerValidatorTest extends BaseSpringTestCase {
         customer.setStatus(randomStatus);
 
         return customer;
+    }
+
+    private void setValidatorOrderLimit(int limit) {
+        ReflectionTestUtils.setField(customerValidator, "initialOrderAmountThreshold", limit);
+    }
+
+    private void resetErrors() {
+        errors = new UnboundErrors(customer, "customer");
     }
 
     private void invokeValidator() {

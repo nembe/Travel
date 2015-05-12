@@ -7,6 +7,7 @@ import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerStatus;
 import nl.yellowbrick.data.domain.MarketingAction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
@@ -25,11 +26,16 @@ public class GeneralCustomerValidator extends AccountRegistrationValidator {
 
     private static final List<CustomerStatus> VALID_STATUSES = Arrays.asList(ACTIVATION_FAILED, REGISTERED, ACTIVE);
 
+    private static final String INITIAL_ORDER_TOO_LARGE = "errors.customer.large.order";
+
     @Autowired
     private MarketingActionDao marketingActionDao;
 
     @Autowired
     private CustomerDao customerDao;
+
+    @Value("${customervalidation.thresholds.initialOrderAmount}")
+    private int initialOrderAmountThreshold;
 
     @Override
     protected void doValidate(Customer customer, Errors errors) {
@@ -37,6 +43,15 @@ public class GeneralCustomerValidator extends AccountRegistrationValidator {
         validateActionCode(customer, errors);
         validateRegistrationMobile(customer, errors);
         validateUniquenessAgainstClosedAccounts(customer, errors);
+        validateInitialOrderSize(customer, errors);
+    }
+
+    private void validateInitialOrderSize(Customer customer, Errors errors) {
+        if(customer.getNumberOfTCards() + customer.getNumberOfQCards() > initialOrderAmountThreshold)
+            errors.reject(
+                    INITIAL_ORDER_TOO_LARGE,
+                    new Object[] {initialOrderAmountThreshold},
+                    "Initial card order is too large");
     }
 
     private void validateUniquenessAgainstClosedAccounts(Customer customer, Errors errors) {
