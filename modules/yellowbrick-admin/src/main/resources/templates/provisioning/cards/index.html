@@ -1,46 +1,21 @@
 <!DOCTYPE HTML>
 <html layout:decorator="provisioning/_layout" th:with="provisioningTitle=#{provisioning.cards.title}">
-<body>
+<body id="card-order-validation">
     <div layout:fragment="content-inner">
-        <div class="section" th:if="${#lists.isEmpty(orders)}">
+        <div class="section" th:if="${#lists.isEmpty(flaggedOrders) and #lists.isEmpty(otherOrders)}">
             <h3>No card orders pending validation.</h3>
         </div>
 
-        <div class="section" th:unless="${#lists.isEmpty(orders)}">
-            <h3>List of card orders pending validation</h3>
+        <div id="flaggedOrders" class="section" th:unless="${#lists.isEmpty(flaggedOrders)}">
+            <h3>Card orders <strong>failing</strong> automatic validation</h3>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Product group</th>
-                        <th>Order date</th>
-                        <th>Business customer</th>
-                        <th>Customer number</th>
-                        <th>Customer name</th>
-                        <th>Card type</th>
-                        <th>Export</th>
-                        <th>Amount</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="orderItem : ${orders}">
-                        <td th:text="${orderItem.customer.productGroup}"></td>
-                        <td th:text="${orderItem.order.date}"></td>
-                        <td th:text="${orderItem.customer.businessCustomer}"></td>
-                        <td th:text="${orderItem.customer.customerNr}"></td>
-                        <td th:text="${orderItem.customer.fullName}"></td>
-                        <td th:text="${orderItem.order.cardType}"></td>
-                        <td th:text="${orderItem.order.export}"></td>
-                        <td th:text="${orderItem.order.amount}"></td>
-                        <td>
-                            <div class="btn">
-                                <a th:href="@{'/provisioning/cards/' + ${orderItem.order.id}}">validate</a>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div th:replace="provisioning/cards/_snippets :: ordersTable(${flaggedOrders})"></div>
+        </div>
+
+        <div class="section" th:unless="${#lists.isEmpty(otherOrders)}">
+            <h3>Card orders <strong>pending</strong> validation</h3>
+
+            <div th:replace="provisioning/cards/_snippets :: ordersTable(${otherOrders})"></div>
         </div>
     </div>
 </body>
