@@ -1,10 +1,11 @@
 package nl.yellowbrick.admin.controller;
 
+import com.google.common.collect.Lists;
 import nl.yellowbrick.activation.service.AccountActivationService;
 import nl.yellowbrick.admin.BaseMvcTestCase;
+import nl.yellowbrick.data.dao.BillingDetailsDao;
 import nl.yellowbrick.data.dao.CustomerAddressDao;
 import nl.yellowbrick.data.dao.CustomerDao;
-import nl.yellowbrick.data.dao.BillingDetailsDao;
 import nl.yellowbrick.data.database.DbHelper;
 import nl.yellowbrick.data.domain.AddressType;
 import nl.yellowbrick.data.domain.BusinessIdentifier;
@@ -306,6 +307,28 @@ public class AccountProvisioningFormControllerTest extends BaseMvcTestCase {
         mockMvc.perform(postBusinessAccountProvisioningForm())
                 .andExpect(redirectedUrl("/provisioning/accounts"))
                 .andExpect(flash().attribute(WARNING_KEY, "Error occurred during account activation: derp"));
+    }
+
+    @Test
+    public void deletes_customer_data() throws Exception {
+        doNothing().when(customerDao).deleteAllCustomerData(PRIVATE_CUSTOMER_ID);
+
+        mockMvc.perform(postDeletionOfPersonalAccount()).andReturn();
+
+        verify(customerDao).deleteAllCustomerData(PRIVATE_CUSTOMER_ID);
+    }
+
+    @Test
+    public void avoids_deleting_customer_not_pending_activation() throws Exception {
+        when(customerDao.findAllPendingActivation()).thenReturn(Lists.newArrayList());
+
+        mockMvc.perform(postDeletionOfPersonalAccount()).andReturn();
+
+        verify(customerDao, never()).deleteAllCustomerData(PRIVATE_CUSTOMER_ID);
+    }
+
+    private MockHttpServletRequestBuilder postDeletionOfPersonalAccount() throws Exception {
+        return post("/provisioning/accounts/" + PRIVATE_CUSTOMER_ID).param("deleteAccount", "Delete");
     }
 
     private MockHttpServletRequestBuilder postPersonalAccountProvisioningForm() throws Exception {

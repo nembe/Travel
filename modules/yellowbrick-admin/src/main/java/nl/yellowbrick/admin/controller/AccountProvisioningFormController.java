@@ -194,6 +194,17 @@ public class AccountProvisioningFormController {
         return activateAccountAndRedirect(customer, priceModel, ra);
     }
 
+    @RequestMapping(method = RequestMethod.POST, params = {"deleteAccount"})
+    public String deleteAccount(@PathVariable("id") int id, RedirectAttributes ra) {
+        // will ensure customer is pending activation
+        assert customerById(id) != null;
+
+        customerDao.deleteAllCustomerData(id);
+        MessageHelper.flash(ra, "account.deleted");
+
+        return "redirect:/provisioning/accounts";
+    }
+
     private String activateAccountAndRedirect(Customer customer, PriceModel priceModel, RedirectAttributes ra) {
         try {
             accountActivationService.activateCustomerAccount(customer, priceModel);

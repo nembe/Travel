@@ -11,3 +11,5 @@ $ ->
   $("input[name='billingAddressSameAsMailingAddress']").change -> toggleBillingAddress()
   $("input[name='billingAddressIsPoBox']").change -> togglePoBox()
 
+  $('input[name=deleteAccount]').click (e) ->
+    e.preventDefault() unless confirm("Are you sure you want to delete the user?")

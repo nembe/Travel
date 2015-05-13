@@ -52,32 +52,44 @@ span.field-error {
       margin-left: 50px;
       margin-top: -10px;
     }
-  }
-
-
-input[type='submit'] + input[type='submit'] {
-  margin-left: 10px;
 }
 
-input {
+input[type='submit'], .input {
+  margin-right: 10px;
+}
+
+input, .input {
   padding: 5px 10px;
   border: none;
   background-color: white;
   color: $head-color;
-
+  text-decoration: none;
 }
+
+a.input {
+  color: $head-color;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
 input[type='text'] {
   width: 300px;
   height: 50px;
 }
+
 .row-33 {
   @include span-columns(4);
 
 }
+
 .row-50 {
   @include span-columns(6);
 
 }
+
 input[type=radio]{
   display: inline-block;
   width: 0.875em;

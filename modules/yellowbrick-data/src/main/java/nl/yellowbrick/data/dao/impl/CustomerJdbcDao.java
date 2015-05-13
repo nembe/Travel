@@ -25,10 +25,7 @@ import java.sql.Types;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class CustomerJdbcDao implements CustomerDao, InitializingBean {
@@ -252,6 +249,19 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     @Override
     public List<String> getMobileNumbers(long customerId) {
         return template.queryForList("SELECT MOBILENR FROM MOBILE WHERE CUSTOMERIDFK = ?", String.class, customerId);
+    }
+
+    // TODO maybe move this to a dedicated DAO since it touches on so much stuff?
+    @Override
+    public void deleteAllCustomerData(long customerId) {
+        Arrays.asList(
+                "DELETE FROM CUSTOMER_IDENTIFICATION WHERE CUSTOMERIDFK = ?",
+                "DELETE FROM CUSTOMER_REGISTRATION WHERE CUSTOMERIDFK = ?",
+                "DELETE FROM SIGNUP_CUSTOMER_CHARITY WHERE CUSTOMERID = ?",
+                "DELETE FROM SUBSCRIPTION WHERE CUSTOMER_ID= ?",
+                "DELETE FROM CUSTOMERADDRESS WHERE CUSTOMERIDFK = ?",
+                "DELETE FROM CUSTOMER WHERE CUSTOMERID = ?"
+        ).forEach(sql -> template.update(sql, customerId));
     }
 
     private void compileJdbcCalls() {
