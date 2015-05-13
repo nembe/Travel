@@ -22,6 +22,10 @@ public class AccountValidationService {
         this.accountRegistrationValidators = accountRegistrationValidators;
     }
 
+    public Errors validate(Customer customer, Errors errors) {
+        return doValidate(customer, errors);
+    }
+
     public Errors validate(Customer customer, String targetName) {
         return doValidate(customer, new UnboundErrors(customer, targetName));
     }

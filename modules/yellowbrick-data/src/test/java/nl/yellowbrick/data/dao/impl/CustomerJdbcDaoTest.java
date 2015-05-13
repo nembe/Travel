@@ -243,6 +243,12 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
         assertThat(customers.get(0), equalTo(testCustomer()));
     }
 
+    @Test
+    public void finds_by_business_identifier() {
+        assertThat(customerDao.findAllByBusinessIdentifier("some label", "some value"), empty());
+        assertThat(customerDao.findAllByBusinessIdentifier("businessRegistrationNumber", "14090089"), hasSize(1));
+    }
+
     private int fetchCustomerStatus(long customerId) {
         return db.apply((template) -> {
             return template.queryForObject("SELECT customerstatusidfk FROM CUSTOMER WHERE customerid = ?",

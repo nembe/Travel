@@ -21,7 +21,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -81,20 +80,19 @@ public class AccountProvisioningFormController {
         addPaymentData(form, customer);
 
         // form validation & binding errors
-        BeanPropertyBindingResult formErrors = new BeanPropertyBindingResult(form, "form");
-        formErrors.initConversion(conversionService);
+        BeanPropertyBindingResult errors = new BeanPropertyBindingResult(form, "form");
+        errors.initConversion(conversionService);
 
         if(model.containsAttribute(FORM_ERRORS)) {
             BindingResult previousErrors = (BindingResult) model.get(FORM_ERRORS);
-            formErrors.addAllErrors(previousErrors);
+            errors.addAllErrors(previousErrors);
         }
 
-        // account validation errors
-        Errors activationErrors = accountValidationService.validate(customer, "form");
-        formErrors.addAllErrors(activationErrors);
+        // add account validation errors
+        accountValidationService.validate(customer, errors);
 
         model.addAttribute("form", form);
-        model.addAttribute(FORM_ERRORS, formErrors);
+        model.addAttribute(FORM_ERRORS, errors);
         model.addAttribute("customer", customer);
         model.addAttribute("specialRateDescription", rateTranslationService.describeRateForCustomer(customer, locale));
         model.addAttribute("priceModel", priceModelForCustomer(id, customer.getActionCode()));

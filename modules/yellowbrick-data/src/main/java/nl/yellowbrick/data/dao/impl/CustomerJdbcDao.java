@@ -241,6 +241,15 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     }
 
     @Override
+    public List<Customer> findAllByBusinessIdentifier(String label, String value) {
+        String sql = buildQuery(BASE_CUSTOMER_QUERY,
+                "INNER JOIN CUSTOMER_IDENTIFICATION cid ON cid.customeridfk = c.customerid AND cid.value = ?",
+                "INNER JOIN IDENTIFICATION_FIELD idf ON idf.id = cid.fieldidfk AND idf.label = ?");
+
+        return template.query(sql, customerRowMapper(), value, label);
+    }
+
+    @Override
     public List<String> getMobileNumbers(long customerId) {
         return template.queryForList("SELECT MOBILENR FROM MOBILE WHERE CUSTOMERIDFK = ?", String.class, customerId);
     }

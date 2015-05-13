@@ -29,6 +29,7 @@
                         <div class="field">
                             <label th:for="'businessIdentifiers' + ${__${rowStat.index}__} + '.value'" class="field-label" th:text="${identifier.label}">vat number</label>
                             <input type="text" th:field="*{businessIdentifiers[__${rowStat.index}__].value}" th:errorclass="field-error" />
+                            <span class="field-error" th:errors="*{businessIdentifiers[__${rowStat.index}__].value}"></span>
                             <input type="hidden" th:field="*{businessIdentifiers[__${rowStat.index}__].id}" />
                             <input type="hidden" th:field="*{businessIdentifiers[__${rowStat.index}__].label}" />
                         </div>
