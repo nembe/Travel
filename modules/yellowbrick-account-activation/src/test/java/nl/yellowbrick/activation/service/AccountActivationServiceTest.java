@@ -26,7 +26,7 @@ public class AccountActivationServiceTest {
     @Mock MembershipDao membershipDao;
     @Mock CardOrderDao cardOrderDao;
     @Mock CardAssignmentService cardAssignmentService;
-    @Mock EmailNotificationService emailNotificationService;
+    @Mock CustomerNotificationService emailNotificationService;
 
     Customer customer;
     PriceModel priceModel;

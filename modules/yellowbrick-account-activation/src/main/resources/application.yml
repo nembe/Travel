@@ -21,6 +21,7 @@ customervalidation:
   thresholds:
     initialOrderAmount: 20
 
+adminEmail: development@brickparking.com
 mutator: BATCH v. ${project.version}
 
 ---
@@ -39,3 +40,10 @@ datasource:
         (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = telepay)(FAILOVER_MODE=(TYPE=select)(METHOD=basic))))
   username: test_nl_brickparking
   password: test_nl_brickparking
+
+---
+
+spring:
+  profiles: production
+
+adminEmail: beheer@brickparking.com

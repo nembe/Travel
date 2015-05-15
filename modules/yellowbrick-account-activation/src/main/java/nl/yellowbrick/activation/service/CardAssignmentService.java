@@ -27,6 +27,9 @@ public class CardAssignmentService {
     @Autowired
     private CustomerDao customerDao;
 
+    @Autowired
+    private AdminNotificationService notificationService;
+
     public void assignTransponderCard(CardOrder order) {
         if(!order.getCardType().equals(CardType.TRANSPONDER_CARD)) {
             log.error("assignTransponderCard called with card type {} for order id {}",
@@ -46,6 +49,9 @@ public class CardAssignmentService {
 
         if (cardNumbers.size() < order.getAmount()) {
             log.error("not enough cards to assign to customer " + customer.getCustomerId());
+
+            notificationService.notifyCardPoolExhausted(customer.getProductGroupId());
+
             throw new ActivationException("not enough cards in the pool");
         }
 

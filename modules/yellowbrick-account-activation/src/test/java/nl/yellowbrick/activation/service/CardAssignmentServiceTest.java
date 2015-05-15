@@ -16,8 +16,10 @@ import org.mockito.MockitoAnnotations;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class CardAssignmentServiceTest {
@@ -25,11 +27,9 @@ public class CardAssignmentServiceTest {
     @InjectMocks
     CardAssignmentService cardAssignmentService;
 
-    @Mock
-    CardOrderDao cardOrderDao;
-
-    @Mock
-    CustomerDao customerDao;
+    @Mock CardOrderDao cardOrderDao;
+    @Mock CustomerDao customerDao;
+    @Mock AdminNotificationService notificationService;
 
     Customer customer;
     CardOrder tCardOrder;
@@ -53,10 +53,17 @@ public class CardAssignmentServiceTest {
                 .thenReturn(Arrays.asList("1", "2"));
     }
 
-    @Test(expected = ActivationException.class)
-    public void fails_if_not_enough_card_numbers_available() {
+    @Test
+    public void notifies_admin_and_raises_exception_if_not_enough_card_numbers_available() {
         tCardOrder.setAmount(5);
-        cardAssignmentService.assignTransponderCard(tCardOrder);
+
+        try {
+            cardAssignmentService.assignTransponderCard(tCardOrder);
+        } catch(ActivationException e) {
+            verify(notificationService).notifyCardPoolExhausted(customer.getProductGroupId());
+            return;
+        }
+        fail("didn't raise exception");
     }
 
     @Test

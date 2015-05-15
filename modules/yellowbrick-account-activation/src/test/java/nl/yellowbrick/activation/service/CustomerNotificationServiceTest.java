@@ -30,9 +30,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.*;
 
-public class EmailNotificationServiceTest extends BaseSpringTestCase {
+public class CustomerNotificationServiceTest extends BaseSpringTestCase {
 
-    @Autowired @InjectMocks EmailNotificationService emailNotificationService;
+    @Autowired @InjectMocks
+    CustomerNotificationService emailNotificationService;
 
     @Autowired @Spy ConfigDao configDao;
     @Autowired @Spy CustomerDao customerDao;

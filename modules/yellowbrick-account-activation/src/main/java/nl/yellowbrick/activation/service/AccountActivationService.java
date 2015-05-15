@@ -31,7 +31,7 @@ public class AccountActivationService {
     private CardAssignmentService cardAssignmentService;
 
     @Autowired
-    private EmailNotificationService emailNotificationService;
+    private CustomerNotificationService emailNotificationService;
 
     private Logger log = LoggerFactory.getLogger(AccountActivationService.class);
 
