@@ -1,6 +1,5 @@
 package nl.yellowbrick.activation.validation;
 
-import com.google.common.collect.Lists;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
@@ -36,7 +35,12 @@ public class BusinessCustomerValidatorTest {
         errors = new UnboundErrors(customer, "customer");
 
         bi = new BusinessIdentifier();
-        bi.setLabel("vatNumber");
+        // randomize which identifier to use
+        doOneOf(
+                () -> bi.setLabel("vatNumber"),
+                () -> bi.setLabel("businessRegistrationNumber"),
+                () -> bi.setLabel("businessRegistrationNumber_showreg")
+        );
         bi.setValue("123456789");
 
         customerDao = mock(CustomerDao.class);
@@ -57,7 +61,9 @@ public class BusinessCustomerValidatorTest {
 
     @Test
     public void rejects_large_orders_for_customers_lacking_business_identifiers() {
-        when(customerDao.getBusinessIdentifiers(123l)).thenReturn(Lists.newArrayList());
+        bi.setValue(""); // clear out the identifier
+
+        when(customerDao.getBusinessIdentifiers(123l)).thenReturn(Arrays.asList(bi));
         customer.setNumberOfTCards(2);
         customer.setNumberOfQCards(2);
 
