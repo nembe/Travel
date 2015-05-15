@@ -80,7 +80,7 @@ public class CardOrderValidationTask {
     }
 
     private void validateAndProcessOrder(CardOrder order) {
-        cardOrderDao.validateCardOrder(order);
         cardAssignmentService.assignTransponderCard(order);
+        cardOrderDao.validateCardOrder(order);
     }
 }

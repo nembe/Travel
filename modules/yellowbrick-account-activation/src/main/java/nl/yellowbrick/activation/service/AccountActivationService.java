@@ -49,8 +49,8 @@ public class AccountActivationService {
 
             cardOrderDao.findForCustomer(customer, CardOrderStatus.INSERTED, QPARK_CARD).forEach(cardOrderDao::validateCardOrder);
             cardOrderDao.findForCustomer(customer, CardOrderStatus.INSERTED, TRANSPONDER_CARD).forEach(order -> {
-                cardOrderDao.validateCardOrder(order);
                 cardAssignmentService.assignTransponderCard(order);
+                cardOrderDao.validateCardOrder(order);
             });
 
             emailNotificationService.notifyAccountAccepted(customer);

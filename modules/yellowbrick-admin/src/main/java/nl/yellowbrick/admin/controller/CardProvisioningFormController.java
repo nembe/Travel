@@ -88,10 +88,9 @@ public class CardProvisioningFormController {
         CardOrder order = order(id);
         order.setPricePerCard(form.getPricePerCardCents());
 
-        cardOrderDao.validateCardOrder(order);
-
         if(order.getCardType().equals(CardType.TRANSPONDER_CARD))
             cardAssignmentService.assignTransponderCard(order);
+        cardOrderDao.validateCardOrder(order);
 
         model.clear();
         MessageHelper.flash(ra, "cardorder.validated");
