@@ -5,7 +5,7 @@ import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.CardType;
 import nl.yellowbrick.data.domain.Customer;
-import nl.yellowbrick.data.errors.ActivationException;
+import nl.yellowbrick.data.errors.ExhaustedCardPoolException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -16,10 +16,8 @@ import org.mockito.MockitoAnnotations;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class CardAssignmentServiceTest {
@@ -29,7 +27,6 @@ public class CardAssignmentServiceTest {
 
     @Mock CardOrderDao cardOrderDao;
     @Mock CustomerDao customerDao;
-    @Mock AdminNotificationService notificationService;
 
     Customer customer;
     CardOrder tCardOrder;
@@ -53,17 +50,11 @@ public class CardAssignmentServiceTest {
                 .thenReturn(Arrays.asList("1", "2"));
     }
 
-    @Test
-    public void notifies_admin_and_raises_exception_if_not_enough_card_numbers_available() {
+    @Test(expected = ExhaustedCardPoolException.class)
+    public void raises_exception_if_not_enough_card_numbers_available() {
         tCardOrder.setAmount(5);
 
-        try {
-            cardAssignmentService.assignTransponderCard(tCardOrder);
-        } catch(ActivationException e) {
-            verify(notificationService).notifyCardPoolExhausted(customer.getProductGroupId());
-            return;
-        }
-        fail("didn't raise exception");
+        cardAssignmentService.assignTransponderCard(tCardOrder);
     }
 
     @Test

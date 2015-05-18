@@ -30,4 +30,6 @@ public interface CardOrderDao {
     void updateOrderStatus(long cardOrderId, CardOrderStatus status);
 
     String nextQCardNumber(long customerId);
+
+    int cardsAvailableForProductGroup(int productGroupId);
 }
