@@ -8,6 +8,7 @@ tasks:
   customer-activation-delay: 5000
   vehicle-profile-validation-delay: 300000
   transpondercard-validation-cron: 0 0 6 1/1 * ? # daily at 6 am (system time)
+  card-pool-assessment-cron: 0 30 6 1/1 * ? # daily at 6:30 am (system time)
 
 mail:
   host: 127.0.0.1

@@ -251,8 +251,8 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void counts_cards_in_stock_per_product_group() {
-        assertThat(cardOrderDao.cardsAvailableForProductGroup(1), is(2));
-        assertThat(cardOrderDao.cardsAvailableForProductGroup(2), is(0));
+        assertThat(cardOrderDao.transponderCardsAvailableForProductGroup(1), is(2));
+        assertThat(cardOrderDao.transponderCardsAvailableForProductGroup(2), is(0));
     }
 
     @Test

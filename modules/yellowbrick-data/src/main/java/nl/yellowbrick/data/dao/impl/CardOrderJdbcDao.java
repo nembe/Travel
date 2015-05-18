@@ -11,7 +11,9 @@ import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
+import java.sql.Date;
 import java.sql.Types;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -160,10 +162,24 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     }
 
     @Override
-    public int cardsAvailableForProductGroup(int productGroupId) {
+    public int transponderCardsAvailableForProductGroup(long productGroupId) {
         String sql = "SELECT COUNT(*) FROM TRANSPONDERCARDPOOL WHERE PRODUCTGROUP_ID = ? AND CARDSTATUS_ID = ?";
 
         return template.queryForObject(sql, Integer.class, productGroupId, CardStatus.INSTOCK.code());
+    }
+
+    @Override
+    public int transponderCardsIssuedForProductGroup(long productGroupId, LocalDate since) {
+        String sql = "SELECT COUNT(*) " +
+                "FROM TRANSPONDERCARDPOOL p " +
+                "INNER JOIN TRANSPONDERCARD t ON t.CARDNR = p.CARDNR and p.PRODUCTGROUP_ID = ? " +
+                "INNER JOIN CARDORDER c IB c.ORDERID = t.ORDERIDFK AND c.ORDERDATE > ? " +
+                "WHERE p.CARDSTATUS_ID = ?";
+
+        return template.queryForObject(sql, Integer.class,
+                productGroupId,
+                Date.valueOf(since),
+                CardStatus.INSTOCK.code());
     }
 
     private RowMapper<CardOrder> cardOrderRowMapper() {

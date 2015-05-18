@@ -14,9 +14,10 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static java.time.LocalDateTime.*;
+import static java.time.LocalDateTime.now;
 
 @Component
 public class AdminNotificationService {
@@ -32,6 +33,12 @@ public class AdminNotificationService {
             String.format("[BRICKWALL %s] Card pool exhausted", profile);
     private static final Function<String, String> POOL_EXHAUSTED_BODY = productGroupId ->
             String.format("Impossible to assign transponder cards for product group id %s: card pool exhausted", productGroupId);
+
+    private static final Function<String, String> POOL_EXHAUSTING_SUBJECT = profile ->
+            String.format("[BRICKWALL %s] Card pool quickly exhausting", profile);
+    private static final BiFunction<String, String, String> POOL_EXHAUSTING_BODY = (productGroupId, cardsLeft)  ->
+            String.format("Card pool for product group id %s is quickly exhausting with only %s cards left",
+                    productGroupId, cardsLeft);
 
     private final String profile;
     private final String adminEmail;
@@ -54,7 +61,7 @@ public class AdminNotificationService {
         this.mailSender = mailSender;
     }
 
-    public void notifyCardPoolExhausted(int productGroupId) {
+    public void notifyCardPoolExhausted(long productGroupId) {
         try {
             MimeMessage message = createMessage(
                     POOL_EXHAUSTED_SUBJECT.apply(profile),
@@ -64,6 +71,19 @@ public class AdminNotificationService {
             sendMessage(message);
         } catch (MessagingException e) {
             log.error("Failed to compose notifyCardPoolExhausted email", e);
+        }
+    }
+
+    public void notifyCardPoolExhausting(long productGroupId, int cardsAvailable) {
+        try {
+            MimeMessage message = createMessage(
+                    POOL_EXHAUSTING_SUBJECT.apply(profile),
+                    POOL_EXHAUSTING_BODY.apply(String.valueOf(productGroupId), String.valueOf(cardsAvailable))
+            );
+
+            sendMessage(message);
+        } catch (MessagingException e) {
+            log.error("Failed to compose notifyCardPoolExhausting email", e);
         }
     }
 

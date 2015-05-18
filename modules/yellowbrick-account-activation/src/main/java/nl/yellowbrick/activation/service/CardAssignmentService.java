@@ -28,7 +28,7 @@ public class CardAssignmentService {
     private CustomerDao customerDao;
 
     public boolean canAssignTransponderCards(Customer customer, int amount) {
-        return cardOrderDao.cardsAvailableForProductGroup(customer.getProductGroupId()) >= amount;
+        return cardOrderDao.transponderCardsAvailableForProductGroup(customer.getProductGroupId()) >= amount;
     }
 
     public void assignTransponderCard(CardOrder order) {
