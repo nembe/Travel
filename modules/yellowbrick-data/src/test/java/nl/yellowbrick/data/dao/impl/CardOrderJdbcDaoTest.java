@@ -250,6 +250,12 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
     }
 
     @Test
+    public void counts_cards_in_stock_per_product_group() {
+        assertThat(cardOrderDao.transponderCardsAvailableForProductGroup(1), is(2));
+        assertThat(cardOrderDao.transponderCardsAvailableForProductGroup(2), is(0));
+    }
+
+    @Test
     public void delegates_retrieval_of_qcardnumber_to_procedure() throws Exception {
         assertThat(cardOrderDao.nextQCardNumber(123l), is(TEST_QCARD_NUMBER));
     }

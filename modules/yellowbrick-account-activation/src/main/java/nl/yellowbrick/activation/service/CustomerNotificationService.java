@@ -18,7 +18,7 @@ import java.time.ZoneId;
 import java.util.*;
 
 @Component
-public class EmailNotificationService {
+public class CustomerNotificationService {
 
     @Autowired
     private ConfigDao configDao;
@@ -35,7 +35,7 @@ public class EmailNotificationService {
     @Autowired
     private JavaMailSender mailSender;
 
-    private Logger log = LoggerFactory.getLogger(EmailNotificationService.class);
+    private Logger log = LoggerFactory.getLogger(CustomerNotificationService.class);
 
     public void notifyAccountAccepted(Customer customer) {
         // get all the required data for the email template

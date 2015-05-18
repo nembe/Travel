@@ -7,6 +7,8 @@ import nl.yellowbrick.data.domain.CardOrderStatus;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.Membership;
 import nl.yellowbrick.data.domain.PriceModel;
+import nl.yellowbrick.data.errors.ActivationException;
+import nl.yellowbrick.data.errors.ExhaustedCardPoolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +33,22 @@ public class AccountActivationService {
     private CardAssignmentService cardAssignmentService;
 
     @Autowired
-    private EmailNotificationService emailNotificationService;
+    private CustomerNotificationService emailNotificationService;
 
     private Logger log = LoggerFactory.getLogger(AccountActivationService.class);
 
     public void activateCustomerAccount(Customer customer, PriceModel priceModel) {
         log.info("Starting acceptance for customer ID: " + customer.getCustomerId());
+
+        if(customer.getNumberOfTCards() < 1) {
+            throw new ActivationException(String.format(
+                    "Customer ID %s expected to have transponder cards at this point",
+                    customer.getCustomerId()));
+        }
+
+        if(!cardAssignmentService.canAssignTransponderCards(customer, customer.getNumberOfTCards())) {
+            throw new ExhaustedCardPoolException(customer);
+        }
 
         customerDao.assignNextCustomerNr(customer);
         cardOrderDao.saveSpecialTarifIfApplicable(customer);
@@ -49,8 +61,8 @@ public class AccountActivationService {
 
             cardOrderDao.findForCustomer(customer, CardOrderStatus.INSERTED, QPARK_CARD).forEach(cardOrderDao::validateCardOrder);
             cardOrderDao.findForCustomer(customer, CardOrderStatus.INSERTED, TRANSPONDER_CARD).forEach(order -> {
-                cardOrderDao.validateCardOrder(order);
                 cardAssignmentService.assignTransponderCard(order);
+                cardOrderDao.validateCardOrder(order);
             });
 
             emailNotificationService.notifyAccountAccepted(customer);

@@ -3,6 +3,7 @@ package nl.yellowbrick.activation.task;
 import com.google.common.collect.Lists;
 import nl.yellowbrick.activation.service.AccountActivationService;
 import nl.yellowbrick.activation.service.AccountValidationService;
+import nl.yellowbrick.activation.service.AdminNotificationService;
 import nl.yellowbrick.activation.validation.UnboundErrors;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.dao.MarketingActionDao;
@@ -11,6 +12,7 @@ import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerStatus;
 import nl.yellowbrick.data.domain.MarketingAction;
 import nl.yellowbrick.data.domain.PriceModel;
+import nl.yellowbrick.data.errors.ExhaustedCardPoolException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.stubbing.Answer;
@@ -34,6 +36,7 @@ public class AccountActivationTaskTest {
     MarketingActionDao marketingActionDao;
     AccountActivationService activationService;
     AccountValidationService accountValidationService;
+    AdminNotificationService notificationService;
 
     Customer customerA = testCustomer();
     Customer customerB = testCustomer();
@@ -47,9 +50,10 @@ public class AccountActivationTaskTest {
         marketingActionDao = mock(MarketingActionDao.class);
         activationService = mock(AccountActivationService.class);
         accountValidationService = mock(AccountValidationService.class);
+        notificationService = mock(AdminNotificationService.class);
 
         accountActivationTask = new AccountActivationTask(customerDao, priceModelDao, marketingActionDao,
-                activationService, accountValidationService);
+                activationService, accountValidationService, notificationService);
     }
 
     @Test
@@ -119,6 +123,24 @@ public class AccountActivationTaskTest {
 
         verify(activationService).activateCustomerAccount(customerA, priceModel);
         assertThat(priceModel.getRegistratiekosten(), equalTo(12345));
+    }
+
+    @Test
+    public void notifies_admin_when_activation_fails_due_to_exhausted_cards() {
+        stubFindCustomersPendingActivation(customerA);
+        stubPriceModel(of(priceModel));
+        stubActionCode(empty());
+        doAnswer(emptyErrors()).when(accountValidationService).validate(any());
+
+        // raise error when trying to activate customerA
+        doThrow(new ExhaustedCardPoolException(customerA))
+                .when(activationService)
+                .activateCustomerAccount(customerA, priceModel);
+
+        accountActivationTask.validateAndActivateAccounts();
+
+        // check that admin is notified
+        verify(notificationService).notifyCardPoolExhausted(customerA.getProductGroupId());
     }
 
     private MarketingAction validMarketingAction() {

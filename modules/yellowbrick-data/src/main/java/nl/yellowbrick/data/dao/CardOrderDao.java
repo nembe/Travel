@@ -2,6 +2,7 @@ package nl.yellowbrick.data.dao;
 
 import nl.yellowbrick.data.domain.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,4 +31,8 @@ public interface CardOrderDao {
     void updateOrderStatus(long cardOrderId, CardOrderStatus status);
 
     String nextQCardNumber(long customerId);
+
+    int transponderCardsAvailableForProductGroup(long productGroupId);
+
+    int transponderCardsIssuedForProductGroup(long productGroupId, LocalDate since);
 }

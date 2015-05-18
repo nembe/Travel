@@ -5,7 +5,7 @@ import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.CardType;
 import nl.yellowbrick.data.domain.Customer;
-import nl.yellowbrick.data.errors.ActivationException;
+import nl.yellowbrick.data.errors.ExhaustedCardPoolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +27,10 @@ public class CardAssignmentService {
     @Autowired
     private CustomerDao customerDao;
 
+    public boolean canAssignTransponderCards(Customer customer, int amount) {
+        return cardOrderDao.transponderCardsAvailableForProductGroup(customer.getProductGroupId()) >= amount;
+    }
+
     public void assignTransponderCard(CardOrder order) {
         if(!order.getCardType().equals(CardType.TRANSPONDER_CARD)) {
             log.error("assignTransponderCard called with card type {} for order id {}",
@@ -45,8 +49,7 @@ public class CardAssignmentService {
                 Optional.empty());
 
         if (cardNumbers.size() < order.getAmount()) {
-            log.error("not enough cards to assign to customer " + customer.getCustomerId());
-            throw new ActivationException("not enough cards in the pool");
+            throw new ExhaustedCardPoolException(customer);
         }
 
         for(String cardNumber: cardNumbers) {

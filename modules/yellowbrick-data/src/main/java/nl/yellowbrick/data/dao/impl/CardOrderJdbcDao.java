@@ -11,9 +11,9 @@ import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.Date;
 import java.sql.Types;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -161,24 +161,42 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         return res.get("qcardNR").toString();
     }
 
+    @Override
+    public int transponderCardsAvailableForProductGroup(long productGroupId) {
+        String sql = "SELECT COUNT(*) FROM TRANSPONDERCARDPOOL WHERE PRODUCTGROUP_ID = ? AND CARDSTATUS_ID = ?";
+
+        return template.queryForObject(sql, Integer.class, productGroupId, CardStatus.INSTOCK.code());
+    }
+
+    @Override
+    public int transponderCardsIssuedForProductGroup(long productGroupId, LocalDate since) {
+        String sql = "SELECT COUNT(*) " +
+                "FROM TRANSPONDERCARDPOOL p " +
+                "INNER JOIN TRANSPONDERCARD t ON t.CARDNR = p.CARDNR and p.PRODUCTGROUP_ID = ? " +
+                "INNER JOIN CARDORDER c ON c.ORDERID = t.ORDERIDFK AND c.ORDERDATE > ? " +
+                "WHERE p.CARDSTATUS_ID = ?";
+
+        return template.queryForObject(sql, Integer.class,
+                productGroupId,
+                Date.valueOf(since),
+                CardStatus.INSTOCK.code());
+    }
+
     private RowMapper<CardOrder> cardOrderRowMapper() {
-        return new RowMapper<CardOrder>() {
-            @Override
-            public CardOrder mapRow(ResultSet rs, int rowNum) throws SQLException {
-                CardOrder co = new CardOrder();
+        return (rs, rowNum) -> {
+            CardOrder co = new CardOrder();
 
-                co.setId(rs.getLong("ORDERID"));
-                co.setDate(rs.getTimestamp("ORDERDATE"));
-                co.setStatus(CardOrderStatus.byCode(rs.getInt("ORDERSTATUS")));
-                co.setCustomerId(rs.getLong("CUSTOMERID"));
-                co.setCardType(CardType.fromDescription(rs.getString("CARDTYPE")));
-                co.setBriefCode(rs.getString("BRIEFCODE"));
-                co.setAmount(rs.getInt("AMOUNT"));
-                co.setPricePerCard(rs.getDouble("PRICEPERCARD"));
-                co.setExport("Y".equals(rs.getString("EXPORT")));
+            co.setId(rs.getLong("ORDERID"));
+            co.setDate(rs.getTimestamp("ORDERDATE"));
+            co.setStatus(CardOrderStatus.byCode(rs.getInt("ORDERSTATUS")));
+            co.setCustomerId(rs.getLong("CUSTOMERID"));
+            co.setCardType(CardType.fromDescription(rs.getString("CARDTYPE")));
+            co.setBriefCode(rs.getString("BRIEFCODE"));
+            co.setAmount(rs.getInt("AMOUNT"));
+            co.setPricePerCard(rs.getDouble("PRICEPERCARD"));
+            co.setExport("Y".equals(rs.getString("EXPORT")));
 
-                return co;
-            }
+            return co;
         };
     }
 

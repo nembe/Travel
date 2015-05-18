@@ -5,7 +5,7 @@ import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.CardType;
 import nl.yellowbrick.data.domain.Customer;
-import nl.yellowbrick.data.errors.ActivationException;
+import nl.yellowbrick.data.errors.ExhaustedCardPoolException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -25,11 +25,8 @@ public class CardAssignmentServiceTest {
     @InjectMocks
     CardAssignmentService cardAssignmentService;
 
-    @Mock
-    CardOrderDao cardOrderDao;
-
-    @Mock
-    CustomerDao customerDao;
+    @Mock CardOrderDao cardOrderDao;
+    @Mock CustomerDao customerDao;
 
     Customer customer;
     CardOrder tCardOrder;
@@ -53,9 +50,10 @@ public class CardAssignmentServiceTest {
                 .thenReturn(Arrays.asList("1", "2"));
     }
 
-    @Test(expected = ActivationException.class)
-    public void fails_if_not_enough_card_numbers_available() {
+    @Test(expected = ExhaustedCardPoolException.class)
+    public void raises_exception_if_not_enough_card_numbers_available() {
         tCardOrder.setAmount(5);
+
         cardAssignmentService.assignTransponderCard(tCardOrder);
     }
 
