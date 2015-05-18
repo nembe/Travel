@@ -173,7 +173,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         String sql = "SELECT COUNT(*) " +
                 "FROM TRANSPONDERCARDPOOL p " +
                 "INNER JOIN TRANSPONDERCARD t ON t.CARDNR = p.CARDNR and p.PRODUCTGROUP_ID = ? " +
-                "INNER JOIN CARDORDER c IB c.ORDERID = t.ORDERIDFK AND c.ORDERDATE > ? " +
+                "INNER JOIN CARDORDER c ON c.ORDERID = t.ORDERIDFK AND c.ORDERDATE > ? " +
                 "WHERE p.CARDSTATUS_ID = ?";
 
         return template.queryForObject(sql, Integer.class,
