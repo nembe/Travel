@@ -3,6 +3,7 @@ package nl.yellowbrick.data.domain;
 public class DirectDebitDetails {
 
     private long id;
+    private long customerId;
     private String sepaNumber;
     private String bic;
     private boolean verified;
@@ -13,6 +14,14 @@ public class DirectDebitDetails {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(long customerId) {
+        this.customerId = customerId;
     }
 
     public String getSepaNumber() {
@@ -44,12 +53,13 @@ public class DirectDebitDetails {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DirectDebitDetails that = (DirectDebitDetails) o;
+        DirectDebitDetails details = (DirectDebitDetails) o;
 
-        if (id != that.id) return false;
-        if (verified != that.verified) return false;
-        if (bic != null ? !bic.equals(that.bic) : that.bic != null) return false;
-        if (sepaNumber != null ? !sepaNumber.equals(that.sepaNumber) : that.sepaNumber != null) return false;
+        if (customerId != details.customerId) return false;
+        if (id != details.id) return false;
+        if (verified != details.verified) return false;
+        if (bic != null ? !bic.equals(details.bic) : details.bic != null) return false;
+        if (sepaNumber != null ? !sepaNumber.equals(details.sepaNumber) : details.sepaNumber != null) return false;
 
         return true;
     }
@@ -57,6 +67,7 @@ public class DirectDebitDetails {
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (int) (customerId ^ (customerId >>> 32));
         result = 31 * result + (sepaNumber != null ? sepaNumber.hashCode() : 0);
         result = 31 * result + (bic != null ? bic.hashCode() : 0);
         result = 31 * result + (verified ? 1 : 0);

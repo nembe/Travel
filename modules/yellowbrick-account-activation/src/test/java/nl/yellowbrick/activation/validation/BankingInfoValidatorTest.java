@@ -3,7 +3,9 @@ package nl.yellowbrick.activation.validation;
 import com.google.common.collect.Lists;
 import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.dao.BillingDetailsDao;
+import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.Customer;
+import nl.yellowbrick.data.domain.CustomerStatus;
 import nl.yellowbrick.data.domain.DirectDebitDetails;
 import nl.yellowbrick.data.domain.PaymentMethod;
 import org.junit.Before;
@@ -31,6 +33,7 @@ public class BankingInfoValidatorTest extends BaseSpringTestCase {
 
     @InjectMocks BankingInfoValidator validator;
     @Mock BillingDetailsDao billingDetailsDao;
+    @Mock CustomerDao customerDao;
 
     Customer customer;
     Errors errors;
@@ -59,10 +62,37 @@ public class BankingInfoValidatorTest extends BaseSpringTestCase {
     public void rejects_previously_used_iban() {
         stubDirectDebitDetailsByCustomer(of(details(123)));
         stubDirectDebitDetailsBySepaNumber(details(456));
+        stubMatchedCustomer(CustomerStatus.ACTIVE);
 
         invokeValidator();
 
         assertThat(errors.getFieldError("iban").getCode(), equalTo("errors.duplicate"));
+    }
+
+    @Test
+    public void rejects_with_different_message_when_iban_matches_blacklisted_account() {
+        stubDirectDebitDetailsByCustomer(of(details(123)));
+        stubDirectDebitDetailsBySepaNumber(details(456));
+
+        stubMatchedCustomer(CustomerStatus.BLACKLISTED);
+
+        invokeValidator();
+
+        assertThat(errors.getFieldError("iban").getCode(), equalTo("errors.matches.blacklisted"));
+        assertThat(errors.getGlobalError().getCode(), equalTo("errors.iban.matches.blacklisted"));
+    }
+
+    @Test
+    public void rejects_with_different_message_when_iban_matches_unbillable_account() {
+        stubDirectDebitDetailsByCustomer(of(details(123)));
+        stubDirectDebitDetailsBySepaNumber(details(456));
+
+        stubMatchedCustomer(CustomerStatus.IRRECOVERABLE);
+
+        invokeValidator();
+
+        assertThat(errors.getFieldError("iban").getCode(), equalTo("errors.matches.unbillable"));
+        assertThat(errors.getGlobalError().getCode(), equalTo("errors.iban.matches.unbillable"));
     }
 
     @Test
@@ -86,6 +116,14 @@ public class BankingInfoValidatorTest extends BaseSpringTestCase {
 
     private void invokeValidator() {
         ValidationUtils.invokeValidator(validator, customer, errors);
+    }
+
+    private void stubMatchedCustomer(CustomerStatus status) {
+        Customer cust = new Customer();
+        cust.setCustomerId(123l);
+        cust.setStatus(status);
+
+        when(customerDao.findById(anyLong())).thenReturn(of(cust));
     }
 
     private void stubDirectDebitDetailsByCustomer(Optional<DirectDebitDetails> details) {

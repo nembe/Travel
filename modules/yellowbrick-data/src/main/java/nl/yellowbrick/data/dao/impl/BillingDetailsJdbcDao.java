@@ -46,6 +46,7 @@ public class BillingDetailsJdbcDao implements BillingDetailsDao {
             DirectDebitDetails details = new DirectDebitDetails();
 
             details.setId(rs.getLong("ID"));
+            details.setCustomerId(rs.getLong("CUSTOMERID"));
             details.setSepaNumber(rs.getString("SEPANUMBER"));
             details.setBic(rs.getString("BIC"));
             details.setVerified(rs.getString("VERIFIED").equals("Y"));

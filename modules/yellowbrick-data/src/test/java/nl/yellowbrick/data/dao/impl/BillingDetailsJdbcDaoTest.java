@@ -61,6 +61,7 @@ public class BillingDetailsJdbcDaoTest extends BaseSpringTestCase {
     private DirectDebitDetails expectedDetails() {
         DirectDebitDetails details = new DirectDebitDetails();
         details.setId(1);
+        details.setCustomerId(394744);
         details.setBic("RABONL2U");
         details.setSepaNumber("NL39 RABO 0300 0652 64");
         details.setVerified(true);
