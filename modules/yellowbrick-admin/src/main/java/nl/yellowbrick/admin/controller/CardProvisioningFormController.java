@@ -88,12 +88,18 @@ public class CardProvisioningFormController {
         CardOrder order = order(id);
         order.setPricePerCard(form.getPricePerCardCents());
 
-        if(order.getCardType().equals(CardType.TRANSPONDER_CARD))
-            cardAssignmentService.assignTransponderCard(order);
-        cardOrderDao.validateCardOrder(order);
+        try {
+            if(order.getCardType().equals(CardType.TRANSPONDER_CARD))
+                cardAssignmentService.assignTransponderCard(order);
+            cardOrderDao.validateCardOrder(order);
+        } catch(Exception e) {
+            MessageHelper.flashWarning(model, "cardorder.unknownValidationError", e.getMessage());
+            return showValidationForm(model, id, ra);
+        }
 
         model.clear();
         MessageHelper.flash(ra, "cardorder.validated");
+
         return "redirect:/provisioning/cards";
     }
 

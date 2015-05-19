@@ -8,6 +8,7 @@ import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.CardOrderStatus;
 import nl.yellowbrick.data.domain.CardType;
+import nl.yellowbrick.data.errors.ExhaustedCardPoolException;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.junit.Test;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -110,6 +112,20 @@ public class CardProvisioningFormControllerTest extends BaseMvcTestCase {
 
         assertThat(response.getStatus(), is(302));
         assertThat(response.getHeader(HttpHeaders.LOCATION), is("/provisioning/cards"));
+    }
+
+    @Test
+    public void shows_unhandled_errors_from_card_validation_or_assignment() throws Exception {
+        // only TransponderCard order can ever trigger an exception during card assignment
+        CardOrder order = cardOrderDao.findById(ORDER_ID).get();
+        order.setCardType(CardType.TRANSPONDER_CARD);
+        when(cardOrderDao.findById(ORDER_ID)).thenReturn(Optional.of(order));
+
+        // raise exception during card assignment
+        doThrow(ExhaustedCardPoolException.class).when(cardAssignmentService).assignTransponderCard(any());
+
+        Document html = parseHtml(doCorrectValidateRequest());
+        assertTrue(html.select("#flash").hasText());
     }
 
     private MvcResult doCorrectValidateRequest() throws Exception {
