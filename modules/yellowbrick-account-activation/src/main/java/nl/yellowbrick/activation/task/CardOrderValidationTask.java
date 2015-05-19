@@ -1,11 +1,13 @@
 package nl.yellowbrick.activation.task;
 
+import nl.yellowbrick.activation.service.AdminNotificationService;
 import nl.yellowbrick.activation.service.CardAssignmentService;
 import nl.yellowbrick.activation.service.CardOrderValidationService;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.CardOrderStatus;
 import nl.yellowbrick.data.domain.CardType;
+import nl.yellowbrick.data.errors.ExhaustedCardPoolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +24,18 @@ public class CardOrderValidationTask {
     private final CardOrderDao cardOrderDao;
     private final CardAssignmentService cardAssignmentService;
     private final CardOrderValidationService validationService;
+    private final AdminNotificationService notificationService;
 
     @Autowired
     public CardOrderValidationTask(CardOrderDao cardOrderDao,
                                    CardAssignmentService cardAssignmentService,
-                                   CardOrderValidationService validationService
+                                   CardOrderValidationService validationService,
+                                   AdminNotificationService notificationService
     ) {
         this.cardOrderDao = cardOrderDao;
         this.cardAssignmentService = cardAssignmentService;
         this.validationService = validationService;
+        this.notificationService = notificationService;
     }
 
     @Scheduled(fixedDelayString = "${tasks.vehicle-profile-validation-delay}")
@@ -80,7 +85,12 @@ public class CardOrderValidationTask {
     }
 
     private void validateAndProcessOrder(CardOrder order) {
-        cardAssignmentService.assignTransponderCard(order);
-        cardOrderDao.validateCardOrder(order);
+        try {
+            cardAssignmentService.assignTransponderCard(order);
+            cardOrderDao.validateCardOrder(order);
+        } catch(ExhaustedCardPoolException e) {
+            log.error("Failed card order validation", e);
+            notificationService.notifyCardPoolExhausted(e.getProductGroupId());
+        }
     }
 }

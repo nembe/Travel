@@ -100,7 +100,7 @@ public class AccountActivationTask {
             }
         } catch(ExhaustedCardPoolException e) {
             log.error("Failed customer activation", e);
-            notificationService.notifyCardPoolExhausted(customer.getProductGroupId());
+            notificationService.notifyCardPoolExhausted(e.getProductGroupId());
         } catch(ActivationException e) {
             log.error(e.getMessage(), e);
         }
