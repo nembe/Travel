@@ -48,8 +48,6 @@ public class CardPoolAssessmentTask {
                     CARD_ISSUANCE_PERIOD_WEEKS);
 
             if(cardsIssuedPerWeek >= cardsAvailable) {
-                log.warn("Notifying admin that at {} cards available {}'s card pool is about to expire",
-                        cardsAvailable, pg.getDescription());
                 notificationService.notifyCardPoolExhausting(pg.getId(), cardsAvailable);
             }
         });

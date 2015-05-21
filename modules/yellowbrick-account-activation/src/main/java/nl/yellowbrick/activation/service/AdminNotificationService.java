@@ -68,6 +68,8 @@ public class AdminNotificationService {
                     POOL_EXHAUSTED_BODY.apply(String.valueOf(productGroupId))
             );
 
+            log.warn("Notifying admin card pool for product group {} has expired", productGroupId);
+
             sendMessage(message);
         } catch (MessagingException e) {
             log.error("Failed to compose notifyCardPoolExhausted email", e);
@@ -75,11 +77,20 @@ public class AdminNotificationService {
     }
 
     public void notifyCardPoolExhausting(long productGroupId, int cardsAvailable) {
+        // maybe card pool has already expired?
+        if(cardsAvailable == 0) {
+            notifyCardPoolExhausted(productGroupId);
+            return;
+        }
+
         try {
             MimeMessage message = createMessage(
                     POOL_EXHAUSTING_SUBJECT.apply(profile),
                     POOL_EXHAUSTING_BODY.apply(String.valueOf(productGroupId), String.valueOf(cardsAvailable))
             );
+
+            log.warn("Notifying admin that at {} cards available the card pool for product group {} is about to expire",
+                    cardsAvailable, productGroupId);
 
             sendMessage(message);
         } catch (MessagingException e) {
