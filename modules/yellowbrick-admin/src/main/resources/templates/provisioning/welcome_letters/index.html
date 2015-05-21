@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html layout:decorator="provisioning/_layout" th:with="provisioningTitle=#{provisioning.welcome_letters.title}">
+<body id="welcome-letters-export">
+<div layout:fragment="content-inner">
+
+    <div class="section group-selection">
+        <form>
+            <label for="productGroup">Product group:</label>
+            <select name="productGroup" id="productGroup" onchange="this.form.submit()">
+                <option th:each="pg : ${allProductGroups}"
+                        th:value="${pg.id}"
+                        th:selected="${pg == productGroup}"
+                        th:text="${pg.description}">Description</option>
+            </select>
+        </form>
+    </div>
+
+    <div class="section" th:if="${#lists.isEmpty(exports)}">
+        <h3>No exports available.</h3>
+    </div>
+
+    <div class="section">
+        <form method="post">
+            <h3>Export between dates</h3>
+
+            <div class="row-33">
+                <div class="field">
+                    <label for="startDate" class="field-label">Start date (inclusive):</label>
+                    <input type="text" name="startDate"/>
+                </div>
+            </div>
+
+            <div class="row-33">
+                <div class="field">
+                    <label for="endDate" class="field-label">End date (exclusive):</label>
+                    <input type="text" name="endDate"/>
+                </div>
+            </div>
+
+            <div class="clear">
+                <input type="submit" name="exportBoundedBtn" value="Export" />
+            </div>
+        </form>
+    </div>
+
+    <div class="section">
+        <form method="post">
+            <h3>Export next batch</h3>
+
+            <p>Some explanation of how this works</p>
+
+            <div class="clear">
+                <input type="submit" name="exportNextBtn" value="Export" />
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>
