@@ -19,6 +19,29 @@
         <h3>No exports available.</h3>
     </div>
 
+    <div class="section" th:unless="${#lists.isEmpty(exports)}">
+        <h3>List of user exports</h3>
+
+        <table>
+            <thead>
+            <tr>
+                <th>File name</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="export : ${exports}">
+                <td th:text="${export.fileName}"></td>
+                <td>
+                    <div class="btn">
+                        <a th:href="@{${export.downloadUrl}}">Download</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
     <div class="section">
         <form method="post">
             <h3>Export between dates</h3>

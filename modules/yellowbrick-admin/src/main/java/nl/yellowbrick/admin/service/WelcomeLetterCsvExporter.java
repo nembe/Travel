@@ -7,6 +7,8 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.base.Joiner;
 import nl.yellowbrick.admin.domain.CardOrderExportRecord;
 import nl.yellowbrick.data.domain.ProductGroup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,9 +20,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.stream.Stream;
 
 @Component
 public class WelcomeLetterCsvExporter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(WelcomeLetterCsvExporter.class);
 
     private static final char SEPARATOR = ';';
 
@@ -40,6 +45,15 @@ public class WelcomeLetterCsvExporter {
             return new Appender(resolveFilePath(productGroup, name));
         } catch(IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public Stream<Path> listExports(ProductGroup productGroup) {
+        try {
+            return Files.list(exportsDir(productGroup)).sorted();
+        } catch (IOException e) {
+            LOG.error("Failed to retrieve exports lists for group " + productGroup.getDescription(), e);
+            return Stream.empty();
         }
     }
 

@@ -8,11 +8,13 @@ import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
 import nl.yellowbrick.data.domain.ProductGroup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Component
 public class WelcomeLetterExportService {
@@ -51,6 +53,12 @@ public class WelcomeLetterExportService {
 
             return Optional.ofNullable(appender.isWriting() ? appender.getPath() : null);
         }
+    }
+
+    public Stream<FileSystemResource> listExports(ProductGroup productGroup) {
+        return csvExporter.listExports(productGroup)
+                .map(Path::toFile)
+                .map(FileSystemResource::new);
     }
 
     private CardOrderExportRecord record(Customer customer) {
