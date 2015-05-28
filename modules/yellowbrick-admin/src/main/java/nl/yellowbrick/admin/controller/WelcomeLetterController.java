@@ -46,6 +46,7 @@ public class WelcomeLetterController {
 
         List<ExportsListItem> exports = exportService.listExports(productGroup)
                 .map(resource -> new ExportsListItem(resource, productGroup))
+                .sorted()
                 .collect(Collectors.toList());
 
         model.put(PRODUCT_GROUP_KEY, productGroup);
@@ -116,7 +117,7 @@ public class WelcomeLetterController {
         return form;
     }
 
-    private class ExportsListItem {
+    private class ExportsListItem implements Comparable<ExportsListItem> {
 
         public final String fileName;
         public final String downloadUrl;
@@ -125,6 +126,11 @@ public class WelcomeLetterController {
             this.fileName = resource.getFilename();
             this.downloadUrl = String.format("/provisioning/welcome_letters/?productGroup=%s&fileName=%s",
                     pg.getId(), this.fileName);
+        }
+
+        @Override
+        public int compareTo(ExportsListItem other) {
+            return fileName.compareTo(other.fileName) * -1;
         }
     }
 
