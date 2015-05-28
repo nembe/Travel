@@ -1,5 +1,8 @@
 <!DOCTYPE HTML>
 <html layout:decorator="provisioning/_layout" th:with="provisioningTitle=#{provisioning.welcome_letters.title}">
+<head>
+    <script type="text/javascript" charset="utf-8" th:src="@{/javascript/provisioning/welcome_letters.js}"></script>
+</head>
 <body id="welcome-letters-export">
 <div layout:fragment="content-inner">
 
@@ -67,13 +70,24 @@
     </div>
 
     <div class="section">
-        <form method="post">
+        <form id="nextBatchForm" th:object="${nextBatchForm}" th:action="@{#}" method="post">
             <h3>Export next batch</h3>
 
-            <p>Some explanation of how this works</p>
+            <p>
+                Export all customers whose customer ID is greater than the one specified below.
+                Beware that this may generate a huge request.
+            </p>
+
+            <div class="field row-33">
+                <label for="customer" class="field-label">Last exported customer id</label>
+                <input type="text" th:field="*{customer}" th:errorclass="field-error"/>
+                <span class="field-error" th:if="${#fields.hasErrors('customer')}" th:errors="*{customer}"></span>
+            </div>
 
             <div class="clear">
-                <input type="submit" name="exportNextBtn" value="Export" />
+                <input type="hidden" name="productGroup" th:value="${productGroup.id}" />
+                <input type="hidden" name="action" value="exportBatch" />
+                <input type="submit" value="Export" />
             </div>
         </form>
     </div>
