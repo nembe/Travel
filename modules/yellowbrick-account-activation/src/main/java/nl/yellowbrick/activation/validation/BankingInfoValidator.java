@@ -66,14 +66,16 @@ public class BankingInfoValidator extends AccountRegistrationValidator {
                 .map(ddd -> customerDao.findById(ddd.getCustomerId()))
                 .filter(Optional::isPresent).map(Optional::get) // essentially "flatten"
                 .filter(c -> c.getCustomerId() != customer.getCustomerId())
-                .forEach(c -> {
-                    if(c.getStatus().equals(CustomerStatus.BLACKLISTED)) {
+                .map(Customer::getStatus)
+                .distinct()
+                .forEach(status -> {
+                    if (status.equals(CustomerStatus.BLACKLISTED)) {
                         errors.rejectValue(IBAN_FIELD, "errors.matches.blacklisted");
                         errors.reject("errors.iban.matches.blacklisted");
-                    } else if(c.getStatus().equals(CustomerStatus.IRRECOVERABLE)) {
+                    } else if (status.equals(CustomerStatus.IRRECOVERABLE)) {
                         errors.rejectValue(IBAN_FIELD, "errors.matches.unbillable");
                         errors.reject("errors.iban.matches.unbillable");
-                    } else if(!errors.hasFieldErrors(IBAN_FIELD)) {
+                    } else if (!errors.hasFieldErrors(IBAN_FIELD)) {
                         errors.rejectValue(IBAN_FIELD, "errors.duplicate");
                     }
                 });
