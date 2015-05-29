@@ -14,6 +14,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
@@ -49,7 +50,10 @@ public class WelcomeLetterExportService {
     }
 
     public Optional<Path> exportForProductGroup(ProductGroup productGroup, Date fromDateInclusive, Date toDateExclusive) {
-        String exportName = "between-dates-dateA-dateB";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        String exportName = String.format("between-dates-%s-%s",
+                dateFormat.format(fromDateInclusive),
+                dateFormat.format(toDateExclusive));
 
         try(WelcomeLetterCsvExporter.Appender appender = csvExporter.createAppender(productGroup, exportName)) {
             customerDao.scan(

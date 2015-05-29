@@ -7,6 +7,7 @@ import nl.yellowbrick.data.dao.WelcomeLetterSettingsDao;
 import nl.yellowbrick.data.domain.ProductGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.nio.file.Path;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,6 +35,8 @@ import static nl.yellowbrick.admin.util.CommonRequestParams.from;
 @Controller
 @RequestMapping("/provisioning/welcome_letters")
 public class WelcomeLetterController {
+
+    private static final int MAX_LIST_SIZE = 30;
 
     @Autowired private WelcomeLetterExportService exportService;
     @Autowired private WelcomeLetterSettingsDao welcomeLetterSettingsDao;
@@ -47,6 +51,7 @@ public class WelcomeLetterController {
         List<ExportsListItem> exports = exportService.listExports(productGroup)
                 .map(resource -> new ExportsListItem(resource, productGroup))
                 .sorted()
+                .limit(MAX_LIST_SIZE)
                 .collect(Collectors.toList());
 
         model.put(PRODUCT_GROUP_KEY, productGroup);
@@ -54,6 +59,9 @@ public class WelcomeLetterController {
 
         if(!model.containsAttribute("nextBatchForm"))
             model.addAttribute("nextBatchForm", nextBatchForm(productGroup));
+
+        if(!model.containsAttribute("betweenDatesForm"))
+            model.addAttribute("betweenDatesForm", betweenDatesForm(productGroup));
 
         return "provisioning/welcome_letters/index";
     }
@@ -93,12 +101,32 @@ public class WelcomeLetterController {
 
         ProductGroup productGroup = from(requestParams).productGroupOrDefault(allProductGroups);
 
-        allProductGroups.stream()
-                .filter(pg -> pg.getId().equals(form.getProductGroup()))
-                .findFirst()
-                .orElseThrow(ResourceNotFoundException::new);
-
         Optional<Path> filePath = exportService.exportForProductGroup(productGroup, form.getCustomer());
+
+        if(filePath.isPresent())
+            MessageHelper.flash(ra, "welcomeLetter.exported");
+        else
+            MessageHelper.flashWarning(ra, "welcomeLetter.exportError");
+
+        return "redirect:/provisioning/welcome_letters";
+    }
+
+    @RequestMapping(method = RequestMethod.POST, params = "action=exportBetweenDates")
+    public String triggerNextBatch(ModelMap model,
+                                   @RequestParam Map<String, String> requestParams,
+                                   @ModelAttribute("allProductGroups") List<ProductGroup> allProductGroups,
+                                   @ModelAttribute("betweenDatesForm") @Valid BetweenDatesForm form,
+                                   BindingResult bindingResult,
+                                   RedirectAttributes ra) {
+
+        if(bindingResult.hasErrors())
+            return get(model, requestParams, allProductGroups);
+        else
+            model.clear();
+
+        ProductGroup productGroup = from(requestParams).productGroupOrDefault(allProductGroups);
+
+        Optional<Path> filePath = exportService.exportForProductGroup(productGroup, form.getStartDate(), form.getEndDate());
 
         if(filePath.isPresent())
             MessageHelper.flash(ra, "welcomeLetter.exported");
@@ -113,6 +141,13 @@ public class WelcomeLetterController {
         form.setProductGroup(productGroup.getId());
 
         welcomeLetterSettingsDao.latestExportedCustomer().ifPresent(form::setCustomer);
+
+        return form;
+    }
+
+    private BetweenDatesForm betweenDatesForm(ProductGroup productGroup) {
+        BetweenDatesForm form = new BetweenDatesForm();
+        form.setProductGroup(productGroup.getId());
 
         return form;
     }
@@ -146,6 +181,41 @@ public class WelcomeLetterController {
 
         public void setCustomer(long customerId) {
             this.customer = customerId;
+        }
+
+        public Long getProductGroup() {
+            return productGroup;
+        }
+
+        public void setProductGroup(long productGroup) {
+            this.productGroup = productGroup;
+        }
+    }
+
+    static class BetweenDatesForm {
+
+        @DateTimeFormat(pattern = "dd-MM-yyyy")
+        private Date startDate;
+        @DateTimeFormat(pattern = "dd-MM-yyyy")
+        private Date endDate;
+        private Long productGroup;
+
+        public BetweenDatesForm() {}
+
+        public Date getStartDate() {
+            return startDate;
+        }
+
+        public void setStartDate(Date startDate) {
+            this.startDate = startDate;
+        }
+
+        public Date getEndDate() {
+            return endDate;
+        }
+
+        public void setEndDate(Date endDate) {
+            this.endDate = endDate;
         }
 
         public Long getProductGroup() {

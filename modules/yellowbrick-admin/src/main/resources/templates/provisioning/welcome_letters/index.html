@@ -46,25 +46,29 @@
     </div>
 
     <div class="section">
-        <form method="post">
+        <form id="betweenDatesForm" th:object="${betweenDatesForm}" th:action="@{#}" method="post">
             <h3>Export between dates</h3>
 
             <div class="row-33">
                 <div class="field">
                     <label for="startDate" class="field-label">Start date (inclusive):</label>
-                    <input type="text" name="startDate"/>
+                    <input type="text" placeholder="dd-MM-yyyy" th:field="*{startDate}" th:errorclass="field-error"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></span>
                 </div>
             </div>
 
             <div class="row-33">
                 <div class="field">
                     <label for="endDate" class="field-label">End date (exclusive):</label>
-                    <input type="text" name="endDate"/>
+                    <input type="text" placeholder="dd-MM-yyyy" th:field="*{endDate}" th:errorclass="field-error"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}"></span>
                 </div>
             </div>
 
             <div class="clear">
-                <input type="submit" name="exportBoundedBtn" value="Export" />
+                <input type="hidden" name="productGroup" th:value="${productGroup.id}" />
+                <input type="hidden" name="action" value="exportBetweenDates" />
+                <input type="submit" value="Export" />
             </div>
         </form>
     </div>

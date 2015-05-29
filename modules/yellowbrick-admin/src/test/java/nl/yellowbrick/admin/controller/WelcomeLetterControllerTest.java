@@ -18,6 +18,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -120,6 +123,40 @@ public class WelcomeLetterControllerTest extends BaseMvcTestCase {
 
         assertTrue(html.getElementById("customer").hasClass("field-error"));
         verify(exportService, never()).exportForProductGroup(any(), anyLong());
+    }
+
+    @Test
+    public void triggers_export_between_dates() throws Exception {
+        DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+        Date from = df.parse("01-01-2015");
+        Date to = df.parse("01-06-2015");
+
+        when(exportService.exportForProductGroup(productGroup, from, to))
+                .thenReturn(Optional.of(testPath()));
+
+        mockMvc.perform(post("/provisioning/welcome_letters")
+                        .param("productGroup", productGroup.getId().toString())
+                        .param("startDate", "01-01-2015")
+                        .param("endDate", "01-06-2015")
+                        .param("action", "exportBetweenDates"));
+
+        verify(exportService).exportForProductGroup(productGroup, from, to);
+    }
+
+    @Test
+    public void validates_form_binding_errors_on_between_dates_form() throws Exception {
+        MvcResult result = mockMvc.perform(post("/provisioning/welcome_letters")
+                        .param("productGroup", productGroup.getId().toString())
+                        .param("startDate", "01-01-2015")
+                        .param("endDate", "totally not a date!") // our erroneous input
+                        .param("action", "exportBetweenDates")
+        ).andReturn();
+
+        Document html = parseHtml(result);
+
+        assertTrue(html.getElementById("endDate").hasClass("field-error"));
+
+        verify(exportService, never()).exportForProductGroup(any(), any(Date.class), any(Date.class));
     }
 
     private void stubExportService(Stream<FileSystemResource> stream) {
