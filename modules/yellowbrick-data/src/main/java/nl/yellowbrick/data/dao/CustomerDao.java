@@ -2,10 +2,12 @@ package nl.yellowbrick.data.dao;
 
 import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
+import nl.yellowbrick.data.domain.ProductGroup;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public interface CustomerDao {
 
@@ -42,4 +44,8 @@ public interface CustomerDao {
     List<String> getMobileNumbers(long customerId);
 
     void deleteAllCustomerData(long customerId);
+
+    void scan(ProductGroup productGroup, long fromCustomerIdExclusive, Consumer<Customer> callback);
+
+    void scan(ProductGroup productGroup, Date fromMemberDateInclusive, Date toMemberDateExclusive, Consumer<Customer> callback);
 }

@@ -6,15 +6,13 @@ import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerStatus;
+import nl.yellowbrick.data.domain.ProductGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +24,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Consumer;
 
 @Component
 public class CustomerJdbcDao implements CustomerDao, InitializingBean {
@@ -262,6 +261,38 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                 "DELETE FROM CUSTOMERADDRESS WHERE CUSTOMERIDFK = ?",
                 "DELETE FROM CUSTOMER WHERE CUSTOMERID = ?"
         ).forEach(sql -> template.update(sql, customerId));
+    }
+
+    @Override
+    public void scan(ProductGroup productGroup, long fromCustomerIdExclusive, Consumer<Customer> callback) {
+        String sql = buildQuery(BASE_CUSTOMER_QUERY,
+                "WHERE c.productgroup_id = ?",
+                "AND c.customerId > ?");
+
+        template.query(
+                new StreamingStatementCreator(sql, productGroup.getId(), fromCustomerIdExclusive),
+                mapForConsumer(callback));
+    }
+
+    @Override
+    public void scan(ProductGroup productGroup, Date fromMemberDateInclusive, Date toMemberDateExclusive, Consumer<Customer> callback) {
+        String sql = buildQuery(BASE_CUSTOMER_QUERY,
+                "WHERE c.productgroup_id = ?",
+                "AND c.memberDate >= ?",
+                "AND c.memberDate < ?");
+
+        template.query(
+                new StreamingStatementCreator(sql, productGroup.getId(), fromMemberDateInclusive, toMemberDateExclusive),
+                mapForConsumer(callback));
+    }
+
+    private RowCallbackHandler mapForConsumer(Consumer<Customer> callback) {
+        RowMapper<Customer> rowMapper = customerRowMapper();
+
+        return rs -> {
+            final Customer customer = rowMapper.mapRow(rs, rs.getRow());
+            callback.accept(customer);
+        };
     }
 
     private void compileJdbcCalls() {

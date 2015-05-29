@@ -39,7 +39,7 @@ public class CardOrderExportRecord {
 
     @JsonIgnore
     public CardOrderExportTarget target() {
-        if(order.getCardType().equals(CardType.SLEEVE) || order.getCardType().equals(CardType.UNKNOWN_CARD))
+        if(CardType.SLEEVE.equals(order.getCardType()) || CardType.UNKNOWN_CARD.equals(order.getCardType()))
             return CardOrderExportTarget.OTHER;
 
         // external provisioning: orders go to a combined file
@@ -63,7 +63,9 @@ public class CardOrderExportRecord {
 
     @JsonProperty("CARDTYPE")
     public String getCardType() {
-        if(order.getCardType().equals(CardType.RTP_CARD))
+        if(order == null)
+            return "";
+        else if(order.getCardType().equals(CardType.RTP_CARD))
             return productGroup.getId().toString();
         else if(order.getCardType().equals(CardType.TRANSPONDER_CARD))
             return productGroup.getId().toString() + ".6";
@@ -173,6 +175,9 @@ public class CardOrderExportRecord {
 
     @JsonProperty("BRIEFCODE")
     public String briefCode() {
+        if(order == null)
+            return "";
+
         String langSuffix = isNullOrEmpty(locale) ? "" : "/".concat(locale);
 
         return order.getBriefCode() + langSuffix;
@@ -206,6 +211,10 @@ public class CardOrderExportRecord {
 
         public Builder(CardOrder order) {
             this.order = order;
+        }
+
+        public Builder(Customer customer) {
+            customer(customer);
         }
 
         public Builder productGroup(ProductGroup pg) {
