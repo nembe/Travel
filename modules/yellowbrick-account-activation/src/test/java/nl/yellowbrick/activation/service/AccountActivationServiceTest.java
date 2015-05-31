@@ -1,111 +1,98 @@
 package nl.yellowbrick.activation.service;
 
-import com.google.common.collect.Lists;
+import nl.yellowbrick.data.BaseSpringTestCase;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.dao.MembershipDao;
-import nl.yellowbrick.data.domain.CardOrder;
-import nl.yellowbrick.data.domain.Customer;
-import nl.yellowbrick.data.domain.Membership;
-import nl.yellowbrick.data.domain.PriceModel;
+import nl.yellowbrick.data.database.DbHelper;
+import nl.yellowbrick.data.domain.*;
 import nl.yellowbrick.data.errors.ActivationException;
 import nl.yellowbrick.data.errors.ExhaustedCardPoolException;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.stubbing.Answer;
+import org.mockito.Spy;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import static nl.yellowbrick.data.domain.CardOrderStatus.INSERTED;
-import static nl.yellowbrick.data.domain.CardType.QPARK_CARD;
-import static nl.yellowbrick.data.domain.CardType.TRANSPONDER_CARD;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
-public class AccountActivationServiceTest {
+public class AccountActivationServiceTest extends BaseSpringTestCase {
 
-    @InjectMocks AccountActivationService activationService;
+    private static final long CUSTOMER_ID = 4776;
 
-    @Mock CustomerDao customerDao;
-    @Mock MembershipDao membershipDao;
-    @Mock CardOrderDao cardOrderDao;
-    @Mock CardAssignmentService cardAssignmentService;
-    @Mock CustomerNotificationService emailNotificationService;
-    @Mock AdminNotificationService notificationService;
+    @Autowired @InjectMocks AccountActivationService activationService;
+
+    @Autowired @Spy CustomerDao customerDao;
+    @Autowired @Spy MembershipDao membershipDao;
+    @Autowired @Spy CardOrderDao cardOrderDao;
+    @Autowired @Spy CardAssignmentService cardAssignmentService;
+    @Autowired @Spy CustomerNotificationService emailNotificationService;
+    @Autowired @Spy AdminNotificationService notificationService;
+
+    @Autowired DbHelper db;
 
     Customer customer;
     PriceModel priceModel;
 
-    CardOrder tCardOrder;
-    CardOrder qparkCardOrder;
-
     @Before
     public void setUp() {
-        customer = new Customer();
-        customer.setCustomerId(123);
-        customer.setNumberOfTCards(1);
-
-        priceModel = new PriceModel();
-
-        tCardOrder = new CardOrder();
-        tCardOrder.setCardType(TRANSPONDER_CARD);
-
-        qparkCardOrder = new CardOrder();
-        qparkCardOrder.setCardType(QPARK_CARD);
-
         MockitoAnnotations.initMocks(this);
 
-        when(cardOrderDao.findForCustomer(customer, INSERTED, TRANSPONDER_CARD))
-                .thenReturn(Lists.newArrayList(tCardOrder));
-        when(cardOrderDao.findForCustomer(customer, INSERTED, QPARK_CARD))
-                .thenReturn(Lists.newArrayList(qparkCardOrder));
-        when(cardAssignmentService.canAssignTransponderCards(customer, customer.getNumberOfTCards()))
-                .thenReturn(true);
+        // change status from our sample customer back to "registered"
+        db.accept(t -> t.update("update customer set customerstatusidfk = 1 where customerid = ?", CUSTOMER_ID));
+
+        // make sure his card orders haven't been processed yet
+        db.accept(t -> t.update("update cardorder set orderstatus = '1' where customerid = ?", CUSTOMER_ID));
+
+        customer = customerDao.findById(CUSTOMER_ID).get();
+        priceModel = new PriceModel();
     }
 
     @Test
     public void assigns_next_customer_nr() {
-        mockCollaborations();
         activationService.activateCustomerAccount(customer, priceModel);
 
-        assertThat(customer.getCustomerNr(), equalTo("ABC123"));
+        verify(customerDao).assignNextCustomerNr(any());
     }
 
     @Test
     public void saves_special_tarif_and_validates_card_orders_and_then_assigns_cards_to_customer() {
-        mockCollaborations();
         activationService.activateCustomerAccount(customer, priceModel);
 
         // saves specialtarif
-        verify(cardOrderDao).saveSpecialTarifIfApplicable(eq(customer));
+        verify(cardOrderDao).saveSpecialTarifIfApplicable(any());
 
         // validates card orders
-        verify(cardOrderDao).validateCardOrder(tCardOrder);
-        verify(cardOrderDao).validateCardOrder(qparkCardOrder);
+        verify(cardOrderDao, times(1)).validateCardOrder(argThat(isTransponderCardOrder()));
+        verify(cardOrderDao, times(1)).validateCardOrder(argThat(isQparkCardOrder()));
 
         // assigns transponder cards
-        verify(cardAssignmentService).assignTransponderCard(tCardOrder);
+        verify(cardAssignmentService).assignTransponderCard(argThat(isTransponderCardOrder()));
     }
 
     @Test
     public void saves_new_membership_and_notifies_customer() {
-        mockCollaborations();
         activationService.activateCustomerAccount(customer, priceModel);
 
-        Membership expectedMembership = new Membership(customer, priceModel);
+        Matcher<Membership> isExpectedMembership = new ArgumentMatcher<Membership>() {
+            @Override
+            public boolean matches(Object o) {
+                Membership m = (Membership) o;
+                return m.getPriceModel().equals(priceModel) && m.getCustomer().getCustomerId() == CUSTOMER_ID;
+            }
+        };
 
-        verify(membershipDao).saveValidatedMembership(eq(expectedMembership));
-        verify(emailNotificationService).notifyAccountAccepted((eq(customer)));
+        verify(membershipDao).saveValidatedMembership(argThat(isExpectedMembership));
+        verify(emailNotificationService).notifyAccountAccepted(any());
     }
 
     @Test
     public void no_op_if_customer_lacks_transponder_cards() {
-        mockCollaborations();
-        customer.setNumberOfTCards(0);
+        db.accept(t -> t.update("update customer set numberoftcards = 0 where customerid = ?", CUSTOMER_ID));
 
         try {
             activationService.activateCustomerAccount(customer, priceModel);
@@ -117,22 +104,25 @@ public class AccountActivationServiceTest {
 
     @Test(expected = ExhaustedCardPoolException.class)
     public void raises_exception_when_transponder_cards_cant_be_assigned() {
-        reset(cardAssignmentService);
-        when(cardAssignmentService.canAssignTransponderCards(any(), anyInt())).thenReturn(false);
+        doReturn(false).when(cardAssignmentService).canAssignTransponderCards(any(), anyInt());
 
         activationService.activateCustomerAccount(customer, priceModel);
     }
 
-    private void mockCollaborations() {
-        doAnswer(setCustomerNr()).when(customerDao).assignNextCustomerNr(eq(customer));
-    }
-
-    private Answer setCustomerNr() {
-        return invocationOnMock -> {
-            Customer cust = (Customer) invocationOnMock.getArguments()[0];
-            cust.setCustomerNr("ABC123");
-            return null;
+    private Matcher<CardOrder> isOrderOf(CardType cardType) {
+        return new ArgumentMatcher<CardOrder>() {
+            @Override
+            public boolean matches(Object o) {
+                return ((CardOrder) o).getCardType().equals(cardType);
+            }
         };
     }
 
+    private Matcher<CardOrder> isTransponderCardOrder() {
+        return isOrderOf(CardType.TRANSPONDER_CARD);
+    }
+
+    private Matcher<CardOrder> isQparkCardOrder() {
+        return isOrderOf(CardType.QPARK_CARD);
+    }
 }

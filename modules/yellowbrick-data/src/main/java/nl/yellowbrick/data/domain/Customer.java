@@ -1,6 +1,7 @@
 package nl.yellowbrick.data.domain;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
 
 import java.util.Date;
 
@@ -457,5 +458,48 @@ public class Customer {
         result = 31 * result + (invoiceEmail != null ? invoiceEmail.hashCode() : 0);
         result = 31 * result + (extraInvoiceAnnotations ? 1 : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("accountHolderName", accountHolderName)
+                .add("accountNr", accountNr)
+                .add("accountType", accountType)
+                .add("actionCode", actionCode)
+                .add("agentName", agentName)
+                .add("applicationDate", applicationDate)
+                .add("billingAgentId", billingAgentId)
+                .add("businessName", businessName)
+                .add("businessTypeId", businessTypeId)
+                .add("business", business)
+                .add("creditLimit", creditLimit)
+                .add("customerId", customerId)
+                .add("customerNr", customerNr)
+                .add("dateOfBirth", dateOfBirth)
+                .add("email", email)
+                .add("exitDate", exitDate)
+                .add("fax", fax)
+                .add("firstCardLicensePlate", firstCardLicensePlate)
+                .add("firstCardMobile", firstCardMobile)
+                .add("firstName", firstName)
+                .add("gender", gender)
+                .add("infix", infix)
+                .add("initials", initials)
+                .add("lastName", lastName)
+                .add("memberDate", memberDate)
+                .add("numberOfQCards", numberOfQCards)
+                .add("numberOfRTPCards", numberOfRTPCards)
+                .add("numberOfTCards", numberOfTCards)
+                .add("parkadammerTotal", parkadammerTotal)
+                .add("phoneNr", phoneNr)
+                .add("pincode", pincode)
+                .add("productGroup", productGroup)
+                .add("productGroupId", productGroupId)
+                .add("status", status)
+                .add("invoiceAttn", invoiceAttn)
+                .add("invoiceEmail", invoiceEmail)
+                .add("extraInvoiceAnnotations", extraInvoiceAnnotations)
+                .toString();
     }
 }
