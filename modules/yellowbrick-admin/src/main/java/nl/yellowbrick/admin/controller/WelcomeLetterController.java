@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
@@ -170,7 +171,10 @@ public class WelcomeLetterController {
     }
 
     static class NextBatchForm {
+
+        @NotNull
         private Long customer;
+        @NotNull
         private Long productGroup;
 
         public NextBatchForm() {}
@@ -195,9 +199,12 @@ public class WelcomeLetterController {
     static class BetweenDatesForm {
 
         @DateTimeFormat(pattern = "dd-MM-yyyy")
+        @NotNull
         private Date startDate;
         @DateTimeFormat(pattern = "dd-MM-yyyy")
+        @NotNull
         private Date endDate;
+        @NotNull
         private Long productGroup;
 
         public BetweenDatesForm() {}
