@@ -179,7 +179,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         return template.queryForObject(sql, Integer.class,
                 productGroupId,
                 Date.valueOf(since),
-                CardStatus.INSTOCK.code());
+                CardStatus.ACTIVE.code());
     }
 
     private RowMapper<CardOrder> cardOrderRowMapper() {

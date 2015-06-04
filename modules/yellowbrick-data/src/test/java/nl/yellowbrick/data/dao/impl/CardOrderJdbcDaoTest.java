@@ -17,9 +17,7 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static nl.yellowbrick.data.database.Functions.CALL_RECORDERS;
-import static nl.yellowbrick.data.database.Functions.FunctionCall;
-import static nl.yellowbrick.data.database.Functions.TEST_QCARD_NUMBER;
+import static nl.yellowbrick.data.database.Functions.*;
 import static nl.yellowbrick.data.domain.CardOrderStatus.*;
 import static nl.yellowbrick.data.domain.CardType.*;
 import static org.exparity.hamcrest.date.DateMatchers.after;
