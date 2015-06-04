@@ -38,7 +38,7 @@ public class WelcomeLetterExportService {
             Consumer<Customer> trackCustomer = customer -> customerHolder.put(0, customer);
             Consumer<Customer> appendRecord = customer -> appender.append(record(customer));
 
-            customerDao.scan(productGroup, fromCustomerIdExclusive, appendRecord.andThen(trackCustomer));
+            customerDao.scanActive(productGroup, fromCustomerIdExclusive, appendRecord.andThen(trackCustomer));
 
             if(customerHolder.isEmpty()) {
                 return Optional.empty();
@@ -56,7 +56,7 @@ public class WelcomeLetterExportService {
                 dateFormat.format(toDateExclusive));
 
         try(WelcomeLetterCsvExporter.Appender appender = csvExporter.createAppender(productGroup, exportName)) {
-            customerDao.scan(
+            customerDao.scanActive(
                     productGroup,
                     fromDateInclusive,
                     toDateExclusive,

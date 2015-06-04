@@ -45,7 +45,7 @@ public interface CustomerDao {
 
     void deleteAllCustomerData(long customerId);
 
-    void scan(ProductGroup productGroup, long fromCustomerIdExclusive, Consumer<Customer> callback);
+    void scanActive(ProductGroup productGroup, long fromCustomerIdExclusive, Consumer<Customer> callback);
 
-    void scan(ProductGroup productGroup, Date fromMemberDateInclusive, Date toMemberDateExclusive, Consumer<Customer> callback);
+    void scanActive(ProductGroup productGroup, Date fromMemberDateInclusive, Date toMemberDateExclusive, Consumer<Customer> callback);
 }

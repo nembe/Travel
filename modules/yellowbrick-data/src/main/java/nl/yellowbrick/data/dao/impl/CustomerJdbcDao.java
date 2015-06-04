@@ -264,25 +264,36 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     }
 
     @Override
-    public void scan(ProductGroup productGroup, long fromCustomerIdExclusive, Consumer<Customer> callback) {
+    public void scanActive(ProductGroup productGroup, long fromCustomerIdExclusive, Consumer<Customer> callback) {
         String sql = buildQuery(BASE_CUSTOMER_QUERY,
                 "WHERE c.productgroup_id = ?",
+                "AND c.customerstatusidfk = ?",
                 "AND c.customerId > ?");
 
         template.query(
-                new StreamingStatementCreator(sql, productGroup.getId(), fromCustomerIdExclusive),
+                new StreamingStatementCreator(
+                        sql,
+                        productGroup.getId(),
+                        CustomerStatus.ACTIVE.code(),
+                        fromCustomerIdExclusive),
                 mapForConsumer(callback));
     }
 
     @Override
-    public void scan(ProductGroup productGroup, Date fromMemberDateInclusive, Date toMemberDateExclusive, Consumer<Customer> callback) {
+    public void scanActive(ProductGroup productGroup, Date fromMemberDateInclusive, Date toMemberDateExclusive, Consumer<Customer> callback) {
         String sql = buildQuery(BASE_CUSTOMER_QUERY,
                 "WHERE c.productgroup_id = ?",
+                "AND c.customerstatusidfk = ?",
                 "AND c.memberDate >= ?",
                 "AND c.memberDate < ?");
 
         template.query(
-                new StreamingStatementCreator(sql, productGroup.getId(), fromMemberDateInclusive, toMemberDateExclusive),
+                new StreamingStatementCreator(
+                        sql,
+                        productGroup.getId(),
+                        CustomerStatus.ACTIVE.code(),
+                        fromMemberDateInclusive,
+                        toMemberDateExclusive),
                 mapForConsumer(callback));
     }
 
