@@ -23,11 +23,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static nl.yellowbrick.admin.util.CommonRequestParams.PRODUCT_GROUP_KEY;
@@ -102,12 +100,10 @@ public class WelcomeLetterController {
 
         ProductGroup productGroup = from(requestParams).productGroupOrDefault(allProductGroups);
 
-        Optional<Path> filePath = exportService.exportForProductGroup(productGroup, form.getCustomer());
-
-        if(filePath.isPresent())
-            MessageHelper.flash(ra, "welcomeLetter.exported");
-        else
-            MessageHelper.flashWarning(ra, "welcomeLetter.exportError");
+        exportService.exportForProductGroup(productGroup, form.getCustomer()).apply(
+                exception -> MessageHelper.flashWarning(ra, "welcomeLetter.exportError", exception.getMessage()),
+                path -> MessageHelper.flash(ra, "welcomeLetter.exported")
+        );
 
         return "redirect:/provisioning/welcome_letters";
     }
@@ -127,12 +123,10 @@ public class WelcomeLetterController {
 
         ProductGroup productGroup = from(requestParams).productGroupOrDefault(allProductGroups);
 
-        Optional<Path> filePath = exportService.exportForProductGroup(productGroup, form.getStartDate(), form.getEndDate());
-
-        if(filePath.isPresent())
-            MessageHelper.flash(ra, "welcomeLetter.exported");
-        else
-            MessageHelper.flashWarning(ra, "welcomeLetter.exportError");
+        exportService.exportForProductGroup(productGroup, form.getStartDate(), form.getEndDate()).apply(
+                exception -> MessageHelper.flashWarning(ra, "welcomeLetter.exportError", exception.getMessage()),
+                path -> MessageHelper.flash(ra, "welcomeLetter.exported")
+        );
 
         return "redirect:/provisioning/welcome_letters";
     }

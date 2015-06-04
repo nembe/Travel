@@ -9,6 +9,7 @@ import nl.yellowbrick.data.domain.AddressType;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
 import nl.yellowbrick.data.domain.ProductGroup;
+import nl.yellowbrick.data.function.Either;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,6 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -29,7 +29,7 @@ public class WelcomeLetterExportService {
     @Autowired private WelcomeLetterCsvExporter csvExporter;
     @Autowired private WelcomeLetterSettingsDao settings;
 
-    public Optional<Path> exportForProductGroup(ProductGroup productGroup, long fromCustomerIdExclusive) {
+    public Either<Exception, Path> exportForProductGroup(ProductGroup productGroup, long fromCustomerIdExclusive) {
         String exportName = String.format("from-customer-%s", fromCustomerIdExclusive);
 
         try(WelcomeLetterCsvExporter.Appender appender = csvExporter.createAppender(productGroup, exportName)) {
@@ -41,15 +41,17 @@ public class WelcomeLetterExportService {
             customerDao.scanActive(productGroup, fromCustomerIdExclusive, appendRecord.andThen(trackCustomer));
 
             if(customerHolder.isEmpty()) {
-                return Optional.empty();
+                return Either.left(new IllegalStateException("no data to write"));
             } else {
                 settings.updateLatestExportedCustomer(customerHolder.get(0).getCustomerId());
-                return Optional.ofNullable(appender.getPath());
+                return Either.right(appender.getPath());
             }
+        } catch(Exception e) {
+            return Either.left(e);
         }
     }
 
-    public Optional<Path> exportForProductGroup(ProductGroup productGroup, Date fromDateInclusive, Date toDateExclusive) {
+    public Either<Exception, Path> exportForProductGroup(ProductGroup productGroup, Date fromDateInclusive, Date toDateExclusive) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         String exportName = String.format("between-dates-%s-%s",
                 dateFormat.format(fromDateInclusive),
@@ -62,7 +64,11 @@ public class WelcomeLetterExportService {
                     toDateExclusive,
                     customer -> appender.append(record(customer)));
 
-            return Optional.ofNullable(appender.isWriting() ? appender.getPath() : null);
+            return appender.isWriting()
+                    ? Either.right(appender.getPath())
+                    : Either.left(new IllegalStateException("no data to write"));
+        } catch(Exception e) {
+            return Either.left(e);
         }
     }
 

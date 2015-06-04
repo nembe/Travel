@@ -6,6 +6,7 @@ import nl.yellowbrick.admin.BaseMvcTestCase;
 import nl.yellowbrick.admin.service.WelcomeLetterExportService;
 import nl.yellowbrick.data.dao.ProductGroupDao;
 import nl.yellowbrick.data.domain.ProductGroup;
+import nl.yellowbrick.data.function.Either;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.junit.Before;
@@ -22,7 +23,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Stream;
 
@@ -101,7 +101,7 @@ public class WelcomeLetterControllerTest extends BaseMvcTestCase {
 
     @Test
     public void triggers_next_batch_export() throws Exception {
-        when(exportService.exportForProductGroup(productGroup, 123l)).thenReturn(Optional.of(testPath()));
+        when(exportService.exportForProductGroup(productGroup, 123l)).thenReturn(Either.right(testPath()));
 
         mockMvc.perform(post("/provisioning/welcome_letters")
                         .param("productGroup", productGroup.getId().toString())
@@ -132,7 +132,7 @@ public class WelcomeLetterControllerTest extends BaseMvcTestCase {
         Date to = df.parse("01-06-2015");
 
         when(exportService.exportForProductGroup(productGroup, from, to))
-                .thenReturn(Optional.of(testPath()));
+                .thenReturn(Either.right(testPath()));
 
         mockMvc.perform(post("/provisioning/welcome_letters")
                         .param("productGroup", productGroup.getId().toString())
