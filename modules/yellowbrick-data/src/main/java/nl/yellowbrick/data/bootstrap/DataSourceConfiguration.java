@@ -2,6 +2,7 @@ package nl.yellowbrick.data.bootstrap;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -13,18 +14,21 @@ import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-
 @Configuration
 @EnableConfigurationProperties(DataSourceProperties.class)
 public class DataSourceConfiguration {
 
-    private static final String DEFAULT_JNDI_NAME = "jdbc/pooledDS";
-
     @Autowired
     private DataSourceProperties properties;
 
-    @ConditionalOnProperty("datasource.url")
+    @ConditionalOnWebApplication
+    @ConditionalOnProperty("jndiDatasource")
+    @Bean
+    public DataSource jndiDataSource(@Value("${jndiDatasource}") String jndiName) {
+        return new JndiDataSourceLookup().getDataSource(jndiName);
+    }
+
+    @ConditionalOnMissingBean
     @Bean
     public DataSource dataSource() throws PropertyVetoException {
         ComboPooledDataSource ds = new ComboPooledDataSource();
@@ -34,16 +38,5 @@ public class DataSourceConfiguration {
         ds.setDriverClass(properties.driverClassName);
 
         return ds;
-    }
-
-    @ConditionalOnMissingBean
-    @ConditionalOnWebApplication
-    @Bean
-    public DataSource jndiDataSource() {
-        String name = isNullOrEmpty(properties.jdniName)
-                ? DEFAULT_JNDI_NAME
-                : properties.jdniName;
-
-        return new JndiDataSourceLookup().getDataSource(name);
     }
 }
