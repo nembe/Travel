@@ -14,18 +14,21 @@
         <a id="logo" th:href="@{/}"></a>
         <ul>
             <li class="dashboard">
+                <span class="dash-con icon"></span>
                 <a class="menu-fw" href="#">DASHBOARD</a>
                 <ul class="side-submenu" bw:activeforctx="/dashboard/">
                     <h2>dashboard</h2>
                     <li class="menu-back-button"><a href="#">back</a></li>
-                    <li><a href="#">one</a></li>
-                    <li><a href="#">two</a></li>
+                    <li><a href="#"><span class="icon"></span>one</a></li>
+                    <li><a href="#"><span class="icon"></span>two</a></li>
                 </ul>
             </li>
             <li class="customers" >
+                <span class="cust-con icon"></span>
                 <a class="menu-fw" th:href="@{/customers}">CUSTOMERS</a>
             </li>
             <li class="product-groups">
+                <span class="prod-con icon"></span>
                 <a class="menu-fw" href="#">PRODUCT GROUPS</a>
                 <ul class="side-submenu" bw:activeforctx="/productgroups/">
                     <h2>product groups</h2>
@@ -35,8 +38,10 @@
                         th:with="ctx='/productgroups/' + ${pg.description.toLowerCase()}">
                         <a class="menu-fw"
                            bw:activeforctx="${ctx}"
-                           th:href="@{${ctx}}"
-                           th:text="${pg.description}">PRODUCTGROUP DESCRIPTION</a>
+                           th:href="@{${ctx}}">
+                            <span th:class='${pg.description.toLowerCase()}' th:classappend='icon'></span>
+                            <span th:text="${pg.description}">PRODUCTGROUP DESCRIPTION</span>
+                        </a>
 
                        <ul class="side-submenu" bw:activeforctx="${ctx}">
                             <h2>product groups</h2>
@@ -48,37 +53,39 @@
                                    th:text="${subgroup.text}">SUBGROUP</a>
                             </li>
                        </ul>
-
                     </li>
                 </ul>
             </li>
             <li class="municipalities" >
+                <span class="icon muni-con"></span>
                 <a class="menu-fw" href="#">MUNICIPALITIES</a>
                 <ul class="side-submenu" bw:activeforctx="/municipalities/">
                     <h2>municipalities</h2>
                     <li class="menu-back-button"><a href="#">back</a></li>
-                    <li><a href="#">one</a></li>
-                    <li><a href="#">two</a></li>
+                    <li><a href="#"><span class="icon"></span>one</a></li>
+                    <li><a href="#"><span class="icon"></span>two</a></li>
                 </ul>
             </li>
             <li class="action-codes">
+                <span class="icon mark-con"></span>
                 <a class="menu-fw" href="#">ACTION CODES</a>
                 <ul class="side-submenu" bw:activeforctx="/action-codes/">
                     <h2>action codes</h2>
                     <li class="menu-back-button"><a href="#">back</a></li>
-                    <li><a href="#">one</a></li>
-                    <li><a href="#">two</a></li>
+                    <li><a href="#"><span class="icon"></span>one</a></li>
+                    <li><a href="#"><span class="icon"></span>two</a></li>
                 </ul>
             </li>
             <li class="provisioning">
+                <span class="icon prov-con"></span>
                 <a class="menu-fw" th:href="@{/provisioning/accounts}">PROVISIONING</a>
                 <ul class="side-submenu" bw:activeforctx="/provisioning/">
                     <h2>provisioning</h2>
                     <p th:text="${provisioningTitle}">FRAGMENT'S TITLE</p>
                     <li class="menu-back-button"><a href="#">back</a></li>
-                    <li><a bw:activeforctx="/provisioning/accounts" th:href="@{/provisioning/accounts}" >ACCOUNT VALIDATION</a></li>
-                    <li><a bw:activeforctx="/provisioning/cards" th:href="@{/provisioning/cards}" >ORDER VALIDATION</a></li>
-                    <li><a bw:activeforctx="/provisioning/exports" th:href="@{/provisioning/exports}" >ORDER EXPORT</a></li>
+                    <li><a bw:activeforctx="/provisioning/accounts" th:href="@{/provisioning/accounts}" ><span class="icon accountval-con"></span>ACCOUNT VALIDATION</a></li>
+                    <li><a bw:activeforctx="/provisioning/cards" th:href="@{/provisioning/cards}" ><span class="icon cardpro-con"></span>ORDER VALIDATION</a></li>
+                    <li><a bw:activeforctx="/provisioning/exports" th:href="@{/provisioning/exports}" ><span class="icon orderex-con"></span>ORDER EXPORT</a></li>
                     <li><a bw:activeforctx="/provisioning/welcome_letters" th:href="@{/provisioning/welcome_letters}" >WELCOME LETTERS</a></li>
                 </ul>
             </li>
@@ -86,6 +93,7 @@
 
         <ul class="baseline">
             <li class="settings" >
+                <span class="icon set-con"></span>
                 <a class="menu-fw" href="#">SETTINGS</a>
                 <ul class="side-submenu-settings">
                     <li>

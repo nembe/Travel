@@ -8,7 +8,6 @@
 @import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600|Open+Sans:400,600,700);
 
 $side-menu-width: 255px;
-
 html, body {
   height: 100%;
   width: 100%;
@@ -421,6 +420,13 @@ table td {
 }
 //Colors for elements
 #side-menu{
+  li:hover > a{
+    color:white;
+  }
+  li:hover > span, li:hover > a > span, a.active > span {
+    -webkit-filter: brightness(2);
+    filter: brightness(3);
+  }
   .provisioning{
     p{
       color: $provisioning-color;
@@ -440,3 +446,62 @@ table td {
     }
   }
 }
+//icons (combine with other color comment)
+#side-menu{
+  ul{
+    li{
+      .icon{
+        position: relative;
+        padding: 25px;
+        top: 15px;
+        left: 14px;
+        margin-right: 5px;
+        fill: yellow;
+      }
+      .side-submenu{
+        a{
+          padding-left:0px;
+        }
+        .icon{
+          left: 2px!important;
+        }
+      }
+      //First level of icons (main menu)
+      .dash-con{
+        background: url('../images/icons/dashboard.svg') no-repeat;
+      }
+      .cust-con{
+        background: url('../images/icons/customers.svg') no-repeat;
+      }
+      .prod-con{
+        background: url('../images/icons/groups.svg') no-repeat;
+      }
+      .muni-con{
+        background: url('../images/icons/municipalities.svg') no-repeat;
+      }
+      .mark-con{
+        background: url('../images/icons/marketing.svg') no-repeat;
+      }
+      .prov-con{
+        background: url('../images/icons/registrations.svg') no-repeat;
+      }
+      .set-con{
+        background: url('../images/icons/settings.svg') no-repeat;
+      }
+      .cardpro-con{
+        background: url('../images/icons/settings.svg') no-repeat;
+      }
+      .cardpro-con{
+        background: url('../images/icons/card-provisioning.svg') no-repeat;
+      }
+      .accountval-con{
+        background: url('../images/icons/accval.svg') no-repeat;
+      }
+      .orderex-con{
+        background: url('../images/icons/accexp.svg') no-repeat;
+      }
+    }
+  }
+}
+
+
