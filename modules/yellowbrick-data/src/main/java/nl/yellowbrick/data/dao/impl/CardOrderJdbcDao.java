@@ -11,10 +11,9 @@ import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.Date;
 import java.sql.Types;
-import java.util.Arrays;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -84,9 +83,10 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     }
 
     @Override
-    public void processTransponderCard(String cardNumber, Customer customer, boolean updateMobileWithCard) {
+    public void processTransponderCard(String cardNumber, Customer customer, CardOrder order, boolean updateMobileWithCard) {
         processTransponderCardsCall.execute(
                 customer.getCustomerId(),
+                order.getId(),
                 cardNumber,
                 mutator.get(),
                 updateMobileWithCard ? 1 : 0);
@@ -150,11 +150,6 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     }
 
     @Override
-    public void updateCardNumber(long cardOrderId, String cardNumber) {
-        template.update("UPDATE CARDORDER SET CARD_NUMBER = ? WHERE ORDERID = ?", cardNumber, cardOrderId);
-    }
-
-    @Override
     public void updateOrderStatus(long cardOrderId, CardOrderStatus status) {
         template.update("UPDATE CARDORDER SET ORDERSTATUS = ? WHERE ORDERID = ?", status.code(), cardOrderId);
     }
@@ -166,38 +161,47 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
         return res.get("qcardNR").toString();
     }
 
+    @Override
+    public int transponderCardsAvailableForProductGroup(long productGroupId) {
+        String sql = "SELECT COUNT(*) FROM TRANSPONDERCARDPOOL WHERE PRODUCTGROUP_ID = ? AND CARDSTATUS_ID = ?";
+
+        return template.queryForObject(sql, Integer.class, productGroupId, CardStatus.INSTOCK.code());
+    }
+
+    @Override
+    public int transponderCardsIssuedForProductGroup(long productGroupId, LocalDate since) {
+        String sql = "SELECT COUNT(*) " +
+                "FROM TRANSPONDERCARDPOOL p " +
+                "INNER JOIN TRANSPONDERCARD t ON t.CARDNR = p.CARDNR and p.PRODUCTGROUP_ID = ? " +
+                "INNER JOIN CARDORDER c ON c.ORDERID = t.ORDERIDFK AND c.ORDERDATE > ? " +
+                "WHERE p.CARDSTATUS_ID = ?";
+
+        return template.queryForObject(sql, Integer.class,
+                productGroupId,
+                Date.valueOf(since),
+                CardStatus.ACTIVE.code());
+    }
+
     private RowMapper<CardOrder> cardOrderRowMapper() {
-        return new RowMapper<CardOrder>() {
-            @Override
-            public CardOrder mapRow(ResultSet rs, int rowNum) throws SQLException {
-                CardOrder co = new CardOrder();
+        return (rs, rowNum) -> {
+            CardOrder co = new CardOrder();
 
-                co.setId(rs.getLong("ORDERID"));
-                co.setDate(rs.getTimestamp("ORDERDATE"));
-                co.setStatus(CardOrderStatus.byCode(rs.getInt("ORDERSTATUS")));
-                co.setCustomerId(rs.getLong("CUSTOMERID"));
-                co.setCardType(CardType.fromDescription(rs.getString("CARDTYPE")));
-                co.setBriefCode(rs.getString("BRIEFCODE"));
-                co.setAmount(rs.getInt("AMOUNT"));
-                co.setPricePerCard(rs.getDouble("PRICEPERCARD"));
-                co.setSurcharge(rs.getDouble("SURCHARGE"));
-                co.setExport("Y".equals(rs.getString("EXPORT")));
-                co.setCardNumber(rs.getString("CARD_NUMBER"));
+            co.setId(rs.getLong("ORDERID"));
+            co.setDate(rs.getTimestamp("ORDERDATE"));
+            co.setStatus(CardOrderStatus.byCode(rs.getInt("ORDERSTATUS")));
+            co.setCustomerId(rs.getLong("CUSTOMERID"));
+            co.setCardType(CardType.fromDescription(rs.getString("CARDTYPE")));
+            co.setBriefCode(rs.getString("BRIEFCODE"));
+            co.setAmount(rs.getInt("AMOUNT"));
+            co.setPricePerCard(rs.getDouble("PRICEPERCARD"));
+            co.setExport("Y".equals(rs.getString("EXPORT")));
 
-                return co;
-            }
+            return co;
         };
     }
 
     private void acceptCardOrder(double orderId, double pricePerCard, int amount) {
         cardOrderUpdateCall.execute(orderId, CardOrderStatus.ACCEPTED.code(), pricePerCard, amount);
-    }
-
-    @Override
-    public void validateCardOrders(Customer customer, CardType... cardTypes) {
-        Arrays.asList(cardTypes).forEach((cardType) -> {
-            findForCustomer(customer, CardOrderStatus.INSERTED, cardType).forEach(this::validateCardOrder);
-        });
     }
 
     private void compileJdbcCalls() {
@@ -230,6 +234,7 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
                 .withProcedureName(PROCESS_TRANSPONDERCARDS_PROC)
                 .declareParameters(
                         new SqlParameter("p_customerID", Types.NUMERIC),
+                        new SqlParameter("p_orderID", Types.NUMERIC),
                         new SqlParameter("p_cardnr", Types.VARCHAR),
                         new SqlParameter("p_mutator", Types.VARCHAR),
                         new SqlParameter("p_updateMobileWithCard", Types.NUMERIC)

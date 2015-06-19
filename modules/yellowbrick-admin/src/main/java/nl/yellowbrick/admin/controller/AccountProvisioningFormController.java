@@ -1,11 +1,10 @@
 package nl.yellowbrick.admin.controller;
 
 import nl.yellowbrick.activation.service.AccountActivationService;
-import nl.yellowbrick.activation.validation.AccountRegistrationValidator;
+import nl.yellowbrick.activation.service.AccountValidationService;
 import nl.yellowbrick.admin.exceptions.InconsistentDataException;
 import nl.yellowbrick.admin.exceptions.ResourceNotFoundException;
 import nl.yellowbrick.admin.form.BusinessAccountProvisioningForm;
-import nl.yellowbrick.admin.form.FormData;
 import nl.yellowbrick.admin.form.PersonalAccountProvisioningForm;
 import nl.yellowbrick.admin.service.RateTranslationService;
 import nl.yellowbrick.admin.util.MessageHelper;
@@ -22,8 +21,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ValidationUtils;
-import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -48,13 +45,11 @@ public class AccountProvisioningFormController {
     @Autowired private CustomerAddressDao addressDao;
     @Autowired private PriceModelDao priceModelDao;
     @Autowired private MarketingActionDao marketingActionDao;
-    @Autowired private DirectDebitDetailsDao directDebitDetailsDao;
+    @Autowired private BillingDetailsDao billingDetailsDao;
     @Autowired private SubscriptionDao subscriptionDao;
     @Autowired private AccountActivationService accountActivationService;
     @Autowired private RateTranslationService rateTranslationService;
-
-    // validators
-    @Autowired private List<AccountRegistrationValidator> accountRegistrationValidators;
+    @Autowired private AccountValidationService accountValidationService;
 
     // formatters
     @Autowired private ConversionService conversionService;
@@ -71,9 +66,9 @@ public class AccountProvisioningFormController {
         Customer customer = customerById(id);
         CustomerAddress address = addressForCustomer(id);
 
-        FormData form;
+        PersonalAccountProvisioningForm form;
         if(model.containsAttribute("form")) {
-            form = (FormData) model.get("form");
+            form = (PersonalAccountProvisioningForm) model.get("form");
         } else if(customer.isBusinessCustomer()) {
             Optional<CustomerAddress> billingAddress = billingAddressForCustomer(id);
             List<BusinessIdentifier> businessIdentifiers = customerDao.getBusinessIdentifiers(id);
@@ -82,6 +77,9 @@ public class AccountProvisioningFormController {
             form = new PersonalAccountProvisioningForm(customer, address);
         }
 
+        addPaymentData(form, customer);
+
+        // form validation & binding errors
         BeanPropertyBindingResult errors = new BeanPropertyBindingResult(form, "form");
         errors.initConversion(conversionService);
 
@@ -90,17 +88,14 @@ public class AccountProvisioningFormController {
             errors.addAllErrors(previousErrors);
         }
 
-        for(Validator validator: accountRegistrationValidators) {
-            ValidationUtils.invokeValidator(validator, customer, errors);
-        }
+        // add account validation errors
+        accountValidationService.validate(customer, errors);
 
         model.addAttribute("form", form);
         model.addAttribute(FORM_ERRORS, errors);
         model.addAttribute("customer", customer);
         model.addAttribute("specialRateDescription", rateTranslationService.describeRateForCustomer(customer, locale));
         model.addAttribute("priceModel", priceModelForCustomer(id, customer.getActionCode()));
-
-        addPaymentData(model, customer);
 
         subscriptionDao.findForCustomer(id).ifPresent((subscription) -> {
             model.addAttribute("activeSubscription", subscription.isSubscriptionActive());
@@ -111,17 +106,17 @@ public class AccountProvisioningFormController {
         return "provisioning/accounts/validate_personal";
     }
 
-    private void addPaymentData(ModelMap model, Customer customer) {
-        PaymentMethod payMethod = customer.getPaymentMethodType();
+    private void addPaymentData(PersonalAccountProvisioningForm form, Customer customer) {
+        PaymentMethod payMethod = customer.getPaymentMethod();
 
         if(payMethod.equals(PaymentMethod.DIRECT_DEBIT)) {
-            directDebitDetailsDao.findForCustomer(customer.getCustomerId()).ifPresent((details) -> {
-                model.addAttribute("iban", details.getSepaNumber());
+            billingDetailsDao.findDirectDebitDetailsForCustomer(customer.getCustomerId()).ifPresent((details) -> {
+                form.setIban(details.getSepaNumber());
             });
         }
 
         if(Arrays.asList(PaymentMethod.MASTERCARD, PaymentMethod.VISA).contains(payMethod)) {
-            model.addAttribute("ccname", payMethod.name());
+            form.setCcname(payMethod.name());
         }
     }
 
@@ -197,6 +192,17 @@ public class AccountProvisioningFormController {
 
         // and activate customer
         return activateAccountAndRedirect(customer, priceModel, ra);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, params = {"deleteAccount"})
+    public String deleteAccount(@PathVariable("id") int id, RedirectAttributes ra) {
+        // will ensure customer is pending activation
+        assert customerById(id) != null;
+
+        customerDao.deleteAllCustomerData(id);
+        MessageHelper.flash(ra, "account.deleted");
+
+        return "redirect:/provisioning/accounts";
     }
 
     private String activateAccountAndRedirect(Customer customer, PriceModel priceModel, RedirectAttributes ra) {

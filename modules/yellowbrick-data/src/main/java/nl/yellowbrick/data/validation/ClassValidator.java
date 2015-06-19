@@ -1,10 +1,13 @@
 package nl.yellowbrick.data.validation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 public abstract class ClassValidator<T> implements Validator {
 
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
     private final Class<T> supportedClass;
 
     protected ClassValidator(Class<T> supportedClass) {
@@ -13,7 +16,7 @@ public abstract class ClassValidator<T> implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return clazz.equals(supportedClass);
+        return clazz.isAssignableFrom(supportedClass);
     }
 
     @Override

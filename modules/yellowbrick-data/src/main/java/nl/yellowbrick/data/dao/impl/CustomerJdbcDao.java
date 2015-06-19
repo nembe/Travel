@@ -6,15 +6,13 @@ import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.BusinessIdentifier;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerStatus;
+import nl.yellowbrick.data.domain.ProductGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
@@ -25,18 +23,33 @@ import java.sql.Types;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Consumer;
 
 @Component
 public class CustomerJdbcDao implements CustomerDao, InitializingBean {
 
-    private static final Logger log = LoggerFactory.getLogger(CustomerJdbcDao.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CustomerJdbcDao.class);
+
     private static final String PACKAGE = "WEBAPP";
     private static final String SAVE_PRIVATE_DATA = "CustomerSavePrivateData";
     private static final String SAVE_BUSINESS_DATA = "CustomerSaveBusinessData";
+
+    private static final String BASE_CUSTOMER_QUERY = buildQuery(
+            "SELECT c.*,",
+            "c.productgroup_id AS product_group_id,",
+            "c.billingagentidfk AS billing_agent_id,",
+            "c.invoice_annotations AS extra_invoice_annotations,",
+            "c.phonenr_tcard AS first_card_mobile,",
+            "c.license_plate_tcard AS first_card_license_plate,",
+            "ba.agentnaam AS agentname,",
+            "cs.label AS status,",
+            "pg.description product_group,",
+            "0 as parkadammertotal",
+            "FROM CUSTOMER c",
+            "INNER JOIN PRODUCT_GROUP pg ON pg.id = c.productgroup_id",
+            "INNER JOIN TBLBILLINGAGENT ba ON c.billingagentidfk = ba.billingagentid",
+            "INNER JOIN CUSTOMERSTATUS cs ON c.customerstatusidfk = cs.customerstatusid");
 
     @Autowired
     private JdbcTemplate template;
@@ -54,44 +67,22 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
 
     @Override
     public Optional<Customer> findById(long id) {
-        String sql = buildQuery(
-                "SELECT c.*,",
-                "c.productgroup_id AS product_group_id,",
-                "c.billingagentidfk AS billing_agent_id,",
-                "c.invoice_annotations AS extra_invoice_annotations,",
-                "c.phonenr_tcard AS first_card_mobile,",
-                "c.license_plate_tcard AS first_card_license_plate,",
-                "ba.agentnaam AS agentname,",
-                "cs.label AS status,",
-                "pg.description product_group,",
-                "0 as parkadammertotal",
-                "FROM CUSTOMER c",
-                "INNER JOIN PRODUCT_GROUP pg ON pg.id = c.productgroup_id",
-                "INNER JOIN TBLBILLINGAGENT ba ON c.billingagentidfk = ba.billingagentid",
-                "INNER JOIN CUSTOMERSTATUS cs ON c.customerstatusidfk = cs.customerstatusid",
-                "WHERE c.customerid = ?"
-        );
+        String sql = buildQuery(BASE_CUSTOMER_QUERY, "WHERE c.customerid = ?");
 
         return template.query(sql, customerRowMapper(), id).stream().findFirst();
     }
 
     @Override
+    public Optional<Customer> findByCustomerNr(String customerNr) {
+        String sql = buildQuery(BASE_CUSTOMER_QUERY,  "WHERE c.customernr = ?");
+
+        return template.query(sql, customerRowMapper(), customerNr).stream().findFirst();
+    }
+
+    @Override
     public List<Customer> findAllPendingActivation() {
         String sql = buildQuery(
-                "SELECT c.*,",
-                "c.productgroup_id AS product_group_id,",
-                "c.billingagentidfk AS billing_agent_id,",
-                "c.invoice_annotations AS extra_invoice_annotations,",
-                "c.phonenr_tcard AS first_card_mobile,",
-                "c.license_plate_tcard AS first_card_license_plate,",
-                "ba.agentnaam AS agentname,",
-                "cs.label AS status,",
-                "pg.description product_group,",
-                "0 as parkadammertotal",
-                "FROM CUSTOMER c",
-                "INNER JOIN PRODUCT_GROUP pg ON pg.id = c.productgroup_id",
-                "INNER JOIN TBLBILLINGAGENT ba ON c.billingagentidfk = ba.billingagentid",
-                "INNER JOIN CUSTOMERSTATUS cs ON c.customerstatusidfk = cs.customerstatusid",
+                BASE_CUSTOMER_QUERY,
                 "AND c.customerstatusidfk < 2 ",
                 "ORDER BY applicationdate"
         );
@@ -112,14 +103,11 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                         .toInstant()
         );
 
-        BeanPropertyRowMapper<Customer> rowMapper = new BeanPropertyRowMapper<>(Customer.class);
-        rowMapper.setPrimitivesDefaultedForNullValue(true);
-
         String query = buildQuery(
-                "SELECT * FROM CUSTOMER",
-                "WHERE TRUNC(dateofbirth) = ?",
-                "AND TRIM(LOWER(firstname)) = ?",
-                "AND TRIM(LOWER(lastname)) = ?"
+                BASE_CUSTOMER_QUERY,
+                "WHERE TRUNC(c.dateofbirth) = ?",
+                "AND TRIM(LOWER(c.firstname)) = ?",
+                "AND TRIM(LOWER(c.lastname)) = ?"
         );
 
         return template.query(query, customerRowMapper(),
@@ -129,8 +117,34 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
     }
 
     @Override
+    public List<Customer> findAllByFuzzyName(String firstName, String lastName) {
+        String query = buildQuery(
+                BASE_CUSTOMER_QUERY,
+                "WHERE TRIM(LOWER(c.firstname)) = ?",
+                "AND TRIM(LOWER(c.lastname)) = ?"
+        );
+
+        return template.query(query, customerRowMapper(),
+                firstName.toLowerCase().trim(),
+                lastName.toLowerCase().trim());
+    }
+
+    @Override
     public List<Customer> findAllByEmail(String email) {
-        return template.query("SELECT * FROM CUSTOMER WHERE email = ?", customerRowMapper(), email);
+        String sql = buildQuery(BASE_CUSTOMER_QUERY, "WHERE c.email = ? AND ROWNUM < 100");
+
+        return template.query(sql, customerRowMapper(), email);
+    }
+
+    @Override
+    public List<Customer> findAllByMobile(String mobile) {
+        String sql = buildQuery(
+                BASE_CUSTOMER_QUERY,
+                "INNER JOIN MOBILE m ON m.customeridfk = c.customerid",
+                "AND m.mobilenr = ?"
+        );
+
+        return template.query(sql, customerRowMapper(), mobile);
     }
 
     @Override
@@ -157,7 +171,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
                     template.queryForObject(sql, String.class, customer.getCustomerId())
             );
         } catch(DataAccessException e) {
-            log.warn("Failed to retrieve locale for customer ID: " + customer.getCustomerId(), e);
+            LOG.warn("Failed to retrieve locale for customer ID: " + customer.getCustomerId(), e);
             return Optional.empty();
         }
     }
@@ -222,6 +236,76 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
         template.update(sql, bi.getValue(), mutator.get(), bi.getId());
     }
 
+    @Override
+    public List<Customer> findAllByBusinessIdentifier(String label, String value) {
+        String sql = buildQuery(BASE_CUSTOMER_QUERY,
+                "INNER JOIN CUSTOMER_IDENTIFICATION cid ON cid.customeridfk = c.customerid AND cid.value = ?",
+                "INNER JOIN IDENTIFICATION_FIELD idf ON idf.id = cid.fieldidfk AND idf.label = ?");
+
+        return template.query(sql, customerRowMapper(), value, label);
+    }
+
+    @Override
+    public List<String> getMobileNumbers(long customerId) {
+        return template.queryForList("SELECT MOBILENR FROM MOBILE WHERE CUSTOMERIDFK = ?", String.class, customerId);
+    }
+
+    // TODO maybe move this to a dedicated DAO since it touches on so much stuff?
+    @Override
+    public void deleteAllCustomerData(long customerId) {
+        Arrays.asList(
+                "DELETE FROM CUSTOMER_IDENTIFICATION WHERE CUSTOMERIDFK = ?",
+                "DELETE FROM CUSTOMER_REGISTRATION WHERE CUSTOMERIDFK = ?",
+                "DELETE FROM SIGNUP_CUSTOMER_CHARITY WHERE CUSTOMERID = ?",
+                "DELETE FROM SUBSCRIPTION WHERE CUSTOMER_ID= ?",
+                "DELETE FROM CUSTOMERADDRESS WHERE CUSTOMERIDFK = ?",
+                "DELETE FROM CUSTOMER WHERE CUSTOMERID = ?"
+        ).forEach(sql -> template.update(sql, customerId));
+    }
+
+    @Override
+    public void scanActive(ProductGroup productGroup, long fromCustomerIdExclusive, Consumer<Customer> callback) {
+        String sql = buildQuery(BASE_CUSTOMER_QUERY,
+                "WHERE c.productgroup_id = ?",
+                "AND c.customerstatusidfk = ?",
+                "AND c.customerId > ?");
+
+        template.query(
+                new StreamingStatementCreator(
+                        sql,
+                        productGroup.getId(),
+                        CustomerStatus.ACTIVE.code(),
+                        fromCustomerIdExclusive),
+                mapForConsumer(callback));
+    }
+
+    @Override
+    public void scanActive(ProductGroup productGroup, Date fromMemberDateInclusive, Date toMemberDateExclusive, Consumer<Customer> callback) {
+        String sql = buildQuery(BASE_CUSTOMER_QUERY,
+                "WHERE c.productgroup_id = ?",
+                "AND c.customerstatusidfk = ?",
+                "AND c.memberDate >= ?",
+                "AND c.memberDate < ?");
+
+        template.query(
+                new StreamingStatementCreator(
+                        sql,
+                        productGroup.getId(),
+                        CustomerStatus.ACTIVE.code(),
+                        fromMemberDateInclusive,
+                        toMemberDateExclusive),
+                mapForConsumer(callback));
+    }
+
+    private RowCallbackHandler mapForConsumer(Consumer<Customer> callback) {
+        RowMapper<Customer> rowMapper = customerRowMapper();
+
+        return rs -> {
+            final Customer customer = rowMapper.mapRow(rs, rs.getRow());
+            callback.accept(customer);
+        };
+    }
+
     private void compileJdbcCalls() {
         saveCustomerCall = new SimpleJdbcCall(template)
                 .withCatalogName(PACKAGE)
@@ -268,7 +352,7 @@ public class CustomerJdbcDao implements CustomerDao, InitializingBean {
         saveBusinessCustomerCall.compile();
     }
 
-    private String buildQuery(String... parts) {
+    private static String buildQuery(String... parts) {
         return Joiner.on(' ').join(parts);
     }
 

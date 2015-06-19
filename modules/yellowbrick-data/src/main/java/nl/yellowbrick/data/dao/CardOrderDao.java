@@ -2,6 +2,7 @@ package nl.yellowbrick.data.dao;
 
 import nl.yellowbrick.data.domain.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,13 +12,11 @@ public interface CardOrderDao {
 
     void validateCardOrder(CardOrder cardOrder);
 
-    void validateCardOrders(Customer customer, CardType... cardTypes);
-
     List<String> nextTransponderCardNumbers(int productGroupId, int numberOfCards, Optional<String> lastUsedCardNumber);
 
     List<CardOrder> findForCustomer(Customer customer, CardOrderStatus orderStatus, CardType cardType);
 
-    void processTransponderCard(String cardNumber, Customer customer, boolean updateMobileWithCard);
+    void processTransponderCard(String cardNumber, Customer customer, CardOrder order, boolean updateMobileWithCard);
 
     List<CardOrder> findByStatusAndType(CardOrderStatus status, CardType cardType);
 
@@ -29,9 +28,11 @@ public interface CardOrderDao {
 
     void delete(long id);
 
-    void updateCardNumber(long cardOrderId, String cardNumber);
-
     void updateOrderStatus(long cardOrderId, CardOrderStatus status);
 
     String nextQCardNumber(long customerId);
+
+    int transponderCardsAvailableForProductGroup(long productGroupId);
+
+    int transponderCardsIssuedForProductGroup(long productGroupId, LocalDate since);
 }

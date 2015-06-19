@@ -6,7 +6,7 @@ import java.util.List;
 
 public enum PaymentMethod {
 
-    VISA(601), MASTERCARD(603), DIRECT_DEBIT(602, 703), UNKNOWN;
+    VISA(601), MASTERCARD(603), DIRECT_DEBIT(602, 703), INVOICED(909), UNKNOWN;
 
     private final List<Integer> codes = new ArrayList<>();
 

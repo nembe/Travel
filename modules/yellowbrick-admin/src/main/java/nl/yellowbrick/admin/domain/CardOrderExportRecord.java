@@ -23,6 +23,7 @@ public class CardOrderExportRecord {
     private final CustomerAddress address;
     private final String locale;
     private final String country;
+    private final String transponderCardNumber;
     private final String qparkCode;
 
     private CardOrderExportRecord(Builder builder) {
@@ -32,12 +33,13 @@ public class CardOrderExportRecord {
         this.address = builder.address;
         this.locale = builder.locale;
         this.country = builder.country;
+        this.transponderCardNumber = builder.transponderCardNumber;
         this.qparkCode = builder.qparkCode;
     }
 
     @JsonIgnore
     public CardOrderExportTarget target() {
-        if(order.getCardType().equals(CardType.SLEEVE) || order.getCardType().equals(CardType.UNKNOWN_CARD))
+        if(CardType.SLEEVE.equals(order.getCardType()) || CardType.UNKNOWN_CARD.equals(order.getCardType()))
             return CardOrderExportTarget.OTHER;
 
         // external provisioning: orders go to a combined file
@@ -61,7 +63,9 @@ public class CardOrderExportRecord {
 
     @JsonProperty("CARDTYPE")
     public String getCardType() {
-        if(order.getCardType().equals(CardType.RTP_CARD))
+        if(order == null)
+            return "";
+        else if(order.getCardType().equals(CardType.RTP_CARD))
             return productGroup.getId().toString();
         else if(order.getCardType().equals(CardType.TRANSPONDER_CARD))
             return productGroup.getId().toString() + ".6";
@@ -71,7 +75,7 @@ public class CardOrderExportRecord {
 
     @JsonProperty("CARDNR")
     public String getCardNr() {
-        return order.getCardNumber();
+        return this.transponderCardNumber;
     }
 
     @JsonProperty("QPARKCARDNR")
@@ -171,6 +175,9 @@ public class CardOrderExportRecord {
 
     @JsonProperty("BRIEFCODE")
     public String briefCode() {
+        if(order == null)
+            return "";
+
         String langSuffix = isNullOrEmpty(locale) ? "" : "/".concat(locale);
 
         return order.getBriefCode() + langSuffix;
@@ -199,10 +206,15 @@ public class CardOrderExportRecord {
         private CustomerAddress address;
         private String locale;
         private String country;
+        private String transponderCardNumber;
         private String qparkCode;
 
         public Builder(CardOrder order) {
             this.order = order;
+        }
+
+        public Builder(Customer customer) {
+            customer(customer);
         }
 
         public Builder productGroup(ProductGroup pg) {
@@ -230,8 +242,13 @@ public class CardOrderExportRecord {
             return this;
         }
 
-        public Builder qparkCode(String code) {
-            this.qparkCode = code;
+        public Builder transponderCardNumber(String transponderCardNumber) {
+            this.transponderCardNumber = transponderCardNumber;
+            return this;
+        }
+
+        public Builder qparkCode(String qparkCode) {
+            this.qparkCode = qparkCode;
             return this;
         }
 

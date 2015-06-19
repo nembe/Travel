@@ -78,8 +78,10 @@ EOF
 function move_done_file_sftp {
   echo "moving $1 to dropoff directory"
 
+  timestamp=$(date "+%Y%m%d-%H%M%S-%3N")
+
   do_in_sftp <<EOF
-    mv $PICKUP_DIR/$1 $DROPOFF_DIR/$1
+    mv $PICKUP_DIR/$1 $DROPOFF_DIR/$1.$timestamp
 EOF
 }
 
@@ -118,6 +120,7 @@ do
     else
         echo "skipping outdated file: $basename"
         notify_outdated_file $basename
+        move_done_file_sftp $basename
     fi
   else
     echo "parse error or incomplete file: $file"

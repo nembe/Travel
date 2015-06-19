@@ -6,12 +6,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class DataSourceProperties {
 
     protected String driverClassName;
-
     protected String url;
-
     protected String username;
-
     protected String password;
+    protected String jdniName;
 
     public String getDriverClassName() {
         return driverClassName;
@@ -43,5 +41,13 @@ public class DataSourceProperties {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getJdniName() {
+        return jdniName;
+    }
+
+    public void setJdniName(String jdniName) {
+        this.jdniName = jdniName;
     }
 }

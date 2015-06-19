@@ -8,10 +8,21 @@ tasks:
   customer-activation-delay: 5000
   vehicle-profile-validation-delay: 300000
   transpondercard-validation-cron: 0 0 6 1/1 * ? # daily at 6 am (system time)
+  card-pool-assessment-cron: 0 30 6 1/1 * ? # daily at 6:30 am (system time)
 
 mail:
   host: 127.0.0.1
 
+ordervalidation:
+  thresholds:
+    priceEurocent: 5000
+    amount: 20
+
+customervalidation:
+  thresholds:
+    initialOrderAmount: 20
+
+adminEmail: development@brickparking.com
 mutator: BATCH v. ${project.version}
 
 ---
@@ -30,3 +41,10 @@ datasource:
         (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = telepay)(FAILOVER_MODE=(TYPE=select)(METHOD=basic))))
   username: test_nl_brickparking
   password: test_nl_brickparking
+
+---
+
+spring:
+  profiles: production
+
+adminEmail: beheer@brickparking.com

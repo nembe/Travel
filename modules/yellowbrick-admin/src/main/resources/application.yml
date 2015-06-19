@@ -26,6 +26,19 @@ orderexport:
     2: 0 0 6 1/1 * ?
     3: 0 0 6 1/1 * ?
 
+welcomeLetterExport:
+  path: /tmp
+
+ordervalidation:
+  thresholds:
+    priceEurocent: 5000
+    amount: 20
+
+customervalidation:
+  thresholds:
+    initialOrderAmount: 20
+
+adminEmail: development@brickparking.com
 mutator: ADMIN
 
 ---
@@ -55,3 +68,20 @@ datasource:
         (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = telepay)(FAILOVER_MODE=(TYPE=select)(METHOD=basic))))
   username: test_nl_brickparking
   password: test_nl_brickparking
+
+orderexport:
+  path: exports
+  schedule:
+    1: 0 0 6 1/1 * ?
+    2: 0 0 6 1/1 * ?
+    3: 0 0 6 1/1 * ?
+
+welcomeLetterExport:
+  path: exportswl
+
+---
+
+spring:
+  profiles: production
+
+adminEmail: beheer@brickparking.com

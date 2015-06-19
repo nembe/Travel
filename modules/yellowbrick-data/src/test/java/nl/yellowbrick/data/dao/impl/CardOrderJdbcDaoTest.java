@@ -17,9 +17,7 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static nl.yellowbrick.data.database.Functions.CALL_RECORDERS;
-import static nl.yellowbrick.data.database.Functions.FunctionCall;
-import static nl.yellowbrick.data.database.Functions.TEST_QCARD_NUMBER;
+import static nl.yellowbrick.data.database.Functions.*;
 import static nl.yellowbrick.data.domain.CardOrderStatus.*;
 import static nl.yellowbrick.data.domain.CardType.*;
 import static org.exparity.hamcrest.date.DateMatchers.after;
@@ -166,7 +164,6 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         orderA.setBriefCode("2");
         orderA.setAmount(2);
         orderA.setPricePerCard(600);
-        orderA.setSurcharge(300);
         orderA.setExport(false);
         
         CardOrder orderB = new CardOrder();
@@ -178,9 +175,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         orderB.setBriefCode("1");
         orderB.setAmount(2);
         orderB.setPricePerCard(500);
-        orderB.setSurcharge(200);
         orderB.setExport(true);
-        orderB.setCardNumber("123456");
 
         List<CardOrder> cardOrders = cardOrderDao.findForCustomer(customer, INSERTED, QPARK_CARD);
         assertThat(cardOrders, contains(orderA));
@@ -199,7 +194,10 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
             lock.countDown();
         });
 
-        cardOrderDao.processTransponderCard("123456", customer, true);
+        CardOrder order = new CardOrder();
+        order.setId(123l);
+
+        cardOrderDao.processTransponderCard("123456", customer, order, true);
 
         lock.await(2, TimeUnit.SECONDS);
 
@@ -207,9 +205,10 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
 
         assertThat(call.functionName, equalTo("PROCESS_TRANSPONDERCARDS"));
         assertThat(call.getNumericArg(0).longValue(), equalTo(customer.getCustomerId()));
-        assertThat(call.arguments[1], equalTo("123456"));
-        assertThat(call.arguments[2], equalTo("TEST MUTATOR"));
-        assertThat(call.arguments[3], is(1));
+        assertThat(call.getNumericArg(1).longValue(), equalTo(order.getId()));
+        assertThat(call.arguments[2], equalTo("123456"));
+        assertThat(call.arguments[3], equalTo("TEST MUTATOR"));
+        assertThat(call.arguments[4], is(1));
     }
 
     @Test
@@ -246,6 +245,12 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         cardOrderDao.delete(cardOrder.getId());
 
         assertThat(cardOrderDao.findById(72031).isPresent(), is(false));
+    }
+
+    @Test
+    public void counts_cards_in_stock_per_product_group() {
+        assertThat(cardOrderDao.transponderCardsAvailableForProductGroup(1), is(2));
+        assertThat(cardOrderDao.transponderCardsAvailableForProductGroup(2), is(0));
     }
 
     @Test

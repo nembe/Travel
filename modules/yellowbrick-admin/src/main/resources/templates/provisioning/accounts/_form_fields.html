@@ -5,10 +5,12 @@
 <body>
     <div th:fragment="gender" class="field">
         <span class="field-label">Gender</span>
-        <input type="radio" th:field="*{gender}" th:value="M" />
-        <label th:for="${#ids.prev('gender')}">Mr.</label>
-        <input type="radio" th:field="*{gender}" th:value="F" />
-        <label th:for="${#ids.prev('gender')}">Mrs.</label>
+        <span class="radioButtons">
+            <input type="radio" th:field="*{gender}" th:value="M" />
+            <label th:for="${#ids.prev('gender')}">Mr.</label>
+            <input type="radio" th:field="*{gender}" th:value="F" />
+            <label th:for="${#ids.prev('gender')}">Mrs.</label>
+        </span>
     </div>
 
     <div th:fragment="initials" class="field">
@@ -106,16 +108,18 @@
     </div>
 
     <div th:fragment="paymentMethod" class="field">
-        <span class="field-label">Payment method</span>
-        <span class="field-value" th:text="${customer.agentName}"></span>
+        <label for="paymentMethod" class="field-label">Payment method</label>
+        <input disabled="disabled" type="text" th:field="*{paymentMethod}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('paymentMethod')}" th:errors="*{paymentMethod}"></span>
     </div>
 
-    <div th:fragment="accountNumber" th:if="${iban}" class="field">
+    <div th:fragment="accountNumber" class="field">
         <span class="field-label">Account number</span>
-        <span class="field-value" th:text="${iban}"></span>
+        <input disabled="disabled" type="text" th:field="*{iban}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('iban')}" th:errors="*{iban}"></span>
     </div>
 
-    <div th:fragment="accountHolderName" th:if="${iban}" class="field" >
+    <div th:fragment="accountHolderName" class="field" >
         <span class="field-label">Account holder name</span>
         <span class="field-value" th:text="${customer.accountHolderName}"></span>
     </div>
@@ -143,18 +147,22 @@
 
     <div th:fragment="billingAddressSameAsMailingAddress" class="field">
         <span class="field-label">Billing address is the same as establishment address</span>
-        <input type="radio" th:field="*{billingAddressSameAsMailingAddress}" th:value="true" />
-        <label th:for="${#ids.prev('billingAddressSameAsMailingAddress')}">Yes</label>
-        <input type="radio" th:field="*{billingAddressSameAsMailingAddress}" th:value="false" />
-        <label th:for="${#ids.prev('billingAddressSameAsMailingAddress')}">No</label>
+        <span class="radioButtons">
+            <input type="radio" th:field="*{billingAddressSameAsMailingAddress}" th:value="true" />
+            <label th:for="${#ids.prev('billingAddressSameAsMailingAddress')}">Yes</label>
+            <input type="radio" th:field="*{billingAddressSameAsMailingAddress}" th:value="false" />
+            <label th:for="${#ids.prev('billingAddressSameAsMailingAddress')}">No</label>
+        </span>
     </div>
 
     <div th:fragment="billingAddressIsPoBox" class="field billingAddress">
         <span class="field-label">Billing address is a PO box address</span>
-        <input type="radio" th:field="*{billingAddressIsPoBox}" th:value="true" />
-        <label th:for="${#ids.prev('billingAddressIsPoBox')}">Yes</label>
-        <input type="radio" th:field="*{billingAddressIsPoBox}" th:value="false" />
-        <label th:for="${#ids.prev('billingAddressIsPoBox')}">No</label>
+        <span class="radioButtons">
+            <input type="radio" th:field="*{billingAddressIsPoBox}" th:value="true" />
+            <label th:for="${#ids.prev('billingAddressIsPoBox')}">Yes</label>
+            <input type="radio" th:field="*{billingAddressIsPoBox}" th:value="false" />
+            <label th:for="${#ids.prev('billingAddressIsPoBox')}">No</label>
+        </span>
     </div>
 
     <div th:fragment="billingAddressPoBox" class="field billingAddress">
@@ -212,12 +220,13 @@
 
     <div th:fragment="firstCardLicensePlate" class="field">
         <span class="field-label">Plate number for 1st transponder card</span>
-        <span class="field-value" th:text="${customer.firstCardLicensePlate} ?: #{not.specified}"></span>
+        <span class="field-value" th:text="${customer.firstCardLicensePlate}"></span>
     </div>
 
     <div th:fragment="firstCardMobile" class="field">
-        <span class="field-label">Mobile phone number for 1st transponder card</span>
-        <span class="field-value" th:text="${customer.firstCardMobile} ?: #{not.specified}"></span>
+        <label for="firstCardMobile" class="field-label">Mobile phone number for 1st transponder card</label>
+        <input disabled="disabled" type="text" th:field="*{firstCardMobile}" th:errorclass="field-error"/>
+        <span class="field-error" th:if="${#fields.hasErrors('firstCardMobile')}" th:errors="*{firstCardMobile}"></span>
     </div>
 
 </body>

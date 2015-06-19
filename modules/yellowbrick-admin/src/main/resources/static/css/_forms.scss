@@ -6,7 +6,7 @@
   margin-bottom: 18px;
   position: static;
   overflow: hidden;
-  z-index: 8;
+  z-index: -1;
 }
 
 .field {
@@ -16,6 +16,15 @@
 
 .field input {
   display: inline-block;
+}
+
+.field input[disabled] {
+  background-color: $background-color;
+  padding: 0;
+
+  &.field-error {
+    padding: 5px 10px;
+  }
 }
 
 .field-label {
@@ -29,37 +38,58 @@ input.field-error {
 
 span.field-error {
   color: #f00;
-  position: relative;
-  right: -210px;
+  display: block;
+  text-align: right;
 }
 
 .global-errors {
-  color: #f00;
+    background-color: #c44117;
+    color: white;
+    position: relative;
+    top: 0px;
+
+    .content-error{
+      margin-left: 50px;
+      margin-top: -10px;
+    }
 }
 
-input[type='submit'] + input[type='submit'] {
-  margin-left: 10px;
+input[type='submit'], .input {
+  margin-right: 10px;
 }
 
-input {
+input, .input {
   padding: 5px 10px;
   border: none;
   background-color: white;
   color: $head-color;
+  text-decoration: none;
+}
+
+a.input {
+  color: $head-color;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+input[type='text'] {
+  width: 300px;
+  height: 50px;
+}
+
+.row-33 {
+  @include span-columns(4);
 
 }
-input[type='text'] {
-  width: 220px;
-  height: 30px;
-}
-.row-33 {
-  width: 33%;
-  float: left;
-}
+
 .row-50 {
-  width: 50%;
-  float: left;
+  @include span-columns(6);
+
 }
+
 input[type=radio]{
   display: inline-block;
   width: 0.875em;
@@ -69,4 +99,9 @@ input[type=radio]{
   border-radius: 0.25em;
   background: rgb(224,224,224);
   &:checked{}
+}
+
+.clear {
+  clear: both;
+  padding: 10px 3px;
 }

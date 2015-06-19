@@ -2,8 +2,6 @@ package nl.yellowbrick.activation.validation;
 
 
 import nl.yellowbrick.data.domain.Customer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
@@ -22,8 +20,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class NonTestAccountValidator extends AccountRegistrationValidator {
-
-    private static final Logger log = LoggerFactory.getLogger(NonTestAccountValidator.class);
 
     @Override
     public void doValidate(Customer customer, Errors errors) {

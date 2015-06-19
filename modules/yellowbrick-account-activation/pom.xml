@@ -46,6 +46,16 @@
             <artifactId>activation</artifactId>
             <version>${javax.activation.version}</version>
         </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-all</artifactId>
+            <version>${hazelcast.version}</version>
+        </dependency>
 
         <!-- Tests -->
         <dependency>

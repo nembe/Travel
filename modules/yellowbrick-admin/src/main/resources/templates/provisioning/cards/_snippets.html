@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html>
+<body>
+<div th:fragment="ordersTable(orders)">
+    <table>
+        <thead>
+        <tr>
+            <th>Product group</th>
+            <th>Order date</th>
+            <th>Business customer</th>
+            <th>Customer number</th>
+            <th>Customer name</th>
+            <th>Card type</th>
+            <th>Export</th>
+            <th>Amount</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="orderItem : ${orders}">
+            <td th:text="${orderItem.customer.productGroup}"></td>
+            <td th:text="${orderItem.order.date}"></td>
+            <td th:text="${orderItem.customer.businessCustomer}"></td>
+            <td th:text="${orderItem.customer.customerNr}"></td>
+            <td th:text="${orderItem.customer.fullName}"></td>
+            <td th:text="${orderItem.order.cardType}"></td>
+            <td th:text="${orderItem.order.export}"></td>
+            <td th:text="${orderItem.order.amount}"></td>
+            <td>
+                <div class="btn">
+                    <a th:href="@{'/provisioning/cards/' + ${orderItem.order.id}}">validate</a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

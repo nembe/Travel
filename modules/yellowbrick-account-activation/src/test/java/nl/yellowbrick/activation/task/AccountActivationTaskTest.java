@@ -1,8 +1,10 @@
 package nl.yellowbrick.activation.task;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import nl.yellowbrick.activation.service.AccountActivationService;
-import nl.yellowbrick.activation.validation.AccountRegistrationValidator;
+import nl.yellowbrick.activation.service.AccountValidationService;
+import nl.yellowbrick.activation.service.AdminNotificationService;
+import nl.yellowbrick.activation.validation.UnboundErrors;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.dao.MarketingActionDao;
 import nl.yellowbrick.data.dao.PriceModelDao;
@@ -10,16 +12,17 @@ import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerStatus;
 import nl.yellowbrick.data.domain.MarketingAction;
 import nl.yellowbrick.data.domain.PriceModel;
+import nl.yellowbrick.data.errors.ExhaustedCardPoolException;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.validation.Errors;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
@@ -32,10 +35,8 @@ public class AccountActivationTaskTest {
     PriceModelDao priceModelDao;
     MarketingActionDao marketingActionDao;
     AccountActivationService activationService;
-
-    // use a couple of validators for tests
-    AccountRegistrationValidator validatorA;
-    AccountRegistrationValidator validatorB;
+    AccountValidationService accountValidationService;
+    AdminNotificationService notificationService;
 
     Customer customerA = testCustomer();
     Customer customerB = testCustomer();
@@ -48,16 +49,16 @@ public class AccountActivationTaskTest {
         priceModelDao = mock(PriceModelDao.class);
         marketingActionDao = mock(MarketingActionDao.class);
         activationService = mock(AccountActivationService.class);
-        validatorA = spy(new NoOpValidator());
-        validatorB = spy(new NoOpValidator());
+        accountValidationService = mock(AccountValidationService.class);
+        notificationService = mock(AdminNotificationService.class);
 
         accountActivationTask = new AccountActivationTask(customerDao, priceModelDao, marketingActionDao,
-                activationService, validatorA, validatorB);
+                activationService, accountValidationService, notificationService);
     }
 
     @Test
     public void no_op_if_there_are_no_accounts_pending_activation() {
-        when(customerDao.findAllPendingActivation()).thenReturn(new ArrayList<>());
+        stubFindCustomersPendingActivation();
 
         accountActivationTask.validateAndActivateAccounts();
 
@@ -67,44 +68,42 @@ public class AccountActivationTaskTest {
 
     @Test
     public void activates_valid_accounts() {
-        // return a couple of customers
-        when(customerDao.findAllPendingActivation()).thenReturn(ImmutableList.of(customerA, customerB));
-        when(priceModelDao.findForCustomer(anyLong())).thenReturn(Optional.of(priceModel));
-        when(marketingActionDao.findByActionCode(any())).thenReturn(Optional.empty());
+        stubFindCustomersPendingActivation(customerA, customerB);
+        stubPriceModel(of(priceModel));
+        stubActionCode(empty());
+
+        doAnswer(emptyErrors()).when(accountValidationService).validate(any());
 
         accountActivationTask.validateAndActivateAccounts();
 
-        verify(activationService).activateCustomerAccount(customerA, priceModel);
-        verify(activationService).activateCustomerAccount(customerB, priceModel);
+        verify(activationService).activateCustomerAccount(same(customerA), eq(priceModel));
+        verify(activationService).activateCustomerAccount(same(customerB), eq(priceModel));
         verifyNoMoreInteractions(activationService);
     }
 
     @Test
     public void marks_invalid_accounts_as_pending_review() {
-        // customerA doesn't pass validation A
-        doAnswer(recordAnError()).when(validatorA).validate(eq(customerA), any());
-        doNothing().when(validatorB).validate(eq(customerA), any());
-
-        // customerB doesn't pass validation B
-        doAnswer(recordAnError()).when(validatorB).validate(eq(customerB), any());
-        doNothing().when(validatorA).validate(eq(customerB), any());
-
         // return a couple of customers
-        when(customerDao.findAllPendingActivation()).thenReturn(ImmutableList.of(customerA, customerB));
+        stubFindCustomersPendingActivation(customerA, customerB);
+        // customerA doesn't pass validation
+        doAnswer(recordAnError()).when(accountValidationService).validate(eq(customerA));
+        // customerB doesn't pass validation
+        doAnswer(recordAnError()).when(accountValidationService).validate(eq(customerB));
 
         accountActivationTask.validateAndActivateAccounts();
 
         // they both are marked for review
-        verify(customerDao).markAsPendingHumanReview(eq(customerA));
-        verify(customerDao).markAsPendingHumanReview(eq(customerB));
+        verify(customerDao).markAsPendingHumanReview(same(customerA));
+        verify(customerDao).markAsPendingHumanReview(same(customerB));
         verifyZeroInteractions(activationService);
     }
 
     @Test
     public void marks_invalid_account_if_missing_price_model() {
-        // return a couple of customers
-        when(customerDao.findAllPendingActivation()).thenReturn(ImmutableList.of(customerA));
-        when(priceModelDao.findForCustomer(anyLong())).thenReturn(Optional.empty());
+        stubFindCustomersPendingActivation(customerA);
+        stubPriceModel(empty());
+
+        doAnswer(emptyErrors()).when(accountValidationService).validate(any());
 
         accountActivationTask.validateAndActivateAccounts();
 
@@ -114,15 +113,34 @@ public class AccountActivationTaskTest {
 
     @Test
     public void applies_marketing_action() {
-        when(customerDao.findAllPendingActivation()).thenReturn(ImmutableList.of(customerA));
-        when(priceModelDao.findForCustomer(anyLong())).thenReturn(Optional.of(priceModel));
-        when(marketingActionDao.findByActionCode(customerA.getActionCode()))
-                .thenReturn(Optional.of(validMarketingAction()));
+        stubFindCustomersPendingActivation(customerA);
+        stubPriceModel(of(priceModel));
+        stubActionCode(of(validMarketingAction()));
+
+        doAnswer(emptyErrors()).when(accountValidationService).validate(any());
 
         accountActivationTask.validateAndActivateAccounts();
 
         verify(activationService).activateCustomerAccount(customerA, priceModel);
         assertThat(priceModel.getRegistratiekosten(), equalTo(12345));
+    }
+
+    @Test
+    public void notifies_admin_when_activation_fails_due_to_exhausted_cards() {
+        stubFindCustomersPendingActivation(customerA);
+        stubPriceModel(of(priceModel));
+        stubActionCode(empty());
+        doAnswer(emptyErrors()).when(accountValidationService).validate(any());
+
+        // raise error when trying to activate customerA
+        doThrow(new ExhaustedCardPoolException(customerA))
+                .when(activationService)
+                .activateCustomerAccount(customerA, priceModel);
+
+        accountActivationTask.validateAndActivateAccounts();
+
+        // check that admin is notified
+        verify(notificationService).notifyCardPoolExhausted(customerA.getProductGroupId());
     }
 
     private MarketingAction validMarketingAction() {
@@ -143,20 +161,33 @@ public class AccountActivationTaskTest {
     }
 
     private Answer recordAnError() {
-        return new Answer() {
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                Errors errors = (Errors) invocationOnMock.getArguments()[1];
-                errors.reject("customerId");
+        return invocationOnMock -> {
+            Customer customer = (Customer) invocationOnMock.getArguments()[0];
+            Errors errors = new UnboundErrors(customer, "customer");
 
-                return null;
-            }
+            errors.reject("customerId");
+
+            return errors;
         };
     }
 
-    private class NoOpValidator extends AccountRegistrationValidator {
+    private Answer emptyErrors() {
+        return invocationOnMock -> {
+            Customer customer = (Customer) invocationOnMock.getArguments()[0];
 
-        @Override
-        protected void doValidate(Customer customer, Errors errors) {
-        }
+            return new UnboundErrors(customer, "customer");
+        };
+    }
+
+    private void stubActionCode(Optional<MarketingAction> marketingAction) {
+        when(marketingActionDao.findByActionCode(any())).thenReturn(marketingAction);
+    }
+
+    private void stubFindCustomersPendingActivation(Customer... customers) {
+        when(customerDao.findAllPendingActivation()).thenReturn(Lists.newArrayList(customers));
+    }
+
+    private void stubPriceModel(Optional<PriceModel> priceModel) {
+        when(priceModelDao.findForCustomer(anyLong())).thenReturn(priceModel);
     }
 }
