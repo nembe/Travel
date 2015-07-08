@@ -63,7 +63,7 @@ public class CardOrderExportRecord {
 
     @JsonProperty("CARDTYPE")
     public String getCardType() {
-        if(order == null)
+        if(order == null || productGroup == null)
             return "";
         else if(order.getCardType().equals(CardType.RTP_CARD))
             return productGroup.getId().toString();
@@ -75,7 +75,7 @@ public class CardOrderExportRecord {
 
     @JsonProperty("CARDNR")
     public String getCardNr() {
-        return this.transponderCardNumber;
+        return isNullOrEmpty(this.transponderCardNumber) ? "" : this.transponderCardNumber;
     }
 
     @JsonProperty("QPARKCARDNR")

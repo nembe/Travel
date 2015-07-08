@@ -27,6 +27,7 @@ orderexport:
     3: 0 0 6 1/1 * ?
 
 sleeveexport:
+  path: /tmp/sleeve_exports
   schedule: 0 0 6 1/1 * ?
 
 welcomeLetterExport:
