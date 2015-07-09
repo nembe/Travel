@@ -6,7 +6,6 @@ import nl.yellowbrick.admin.exceptions.InconsistentDataException;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.CardOrder;
-import nl.yellowbrick.data.domain.CardType;
 import nl.yellowbrick.data.domain.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -39,9 +38,7 @@ public class CardProvisioningListController {
         cardOrderDao.findByStatus(INSERTED).forEach(order -> {
             CardOrderListItem orderItem = toListItem(order);
 
-            if(!order.getCardType().equals(CardType.TRANSPONDER_CARD))
-                otherOrders.add(orderItem);
-            else if(validationService.validate(order).hasErrors())
+            if(validationService.validate(order).hasErrors())
                 flaggedOrders.add(orderItem);
             else
                 otherOrders.add(orderItem);
