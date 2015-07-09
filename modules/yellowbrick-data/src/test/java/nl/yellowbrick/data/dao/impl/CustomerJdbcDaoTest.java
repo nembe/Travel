@@ -116,7 +116,7 @@ public class CustomerJdbcDaoTest extends BaseSpringTestCase {
 
     @Test
     public void fetches_customers_by_email() {
-        assertThat(customerDao.findAllByEmail("bestaatniet@taxameter.nl"), hasSize(3));
+        assertThat(customerDao.findAllByEmail("bestaatniet@taxameter.nl"), hasSize(4));
         assertThat(customerDao.findAllByEmail("something@other.com"), empty());
     }
 

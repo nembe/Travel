@@ -2,7 +2,9 @@ package nl.yellowbrick.admin.service;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
-import nl.yellowbrick.admin.domain.CardOrderExportRecord;
+import nl.yellowbrick.admin.domain.SleeveOrderExportRecord;
+import nl.yellowbrick.data.domain.CardOrder;
+import nl.yellowbrick.data.domain.CardType;
 import nl.yellowbrick.data.domain.Customer;
 import nl.yellowbrick.data.domain.CustomerAddress;
 import org.junit.Before;
@@ -61,9 +63,11 @@ public class SleeveOrderCsvExporterTest {
         }
     }
 
-    private CardOrderExportRecord record() {
-        return new CardOrderExportRecord.Builder(new Customer())
-                .address(new CustomerAddress())
-                .build();
+    private SleeveOrderExportRecord record() {
+        final CardOrder order = new CardOrder();
+        order.setCardType(CardType.SLEEVE);
+        order.setAmount(1);
+
+        return new SleeveOrderExportRecord(order, new Customer(), new CustomerAddress(), null);
     }
 }

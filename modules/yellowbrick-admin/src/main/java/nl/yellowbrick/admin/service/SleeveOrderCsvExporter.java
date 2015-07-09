@@ -3,7 +3,7 @@ package nl.yellowbrick.admin.service;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.google.common.base.Joiner;
-import nl.yellowbrick.admin.domain.CardOrderExportRecord;
+import nl.yellowbrick.admin.domain.SleeveOrderExportRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class SleeveOrderCsvExporter {
             Files.createDirectory(this.baseExportPath);
     }
 
-    public void exportRecords(List<CardOrderExportRecord> exports) {
+    public void exportRecords(List<SleeveOrderExportRecord> exports) {
         if(exports.isEmpty()) {
             LOG.warn("Export requested with empty exports list");
             return;
@@ -49,7 +49,7 @@ public class SleeveOrderCsvExporter {
         try {
             Path path = resolveFilePath();
             CsvMapper csvMapper = new CsvMapper();
-            CsvSchema csvSchema = csvMapper.schemaFor(CardOrderExportRecord.class)
+            CsvSchema csvSchema = csvMapper.schemaFor(SleeveOrderExportRecord.class)
                     .withHeader()
                     .withoutQuoteChar()
                     .withColumnSeparator(SEPARATOR);

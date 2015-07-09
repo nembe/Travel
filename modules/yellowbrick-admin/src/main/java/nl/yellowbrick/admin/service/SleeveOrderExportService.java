@@ -1,8 +1,10 @@
 package nl.yellowbrick.admin.service;
 
-import nl.yellowbrick.admin.domain.CardOrderExportRecord;
+import nl.yellowbrick.admin.domain.SleeveOrderExportRecord;
 import nl.yellowbrick.admin.exceptions.InconsistentDataException;
-import nl.yellowbrick.data.dao.*;
+import nl.yellowbrick.data.dao.CardOrderDao;
+import nl.yellowbrick.data.dao.CustomerAddressDao;
+import nl.yellowbrick.data.dao.CustomerDao;
 import nl.yellowbrick.data.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 @Component
 public class SleeveOrderExportService {
@@ -25,16 +25,13 @@ public class SleeveOrderExportService {
     @Autowired private CardOrderDao cardOrderDao;
     @Autowired private CustomerDao customerDao;
     @Autowired private CustomerAddressDao customerAddressDao;
-    @Autowired private ConfigDao configDao;
     @Autowired private SleeveOrderCsvExporter csvExporter;
 
     public void export() {
-        Stream<CardOrder> orders = cardOrderDao.findPendingExport()
+        List<SleeveOrderExportRecord> exports = cardOrderDao.findPendingExport()
                 .stream()
-                .filter(order -> order.getCardType() == CardType.SLEEVE);
-
-        List<CardOrderExportRecord> exports = orders
-                .flatMap(this::createExportRecords)
+                .filter(order -> order.getCardType() == CardType.SLEEVE)
+                .map(this::createExportRecord)
                 .collect(Collectors.toList());
 
         if(exports.isEmpty()) {
@@ -45,11 +42,11 @@ public class SleeveOrderExportService {
         }
     }
 
-    private void updateOrderStatus(CardOrderExportRecord export) {
+    private void updateOrderStatus(SleeveOrderExportRecord export) {
         cardOrderDao.updateOrderStatus(export.getOrder().getId(), CardOrderStatus.EXPORTED);
     }
 
-    private Stream<CardOrderExportRecord> createExportRecords(CardOrder order) {
+    private SleeveOrderExportRecord createExportRecord(CardOrder order) {
         Customer customer = customerDao
                 .findById(order.getCustomerId())
                 .orElseThrow(() -> new InconsistentDataException("couldn't find customer with id: " + order.getCustomerId()));
@@ -58,16 +55,6 @@ public class SleeveOrderExportService {
         CustomerAddress address = customerAddressDao.findByCustomerId(customer.getCustomerId(), AddressType.BILLING)
                 .orElseGet(() -> customerAddressDao.findByCustomerId(customer.getCustomerId(), AddressType.MAIN).get());
 
-        Config defaultLocale = configDao.findSectionField(ConfigSection.YB, "DEFAULT_LOCALE")
-                .orElseThrow(() -> new InconsistentDataException("couldn't determine default locale"));
-
-        return IntStream.rangeClosed(1, order.getAmount()).mapToObj(idx -> {
-            return new CardOrderExportRecord.Builder(order)
-                    .customer(customer)
-                    .address(address)
-                    .locale(defaultLocale.getValue())
-                    .country(COUNTRY)
-                    .build();
-        });
+        return new SleeveOrderExportRecord(order, customer, address, COUNTRY);
     }
 }
