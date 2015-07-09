@@ -2,7 +2,7 @@ package nl.yellowbrick.data.dao;
 
 
 public enum ConfigSection {
-    ACTIVATION("ACT_CUST"), TAXAMETER("TXM"), YB("YB");
+    ACTIVATION("ACT_CUST"), TAXAMETER("TXM"), YB("YB"), BRICKWALL("BW");
 
     private String sectionKey;
 

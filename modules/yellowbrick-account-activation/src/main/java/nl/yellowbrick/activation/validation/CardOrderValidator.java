@@ -9,8 +9,8 @@ import org.springframework.validation.Errors;
 @Component
 public class CardOrderValidator extends ClassValidator<CardOrder> {
 
-    private static final String COST_TOO_HIGH = "errors.order.high.cost";
-    private static final String AMOUNT_TOO_HIGH = "errors.order.high.quantity";
+    static final String COST_TOO_HIGH = "errors.order.high.cost";
+    static final String AMOUNT_TOO_HIGH = "errors.order.high.quantity";
 
     protected CardOrderValidator() {
         super(CardOrder.class);
