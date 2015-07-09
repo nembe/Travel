@@ -74,13 +74,13 @@ public class OrderValidationTask {
     public void validatePendingSleeveOrders() {
         log.debug("starting validatePendingSleeveOrders");
 
-        List<CardOrder> sleeveOrders = insertedOrders(CardType.SLEEVE)
-                .stream()
+        List<CardOrder> sleeveOrders = insertedOrders(CardType.SLEEVE);
+        List<CardOrder> validSleeveOrders = sleeveOrders.stream()
                 .filter(this::passesValidation)
                 .collect(Collectors.toList());
 
-        log.info("processing {} physical card orders out of a total of {} card orders",
-                sleeveOrders.size(), sleeveOrders.size());
+        log.info("processing {} sleeve orders out of a total of {} sleeve orders",
+                validSleeveOrders.size(), sleeveOrders.size());
 
         sleeveOrders.forEach(this::validateAndProcessSleeveOrder);
     }
