@@ -1,7 +1,7 @@
 package nl.yellowbrick.activation.bootstrap;
 
 import nl.yellowbrick.activation.task.AccountActivationTask;
-import nl.yellowbrick.activation.task.CardOrderValidationTask;
+import nl.yellowbrick.activation.task.OrderValidationTask;
 import nl.yellowbrick.activation.task.CardPoolAssessmentTask;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -20,7 +20,7 @@ public class Application {
     private static final Object[] CONTEXT_SOURCES = new Object[] {
             Application.class,
             AccountActivationTask.class,
-            CardOrderValidationTask.class,
+            OrderValidationTask.class,
             CardPoolAssessmentTask.class
     };
 

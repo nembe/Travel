@@ -1,7 +1,7 @@
 package nl.yellowbrick.admin.controller;
 
 import com.google.common.collect.Lists;
-import nl.yellowbrick.activation.service.CardOrderValidationService;
+import nl.yellowbrick.activation.service.OrderValidationService;
 import nl.yellowbrick.admin.exceptions.InconsistentDataException;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.dao.CustomerDao;
@@ -29,7 +29,7 @@ public class CardProvisioningListController {
     private CustomerDao customerDao;
 
     @Autowired
-    private CardOrderValidationService validationService;
+    private OrderValidationService validationService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String pendingValidation(Model model) {
