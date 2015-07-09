@@ -17,8 +17,8 @@ import static nl.yellowbrick.activation.validation.CardOrderValidator.AMOUNT_TOO
 @Component
 public class SleeveOrderValidator extends ClassValidator<CardOrder> {
 
-    private static final String BUSINESS_CUST_MAX_AMOUNT = "sleeveOrderValidation.businessCustomer.thresholds.amount";
-    private static final String PRIVATE_CUST_MAX_AMOUNT = "sleeveOrderValidation.privateCustomer.thresholds.amount";
+    private static final String BUSINESS_CUST_MAX_AMOUNT = "sleeveOrderValidation.businessCust.maxAmount";
+    private static final String PRIVATE_CUST_MAX_AMOUNT = "sleeveOrderValidation.privateCust.maxAmount";
 
     private final ConfigDao configDao;
     private final CustomerDao customerDao;

@@ -52,7 +52,7 @@ public class SleeveOrderValidatorTest {
     public void rejects_business_cust_order_above_certain_amount() {
         customer.setBusiness("Y");
         stubCustomer(customer);
-        stubConfig("sleeveOrderValidation.businessCustomer.thresholds.amount", "5");
+        stubConfig("sleeveOrderValidation.businessCust.maxAmount", "5");
 
         order.setAmount(5);
         validator.validate(order, errors);
@@ -66,7 +66,7 @@ public class SleeveOrderValidatorTest {
     @Test
     public void rejects_personal_cust_order_above_certain_amount() {
         stubCustomer(customer);
-        stubConfig("sleeveOrderValidation.privateCustomer.thresholds.amount", "5");
+        stubConfig("sleeveOrderValidation.privateCust.maxAmount", "5");
 
         order.setAmount(5);
         validator.validate(order, errors);
@@ -95,7 +95,7 @@ public class SleeveOrderValidatorTest {
     @Test(expected = NumberFormatException.class)
     public void raises_exception_when_threshold_config_isnt_numeric() {
         stubCustomer(customer);
-        stubConfig("sleeveOrderValidation.privateCustomer.thresholds.amount", "not numeric");
+        stubConfig("sleeveOrderValidation.privateCust.maxAmount", "not numeric");
 
         validator.validate(order, errors);
     }
