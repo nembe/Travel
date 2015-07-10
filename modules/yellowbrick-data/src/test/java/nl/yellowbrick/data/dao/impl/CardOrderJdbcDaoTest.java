@@ -222,7 +222,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
         updateCardType(CardType.RTP_CARD.description());
 
         assertThat(cardOrderDao.findByStatusAndType(INSERTED, RTP_CARD), hasSize(1));
-        assertThat(cardOrderDao.findByStatusAndType(ACCEPTED, RTP_CARD), hasSize(1));
+        assertThat(cardOrderDao.findByStatusAndType(ACCEPTED, RTP_CARD), hasSize(2));
         assertThat(cardOrderDao.findByStatusAndType(EXPORTED, RTP_CARD), empty());
     }
 
@@ -234,7 +234,7 @@ public class CardOrderJdbcDaoTest extends BaseSpringTestCase {
 
         List<CardOrder> orders = cardOrderDao.findByStatus(EXPORTED);
 
-        assertThat(orders, hasSize(2));
+        assertThat(orders, hasSize(3));
         assertThat(orders.get(0).getDate(), after(orders.get(1).getDate()));
     }
 

@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html layout:decorator="provisioning/_layout" th:with="provisioningTitle=#{provisioning.sleeve_exports.title}">
+<body id="sleeve-export">
+    <div layout:fragment="content-inner">
+        <div class="section" id="export-schedule">
+            <span th:unless="${nextExportTime}">Next export: <em>not scheduled</em></span>
+            <span th:if="${nextExportTime}">Next export: <em th:text="${nextExportTime}">2015-01-01 15:00</em></span>
+        </div>
+
+        <div class="section" th:if="${#lists.isEmpty(exports)}">
+            <h3>No exports available.</h3>
+        </div>
+
+        <div id="exports-list" class="section" th:unless="${#lists.isEmpty(exports)}">
+            <h3>List of sleeve order exports</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>File name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="export : ${exports}">
+                        <td th:text="${export.fileName}"></td>
+                        <td>
+                            <div class="btn">
+                                <a th:href="@{${export.downloadUrl}}">Download</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

@@ -88,9 +88,4 @@ public class CardOrderExportScheduler {
             this.schedule.put(productGroupId, cronExpression);
         }
     }
-
-
-    private static class DummyTriggerContext extends SimpleTriggerContext {
-    }
-
 }

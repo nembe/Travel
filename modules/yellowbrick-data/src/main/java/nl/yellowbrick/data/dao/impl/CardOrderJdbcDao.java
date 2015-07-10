@@ -136,6 +136,15 @@ public class CardOrderJdbcDao implements CardOrderDao, InitializingBean {
     }
 
     @Override
+    public List<CardOrder> findPendingExport() {
+        String sql = "SELECT * FROM CARDORDER CO " +
+                "INNER JOIN CUSTOMER C ON C.CUSTOMERID = CO.CUSTOMERID " +
+                "WHERE CO.ORDERSTATUS = ? AND CO.EXPORT = 'Y' ORDER BY CO.ORDERDATE DESC";
+
+        return template.query(sql, cardOrderRowMapper(), CardOrderStatus.ACCEPTED.code());
+    }
+
+    @Override
     public Optional<CardOrder> findById(long id) {
         String sql = "SELECT * FROM CARDORDER WHERE ORDERID = ?";
 

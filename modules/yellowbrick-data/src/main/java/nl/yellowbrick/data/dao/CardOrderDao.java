@@ -24,6 +24,8 @@ public interface CardOrderDao {
 
     List<CardOrder> findPendingExport(ProductGroup productGroup);
 
+    List<CardOrder> findPendingExport();
+
     Optional<CardOrder> findById(long id);
 
     void delete(long id);

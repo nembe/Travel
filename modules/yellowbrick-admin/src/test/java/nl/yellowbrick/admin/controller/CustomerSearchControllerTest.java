@@ -24,7 +24,7 @@ public class CustomerSearchControllerTest extends BaseMvcTestCase {
     public void searches_by_email() throws Exception {
         Document html = parseHtml(mvcGet("/customers?email=bestaatniet@taxameter.nl"));
 
-        assertThat(html.select("tbody tr"), hasSize(3));
+        assertThat(html.select("tbody tr"), hasSize(4));
     }
 
     @Test
@@ -46,6 +46,6 @@ public class CustomerSearchControllerTest extends BaseMvcTestCase {
     public void joins_results_of_multiple_filters() throws Exception  {
         Document html = parseHtml(mvcGet("/customers?email=bestaatniet@taxameter.nl&customerNumber=203126"));
 
-        assertThat(html.select("tbody tr"), hasSize(3));
+        assertThat(html.select("tbody tr"), hasSize(4));
     }
 }

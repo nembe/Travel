@@ -14,7 +14,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 })
 public class CardOrderExportRecord {
 
-    private static final String BUSINESS_ATTN = "T.a.v";
+    private static final String BUSINESS_ATTN = "T.a.v.";
     private static final String POBOX_PLACEHOLDER = "Postbus";
 
     private final CardOrder order;
@@ -63,7 +63,7 @@ public class CardOrderExportRecord {
 
     @JsonProperty("CARDTYPE")
     public String getCardType() {
-        if(order == null)
+        if(order == null || productGroup == null)
             return "";
         else if(order.getCardType().equals(CardType.RTP_CARD))
             return productGroup.getId().toString();
@@ -75,7 +75,7 @@ public class CardOrderExportRecord {
 
     @JsonProperty("CARDNR")
     public String getCardNr() {
-        return this.transponderCardNumber;
+        return isNullOrEmpty(this.transponderCardNumber) ? "" : this.transponderCardNumber;
     }
 
     @JsonProperty("QPARKCARDNR")
@@ -145,7 +145,10 @@ public class CardOrderExportRecord {
 
     @JsonProperty("POBOX")
     public String poBox() {
-        return isNullOrEmpty(address.getPoBox()) ? "" : POBOX_PLACEHOLDER;
+        if(isNullOrEmpty(address.getPoBox()))
+            return "";
+
+        return POBOX_PLACEHOLDER + " " + address.getPoBox();
     }
 
     @JsonProperty("HOUSENR")

@@ -268,6 +268,46 @@ INSERT INTO CUSTOMER VALUES (
              NULL,
              '0');
 
+INSERT INTO CUSTOMER VALUES (
+             703,
+             234315,
+             '295577',
+             'Y',
+             '569304962',
+             NULL,
+             NULL,
+             NULL,
+             'F',
+             'Aircoheat B.V.',
+             'Groot',
+             'Fleur',
+             'de',
+             'F.M.',
+             'bestaatniet@taxameter.nl',
+             0,
+             2,
+             '0348416155',
+             NULL,
+             8,
+             0,
+             '4411',
+             TO_DATE ('12/13/2012 14:05:01', 'MM/DD/YYYY HH24:MI:SS'),
+             TO_DATE ('12/13/2012 14:21:57', 'MM/DD/YYYY HH24:MI:SS'),
+             NULL,
+             5000,
+             TO_DATE ('07/20/1984 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             'Aircoheat Service',
+             NULL,
+             1,
+             0,
+             'YBWATCHDOG',
+             NULL,
+             NULL,
+             NULL,
+             NULL,
+             NULL,
+             '0');
+
 INSERT INTO CUSTOMERADDRESS VALUES (
              5803,
              4776,
@@ -343,6 +383,36 @@ INSERT INTO CUSTOMERADDRESS VALUES (
              'YBBEHEER:ron',
              NULL);
 
+INSERT INTO CUSTOMERADDRESS VALUES (
+             236820,
+             234315,
+             1,
+             'Pompmolenlaan',
+             '14',
+             NULL,
+             NULL,
+             '3447 GK',
+             'Woerden',
+             'NL',
+             NULL,
+             'YBBEHEER:fevres',
+             NULL);
+
+INSERT INTO CUSTOMERADDRESS VALUES (
+             236821,
+             234315,
+             2,
+             NULL,
+             NULL,
+             NULL,
+             '76',
+             '3440 AB',
+             'Woerden',
+             'NL',
+             NULL,
+             'YBBEHEER:fevres',
+             NULL);
+
 INSERT INTO TBLBILLINGAGENT VALUES (104, 'TravelCard', 'TravelCard', NULL);
 INSERT INTO TBLBILLINGAGENT VALUES (601, 'creditcard per dag(Visa)', NULL, NULL);
 INSERT INTO TBLBILLINGAGENT VALUES (701, 'creditcard per week', NULL, NULL);
@@ -393,6 +463,17 @@ INSERT INTO CARDORDER VALUES (
              '1',
              2,
              500,
+             'Y');
+
+INSERT INTO CARDORDER VALUES (
+             367366,
+             TO_DATE ('08/27/2013 00:00:00', 'MM/DD/YYYY HH24:MI:SS'),
+             '2',
+             234315,
+             'Hoesje',
+             '2',
+             15,
+             0,
              'Y');
 
 INSERT INTO CUSTOMER_REGISTRATION VALUES (4776, 'nl_NL', 'YBAANMELDEN:Struijk', NULL);
