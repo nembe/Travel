@@ -373,6 +373,11 @@ INSERT INTO TBLCONFIG VALUES ('TXM', 'reply_address', 'info@yellowbrick.nl', NUL
 INSERT INTO TBLCONFIG VALUES ('TXM', 'use_old_mail_impl', NULL, NULL, 'Taxameter Settings');
 INSERT INTO TBLCONFIG VALUES ('YB', 'DEFAULT_LOCALE', 'nl_NL', NULL, 'Internationaal');
 
+INSERT INTO TBLCONFIG (SECTION, FIELD, VALUE) VALUES('BW', 'sleeveOrderValidation.businessCust.maxAmount', '20');
+INSERT INTO TBLCONFIG (SECTION, FIELD, VALUE) VALUES('BW', 'sleeveOrderValidation.privateCust.maxAmount', '2');
+INSERT INTO TBLCONFIG (SECTION, FIELD, VALUE) VALUES('BW', 'qparkCardOrderValidation.businessCust.maxAmount', '20');
+INSERT INTO TBLCONFIG (SECTION, FIELD, VALUE) VALUES('BW', 'qparkCardOrderValidation.privateCust.maxAmount', '2');
+
 INSERT INTO CARDORDER VALUES (
              72031,
              TO_DATE ('12/23/2010 16:26:39', 'MM/DD/YYYY HH24:MI:SS'),

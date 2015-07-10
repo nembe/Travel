@@ -39,6 +39,14 @@ public class ConfigJdbcDao implements ConfigDao {
         }
     }
 
+    @Override
+    public Config mustFindSectionField(ConfigSection section, String field) {
+        return findSectionField(section, field).orElseThrow(() -> {
+            String errorMsg = String.format("Couldn't find config for section %s and field %s", section.name(), field);
+            return new IllegalStateException(errorMsg);
+        });
+    }
+
     private RowMapper<Config> rowMapper() {
         BeanPropertyRowMapper<Config> rowMapper = new BeanPropertyRowMapper<>(Config.class);
         rowMapper.setPrimitivesDefaultedForNullValue(true);

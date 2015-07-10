@@ -14,16 +14,16 @@ import static nl.yellowbrick.activation.validation.CardOrderValidator.AMOUNT_TOO
 import static nl.yellowbrick.data.dao.ConfigSection.BRICKWALL;
 
 @Component
-public class SleeveOrderValidator extends ClassValidator<CardOrder> {
+public class QParkCardOrderValidator extends ClassValidator<CardOrder> {
 
-    private static final String BUSINESS_CUST_MAX_AMOUNT = "sleeveOrderValidation.businessCust.maxAmount";
-    private static final String PRIVATE_CUST_MAX_AMOUNT = "sleeveOrderValidation.privateCust.maxAmount";
+    private static final String BUSINESS_CUST_MAX_AMOUNT = "qparkCardOrderValidation.businessCust.maxAmount";
+    private static final String PRIVATE_CUST_MAX_AMOUNT = "qparkCardOrderValidation.privateCust.maxAmount";
 
     private final ConfigDao configDao;
     private final CustomerDao customerDao;
 
     @Autowired
-    protected SleeveOrderValidator(ConfigDao configDao, CustomerDao customerDao) {
+    protected QParkCardOrderValidator(ConfigDao configDao, CustomerDao customerDao) {
         super(CardOrder.class);
 
         this.configDao = configDao;
@@ -32,7 +32,7 @@ public class SleeveOrderValidator extends ClassValidator<CardOrder> {
 
     @Override
     protected void doValidate(CardOrder order, Errors errors) {
-        if(order.getCardType() != CardType.SLEEVE)
+        if(order.getCardType() != CardType.QPARK_CARD)
             return;
 
         Customer customer = customerDao
