@@ -1,7 +1,7 @@
 package nl.yellowbrick.admin.controller;
 
 import nl.yellowbrick.activation.service.CardAssignmentService;
-import nl.yellowbrick.activation.service.CardOrderValidationService;
+import nl.yellowbrick.activation.service.OrderValidationService;
 import nl.yellowbrick.activation.validation.UnboundErrors;
 import nl.yellowbrick.admin.exceptions.InconsistentDataException;
 import nl.yellowbrick.admin.exceptions.ResourceNotFoundException;
@@ -41,7 +41,7 @@ public class CardProvisioningFormController {
     private CardAssignmentService cardAssignmentService;
 
     @Autowired
-    private CardOrderValidationService validationService;
+    private OrderValidationService validationService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String showValidationForm(ModelMap model,

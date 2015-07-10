@@ -2,7 +2,7 @@ package nl.yellowbrick.activation.task;
 
 import nl.yellowbrick.activation.service.AdminNotificationService;
 import nl.yellowbrick.activation.service.CardAssignmentService;
-import nl.yellowbrick.activation.service.CardOrderValidationService;
+import nl.yellowbrick.activation.service.OrderValidationService;
 import nl.yellowbrick.activation.validation.UnboundErrors;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
@@ -15,20 +15,22 @@ import org.springframework.validation.Errors;
 import java.util.Arrays;
 
 import static nl.yellowbrick.data.domain.CardOrderStatus.INSERTED;
+import static nl.yellowbrick.data.domain.CardType.SLEEVE;
 import static nl.yellowbrick.data.domain.CardType.TRANSPONDER_CARD;
 import static org.mockito.Mockito.*;
 
-public class CardOrderValidationTaskTest {
+public class OrderValidationTaskTest {
 
-    CardOrderValidationTask cardOrderValidationTask;
+    OrderValidationTask orderValidationTask;
 
     CardOrderDao cardOrderDao;
     CardAssignmentService cardAssignmentService;
-    CardOrderValidationService validationService;
+    OrderValidationService validationService;
     AdminNotificationService notificationService;
 
     CardOrder order;
     CardOrder nonPhysicalOrder;
+    CardOrder sleeveOrder;
 
     @Before
     public void setUp() {
@@ -40,16 +42,22 @@ public class CardOrderValidationTaskTest {
         nonPhysicalOrder.setCardType(TRANSPONDER_CARD);
         nonPhysicalOrder.setExport(false);
 
+        sleeveOrder = new CardOrder();
+        sleeveOrder.setCardType(SLEEVE);
+
         cardOrderDao = mock(CardOrderDao.class);
 
         when(cardOrderDao.findByStatusAndType(INSERTED, TRANSPONDER_CARD))
                 .thenReturn(Arrays.asList(order, nonPhysicalOrder));
 
+        when(cardOrderDao.findByStatusAndType(INSERTED, SLEEVE))
+                .thenReturn(Arrays.asList(sleeveOrder));
+
         cardAssignmentService = mock(CardAssignmentService.class);
-        validationService = mock(CardOrderValidationService.class);
+        validationService = mock(OrderValidationService.class);
         notificationService = mock(AdminNotificationService.class);
 
-        cardOrderValidationTask = new CardOrderValidationTask(
+        orderValidationTask = new OrderValidationTask(
                 cardOrderDao, cardAssignmentService, validationService, notificationService);
     }
 
@@ -58,8 +66,8 @@ public class CardOrderValidationTaskTest {
         when(validationService.validate(any())).thenReturn(someError());
 
         // try to validate all kinds of orders
-        cardOrderValidationTask.validatePendingNonPhysicalCardOrders();
-        cardOrderValidationTask.validatePendingPhysicalCardOrders();
+        orderValidationTask.validatePendingNonPhysicalCardOrders();
+        orderValidationTask.validatePendingPhysicalCardOrders();
 
         verify(cardOrderDao, never()).validateCardOrder(any());
         verifyZeroInteractions(cardAssignmentService);
@@ -69,7 +77,7 @@ public class CardOrderValidationTaskTest {
     public void validates_non_physical_card_orders() {
         when(validationService.validate(any())).thenReturn(emptyErrors());
 
-        cardOrderValidationTask.validatePendingNonPhysicalCardOrders();
+        orderValidationTask.validatePendingNonPhysicalCardOrders();
 
         verify(cardOrderDao, times(1)).validateCardOrder(any());
         verify(cardOrderDao).validateCardOrder(nonPhysicalOrder);
@@ -80,7 +88,7 @@ public class CardOrderValidationTaskTest {
     public void validates_physical_card_orders() {
         when(validationService.validate(any())).thenReturn(emptyErrors());
 
-        cardOrderValidationTask.validatePendingPhysicalCardOrders();
+        orderValidationTask.validatePendingPhysicalCardOrders();
 
         verify(cardOrderDao, times(1)).validateCardOrder(any());
         verify(cardOrderDao).validateCardOrder(order);
@@ -94,10 +102,22 @@ public class CardOrderValidationTaskTest {
         doThrow(new ExhaustedCardPoolException(new Customer()))
                 .when(cardAssignmentService).assignTransponderCard(order);
 
-        cardOrderValidationTask.validatePendingPhysicalCardOrders();
+        orderValidationTask.validatePendingPhysicalCardOrders();
 
         // check that admin is notified
         verify(notificationService).notifyCardPoolExhausted(anyLong());
+    }
+
+    @Test
+    public void validates_sleeve_orders() {
+        when(validationService.validate(any())).thenReturn(emptyErrors());
+
+        orderValidationTask.validatePendingSleeveOrders();
+
+        verify(cardOrderDao, times(1)).validateCardOrder(any());
+        verify(cardOrderDao).validateCardOrder(sleeveOrder);
+
+        verifyZeroInteractions(cardAssignmentService);
     }
 
     private Errors emptyErrors() {

@@ -2,7 +2,7 @@ package nl.yellowbrick.activation.task;
 
 import nl.yellowbrick.activation.service.AdminNotificationService;
 import nl.yellowbrick.activation.service.CardAssignmentService;
-import nl.yellowbrick.activation.service.CardOrderValidationService;
+import nl.yellowbrick.activation.service.OrderValidationService;
 import nl.yellowbrick.data.dao.CardOrderDao;
 import nl.yellowbrick.data.domain.CardOrder;
 import nl.yellowbrick.data.domain.CardOrderStatus;
@@ -17,20 +17,20 @@ import org.springframework.validation.Errors;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CardOrderValidationTask {
+public class OrderValidationTask {
 
-    private static final Logger log = LoggerFactory.getLogger(CardOrderValidationTask.class);
+    private static final Logger log = LoggerFactory.getLogger(OrderValidationTask.class);
 
     private final CardOrderDao cardOrderDao;
     private final CardAssignmentService cardAssignmentService;
-    private final CardOrderValidationService validationService;
+    private final OrderValidationService validationService;
     private final AdminNotificationService notificationService;
 
     @Autowired
-    public CardOrderValidationTask(CardOrderDao cardOrderDao,
-                                   CardAssignmentService cardAssignmentService,
-                                   CardOrderValidationService validationService,
-                                   AdminNotificationService notificationService
+    public OrderValidationTask(CardOrderDao cardOrderDao,
+                               CardAssignmentService cardAssignmentService,
+                               OrderValidationService validationService,
+                               AdminNotificationService notificationService
     ) {
         this.cardOrderDao = cardOrderDao;
         this.cardAssignmentService = cardAssignmentService;
@@ -42,7 +42,7 @@ public class CardOrderValidationTask {
     public void validatePendingNonPhysicalCardOrders() {
         log.debug("starting validatePendingNonPhysicalCardOrders");
 
-        List<CardOrder> orders = insertedOrders();
+        List<CardOrder> orders = insertedOrders(CardType.TRANSPONDER_CARD);
         List<CardOrder> nonPhysicalOrders = orders.stream()
                 .filter(order -> !order.isExport())
                 .filter(this::passesValidation)
@@ -51,14 +51,14 @@ public class CardOrderValidationTask {
         log.info("processing {} non physical card orders out of a total of {} card orders",
                 nonPhysicalOrders.size(), orders.size());
 
-        nonPhysicalOrders.forEach(this::validateAndProcessOrder);
+        nonPhysicalOrders.forEach(this::validateAndProcessCardOrder);
     }
 
     @Scheduled(cron = "${tasks.transpondercard-validation-cron}")
     public void validatePendingPhysicalCardOrders() {
         log.debug("starting validatePendingNonPhysicalCardOrders");
 
-        List<CardOrder> orders = insertedOrders();
+        List<CardOrder> orders = insertedOrders(CardType.TRANSPONDER_CARD);
         List<CardOrder> physicalOrders = orders.stream()
                 .filter(CardOrder::isExport)
                 .filter(this::passesValidation)
@@ -67,7 +67,22 @@ public class CardOrderValidationTask {
         log.info("processing {} physical card orders out of a total of {} card orders",
                 physicalOrders.size(), orders.size());
 
-        physicalOrders.forEach(this::validateAndProcessOrder);
+        physicalOrders.forEach(this::validateAndProcessCardOrder);
+    }
+
+    @Scheduled(cron = "${tasks.sleeve-validation-cron}")
+    public void validatePendingSleeveOrders() {
+        log.debug("starting validatePendingSleeveOrders");
+
+        List<CardOrder> sleeveOrders = insertedOrders(CardType.SLEEVE);
+        List<CardOrder> validSleeveOrders = sleeveOrders.stream()
+                .filter(this::passesValidation)
+                .collect(Collectors.toList());
+
+        log.info("processing {} sleeve orders out of a total of {} sleeve orders",
+                validSleeveOrders.size(), sleeveOrders.size());
+
+        sleeveOrders.forEach(this::validateAndProcessSleeveOrder);
     }
 
     private boolean passesValidation(CardOrder order) {
@@ -80,11 +95,15 @@ public class CardOrderValidationTask {
         return true;
     }
 
-    private List<CardOrder> insertedOrders() {
-        return cardOrderDao.findByStatusAndType(CardOrderStatus.INSERTED, CardType.TRANSPONDER_CARD);
+    private List<CardOrder> insertedOrders(CardType cardType) {
+        return cardOrderDao.findByStatusAndType(CardOrderStatus.INSERTED, cardType);
     }
 
-    private void validateAndProcessOrder(CardOrder order) {
+    private void validateAndProcessSleeveOrder(CardOrder order) {
+        cardOrderDao.validateCardOrder(order);
+    }
+
+    private void validateAndProcessCardOrder(CardOrder order) {
         try {
             cardAssignmentService.assignTransponderCard(order);
             cardOrderDao.validateCardOrder(order);
