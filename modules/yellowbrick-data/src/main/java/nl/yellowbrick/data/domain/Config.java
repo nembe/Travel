@@ -13,7 +13,6 @@ public class Config {
     private String section;
     private String title;
 
-
     public String getField() {
         return field;
     }
@@ -28,6 +27,10 @@ public class Config {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public int getValueAsInt() {
+        return Integer.parseInt(value);
     }
 
     public String getDescription() {

@@ -15,8 +15,7 @@ import org.springframework.validation.Errors;
 import java.util.Arrays;
 
 import static nl.yellowbrick.data.domain.CardOrderStatus.INSERTED;
-import static nl.yellowbrick.data.domain.CardType.SLEEVE;
-import static nl.yellowbrick.data.domain.CardType.TRANSPONDER_CARD;
+import static nl.yellowbrick.data.domain.CardType.*;
 import static org.mockito.Mockito.*;
 
 public class OrderValidationTaskTest {
@@ -31,19 +30,19 @@ public class OrderValidationTaskTest {
     CardOrder order;
     CardOrder nonPhysicalOrder;
     CardOrder sleeveOrder;
+    CardOrder qparkCardOrder;
 
     @Before
     public void setUp() {
-        order = new CardOrder();
+        order = new CardOrder(TRANSPONDER_CARD);
         order.setCardType(TRANSPONDER_CARD);
         order.setExport(true);
 
-        nonPhysicalOrder = new CardOrder();
-        nonPhysicalOrder.setCardType(TRANSPONDER_CARD);
+        nonPhysicalOrder = new CardOrder(TRANSPONDER_CARD);
         nonPhysicalOrder.setExport(false);
 
-        sleeveOrder = new CardOrder();
-        sleeveOrder.setCardType(SLEEVE);
+        sleeveOrder = new CardOrder(SLEEVE);
+        qparkCardOrder = new CardOrder(QPARK_CARD);
 
         cardOrderDao = mock(CardOrderDao.class);
 
@@ -52,6 +51,9 @@ public class OrderValidationTaskTest {
 
         when(cardOrderDao.findByStatusAndType(INSERTED, SLEEVE))
                 .thenReturn(Arrays.asList(sleeveOrder));
+
+        when(cardOrderDao.findByStatusAndType(INSERTED, QPARK_CARD))
+                .thenReturn(Arrays.asList(qparkCardOrder));
 
         cardAssignmentService = mock(CardAssignmentService.class);
         validationService = mock(OrderValidationService.class);
@@ -116,6 +118,18 @@ public class OrderValidationTaskTest {
 
         verify(cardOrderDao, times(1)).validateCardOrder(any());
         verify(cardOrderDao).validateCardOrder(sleeveOrder);
+
+        verifyZeroInteractions(cardAssignmentService);
+    }
+
+    @Test
+    public void validates_qpark_card_orders() {
+        when(validationService.validate(any())).thenReturn(emptyErrors());
+
+        orderValidationTask.validatePendingQParkCardOrders();
+
+        verify(cardOrderDao, times(1)).validateCardOrder(any());
+        verify(cardOrderDao).validateCardOrder(qparkCardOrder);
 
         verifyZeroInteractions(cardAssignmentService);
     }

@@ -51,7 +51,7 @@ public class OrderValidationTask {
         log.info("processing {} non physical card orders out of a total of {} card orders",
                 nonPhysicalOrders.size(), orders.size());
 
-        nonPhysicalOrders.forEach(this::validateAndProcessCardOrder);
+        nonPhysicalOrders.forEach(this::validateAndProcessTransponderCardOrder);
     }
 
     @Scheduled(cron = "${tasks.transpondercard-validation-cron}")
@@ -67,7 +67,7 @@ public class OrderValidationTask {
         log.info("processing {} physical card orders out of a total of {} card orders",
                 physicalOrders.size(), orders.size());
 
-        physicalOrders.forEach(this::validateAndProcessCardOrder);
+        physicalOrders.forEach(this::validateAndProcessTransponderCardOrder);
     }
 
     @Scheduled(cron = "${tasks.sleeve-validation-cron}")
@@ -82,7 +82,22 @@ public class OrderValidationTask {
         log.info("processing {} sleeve orders out of a total of {} sleeve orders",
                 validSleeveOrders.size(), sleeveOrders.size());
 
-        sleeveOrders.forEach(this::validateAndProcessSleeveOrder);
+        sleeveOrders.forEach(cardOrderDao::validateCardOrder);
+    }
+
+    @Scheduled(cron = "${tasks.qparkcard-validation-cron}")
+    public void validatePendingQParkCardOrders() {
+        log.debug("starting validatePendingQParkCardOrders");
+
+        List<CardOrder> orders = insertedOrders(CardType.QPARK_CARD);
+        List<CardOrder> validOrders = orders.stream()
+                .filter(this::passesValidation)
+                .collect(Collectors.toList());
+
+        log.info("processing {} qpark card orders out of a total of {} orders",
+                validOrders.size(), orders.size());
+
+        orders.forEach(cardOrderDao::validateCardOrder);
     }
 
     private boolean passesValidation(CardOrder order) {
@@ -99,11 +114,7 @@ public class OrderValidationTask {
         return cardOrderDao.findByStatusAndType(CardOrderStatus.INSERTED, cardType);
     }
 
-    private void validateAndProcessSleeveOrder(CardOrder order) {
-        cardOrderDao.validateCardOrder(order);
-    }
-
-    private void validateAndProcessCardOrder(CardOrder order) {
+        private void validateAndProcessTransponderCardOrder(CardOrder order) {
         try {
             cardAssignmentService.assignTransponderCard(order);
             cardOrderDao.validateCardOrder(order);

@@ -16,6 +16,13 @@ public class CardOrder {
     private double pricePerCard;
     private boolean export;
 
+    public CardOrder() {
+    }
+
+    public CardOrder(CardType cardType) {
+        this.cardType = cardType;
+    }
+
     public double totalCost() {
         return pricePerCard * amount;
     }
