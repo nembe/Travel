@@ -136,6 +136,7 @@ public class WelcomeLetterCsvExporter {
             CsvSchema schema = mapper.schemaFor(CardOrderExportRecord.class)
                     .withHeader()
                     .withoutQuoteChar()
+                    .withLineSeparator(System.lineSeparator())
                     .withColumnSeparator(SEPARATOR);
 
             writer = mapper.writer(schema);

@@ -75,7 +75,7 @@ public class SleeveOrderExportServiceIntegrationTest extends BaseMvcTestCase {
     }
 
     private String fileFromClasspath(String filename) throws Exception {
-        InputStream stream = getClass().getClassLoader().getResourceAsStream(filename);
-        return CharStreams.toString(new InputStreamReader(stream));
+        File file = new File(getClass().getClassLoader().getResource(filename).toURI());
+        return readFile(file);
     }
 }
