@@ -186,6 +186,9 @@
                     </plugin>
                 </plugins>
             </build>
+            <properties>
+                <tmp.dir>/tmp</tmp.dir>
+            </properties>
         </profile>
 
         <!-- windows specific plugin executions -->
@@ -232,6 +235,9 @@
                     </plugin>
                 </plugins>
             </build>
+            <properties>
+                <tmp.dir>${env.TEMP}</tmp.dir>
+            </properties>
         </profile>
     </profiles>
 

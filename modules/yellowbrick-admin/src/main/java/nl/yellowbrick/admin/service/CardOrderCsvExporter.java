@@ -64,6 +64,7 @@ public class CardOrderCsvExporter {
             CsvSchema csvSchema = csvMapper.schemaFor(CardOrderExportRecord.class)
                     .withHeader()
                     .withoutQuoteChar()
+                    .withLineSeparator(System.lineSeparator())
                     .withColumnSeparator(SEPARATOR);
 
             LOG.info("writing card order export for product group {} with {} items to file {}",

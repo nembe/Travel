@@ -52,6 +52,7 @@ public class SleeveOrderCsvExporter {
             CsvSchema csvSchema = csvMapper.schemaFor(SleeveOrderExportRecord.class)
                     .withHeader()
                     .withoutQuoteChar()
+                    .withLineSeparator(System.lineSeparator())
                     .withColumnSeparator(SEPARATOR);
 
             LOG.info("writing sleeve order export with {} items to file {}", exports.size(), path.toString());

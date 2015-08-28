@@ -18,7 +18,7 @@ ldap:
   password: ldap_user
 
 orderexport:
-  path: /tmp
+  path: ${tmp.dir}
   # schedule card order export per product group
   # numeric key corresponds to product group id
   schedule:
@@ -27,11 +27,11 @@ orderexport:
     3: 0 0 6 1/1 * ?
 
 sleeveexport:
-  path: /tmp/sleeve_exports
+  path: ${tmp.dir}/sleeve_exports
   schedule: 0 0 6 1/1 * ?
 
 welcomeLetterExport:
-  path: /tmp
+  path: ${tmp.dir}
 
 ordervalidation:
   thresholds:
