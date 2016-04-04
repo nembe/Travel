@@ -1,8 +1,8 @@
 datasource:
   driverClassName: oracle.jdbc.OracleDriver
-  url: jdbc:oracle:thin:@yb-oradev:1521:orcl
-  username: dev_nl_brickparking
-  password: dev_nl_brickparking
+  url: jdbc:oracle:thin:@10.30.101.116:1521:orcdev
+  username: DEV_NL_BRICKPARKING
+  password: DEV_NL_BRICKPARKING
 
 spring:
   thymeleaf:
