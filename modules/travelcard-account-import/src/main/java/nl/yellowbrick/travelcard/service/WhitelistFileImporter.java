@@ -106,7 +106,7 @@ public class WhitelistFileImporter implements WhitelistFileWatchListener {
         }
 
         if(!systemUserDao.existsAppUserForCard(card.getId()))
-            systemUserDao.createAppUser(card, username(entry), password(entry), UserAccountType.RESTRICTED_SUBACCOUNT);
+            systemUserDao.createAppUser(card, username(entry), password(entry), UserAccountType.APPLOGIN);
     }
 
     private void checkDoneDirectory() throws IOException {
