@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static nl.yellowbrick.data.domain.UserAccountType.RESTRICTED_SUBACCOUNT;
+import static nl.yellowbrick.data.domain.UserAccountType.APPLOGIN;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -136,7 +136,7 @@ public class WhitelistFileImporterTest {
         inOrder.verify(importDao).markAllAsObsolete();
         inOrder.verify(cardBindingService).assignActiveTransponderCard(expectedEntry);
         inOrder.verify(importDao).createEntry(expectedEntry);
-        inOrder.verify(systemUserDao).createAppUser(EXAMPLE_CARD, expectedUsername, expectedPassword, RESTRICTED_SUBACCOUNT);
+        inOrder.verify(systemUserDao).createAppUser(EXAMPLE_CARD, expectedUsername, expectedPassword, APPLOGIN);
         inOrder.verify(importDao).deleteAllObsolete();
     }
 
