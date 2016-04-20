@@ -1,0 +1,91 @@
+.section {
+  background-color: #F4F5F8;
+  padding: 20px 10px;
+  margin-bottom: 18px;
+  position: static;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.field {
+  padding: 3px;
+  line-height: 22px;
+}
+
+.field input {
+  display: inline-block;
+}
+
+.field input[disabled] {
+  background-color: #F4F5F8;
+  padding: 0;
+}
+.field input[disabled].field-error {
+  padding: 5px 10px;
+}
+
+.field-label {
+  display: inline-block;
+  width: 200px;
+}
+
+input.field-error {
+  border: 2px solid #f00;
+}
+
+span.field-error {
+  color: #f00;
+  display: block;
+  text-align: right;
+}
+
+.global-errors {
+  background-color: #c44117;
+  color: white;
+  position: relative;
+  top: 0px;
+}
+.global-errors .content-error {
+  margin-left: 50px;
+  margin-top: -10px;
+}
+
+input[type='submit'], .input {
+  margin-right: 10px;
+}
+
+input, .input {
+  padding: 5px 10px;
+  border: none;
+  background-color: white;
+  color: #515B6D;
+  text-decoration: none;
+}
+
+a.input {
+  color: #515B6D;
+  text-decoration: none;
+}
+a.input:hover {
+  text-decoration: none;
+}
+
+input[type='text'] {
+  width: 300px;
+  height: 50px;
+}
+
+input[type=radio] {
+  display: inline-block;
+  width: 0.875em;
+  height: 0.875em;
+  margin: 0.25em 0.5em 0.25em 0.25em;
+  border: 0.0625em solid silver;
+  border-radius: 0.25em;
+  background: #e0e0e0;
+}
+
+.clear {
+  clear: both;
+  padding: 10px 3px;
+}
